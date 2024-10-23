@@ -1,6 +1,6 @@
 import axiosInstance from "@/core/axios/axios-instance";
 
-type HttpMethod = 'get' | 'post' | 'put' | 'delete';
+type HttpMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
 class Base {
     async execute(options: { method: HttpMethod; url: string; data?: any; params?: any }) {
@@ -29,8 +29,12 @@ class Base {
         return this.execute({ method: 'put', url, data });
     }
 
-    async delete(url: string, data: any) {
-        return this.execute({ method: 'delete', url });
+    async delete(url: string, data?: any) {
+        return this.execute({ method: 'delete', url, data });
+    }
+
+    async patch(url: string, data: any) {
+        return this.execute({ method: 'patch', url, data });
     }
 }
 

@@ -12,9 +12,11 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fontsource/roboto": "^5.1.0",
-    "@mui/icons-material": "^6.1.4",
-    "@mui/material": "^6.1.4",
+    "@mui/icons-material": "^6.1.5",
+    "@mui/material": "^6.1.5",
+    "@toolpad/core": "^0.8.1",
     "axios": "^1.7.7",
+    "newman": "^6.2.1",
     "next": "14.2.15",
     "react": "^18",
     "react-dom": "^18",
@@ -24,6 +26,9 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
     "typescript": "^5"
   }
 }

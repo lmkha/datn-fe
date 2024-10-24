@@ -3,6 +3,7 @@
 import { Button, TextField, Typography, Checkbox, FormControlLabel, Box } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
+import Password from './password';
 
 export default function LoginForm() {
     return (
@@ -35,23 +36,15 @@ export default function LoginForm() {
                     color: 'black',
                 },
             }} />
-            <TextField label="Password" variant="outlined" type="password" fullWidth sx={{
-                '& .MuiOutlinedInput-root': {
-                    borderRadius: 3,
-                    '&:hover fieldset': {
-                        borderColor: 'black',
-                    },
-                    '&.Mui-focused fieldset': {
-                        borderColor: 'black',
-                    },
-                },
-                '& .MuiInputLabel-root': {
-                    color: 'black',
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'black',
-                },
-            }} />
+
+            <Password
+                showPassword={false}
+                isError={false}
+                helperText=''
+                onChange={() => { }}
+                validatePassword={() => { }}
+                onChangeShowPassword={() => { }}
+            />
 
             <FormControlLabel
                 control={<Checkbox />}

@@ -13,8 +13,8 @@ export default function Page() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: 'black',
                 overflow: 'hidden',
+                background: 'linear-gradient(135deg, #EA284E, #F5A7C5, #FF6F61)'
             }}
         >
             <Grid2 container sx={{
@@ -22,6 +22,7 @@ export default function Page() {
                 height: '95%',
                 width: '70%',
                 borderRadius: 4,
+                border: '1px solid #e0e0e0',
             }}>
                 <Grid2 size={6} sx={{
                     padding: 2,

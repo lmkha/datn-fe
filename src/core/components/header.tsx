@@ -37,6 +37,7 @@ export default function Header() {
                 width: '100%',
                 justifyContent: 'center',
                 alignItems: 'center',
+                backgroundColor: 'white',
             }}>
                 <Grid2 size={1}>
                     <Stack direction={'row'} sx={{ justifyContent: 'center', alignItems: 'center' }}>

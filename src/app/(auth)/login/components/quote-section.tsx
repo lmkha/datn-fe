@@ -7,7 +7,7 @@ export default function QuoteSection() {
         <Box
             sx={{
                 height: '100%',
-                backgroundImage: `url('/images/homepage-background.jpg')`,
+                backgroundImage: `url('/images/login-bg.jpg')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 color: 'white',

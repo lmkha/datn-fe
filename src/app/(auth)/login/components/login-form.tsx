@@ -18,22 +18,62 @@ export default function LoginForm() {
                 Enter your email and password to access your account
             </Typography>
 
-            <TextField label="Email" variant="outlined" fullWidth />
-            <TextField label="Password" variant="outlined" type="password" fullWidth />
+            <TextField label="Email" variant="outlined" fullWidth sx={{
+                '& .MuiOutlinedInput-root': {
+                    borderRadius: 3,
+                    '&:hover fieldset': {
+                        borderColor: 'black',
+                    },
+                    '&.Mui-focused fieldset': {
+                        borderColor: 'black',
+                    },
+                },
+                '& .MuiInputLabel-root': {
+                    color: 'black',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                    color: 'black',
+                },
+            }} />
+            <TextField label="Password" variant="outlined" type="password" fullWidth sx={{
+                '& .MuiOutlinedInput-root': {
+                    borderRadius: 3,
+                    '&:hover fieldset': {
+                        borderColor: 'black',
+                    },
+                    '&.Mui-focused fieldset': {
+                        borderColor: 'black',
+                    },
+                },
+                '& .MuiInputLabel-root': {
+                    color: 'black',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                    color: 'black',
+                },
+            }} />
 
             <FormControlLabel
                 control={<Checkbox />}
                 label="Remember me"
                 sx={{ alignSelf: 'flex-start' }}
             />
-            <Button variant="contained" fullWidth sx={{ mt: 2, mb: 2 }}>Sign In</Button>
+            <Button variant="contained" fullWidth sx={{
+                mt: 2, mb: 2,
+                textTransform: 'none',
+                backgroundColor: '#EA284E',
+            }}>Sign In</Button>
 
-            <Button startIcon={<GoogleIcon />} variant="outlined" fullWidth>
+            <Button startIcon={<GoogleIcon />} variant="outlined" fullWidth sx={{
+                textTransform: 'none',
+                borderColor: '#EA284E',
+                color: '#EA284E',
+            }}>
                 Sign In with Google
             </Button>
 
             <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                Don't have an account? <Link href="/signup">Sign Up</Link>
+                Don't have an account? <Link href="/signup" className='font-bold'>Sign up</Link>
             </Typography>
         </Box>
     );

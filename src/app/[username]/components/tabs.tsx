@@ -1,37 +1,66 @@
-'use client';
+import { useState } from 'react';
+import { Box, Tabs, Tab } from '@mui/material';
 
-import * as React from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
+export type Tab = 'videos' | 'playlists' | 'liked';
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
+interface TabsProps {
+    onTabChange?: (tab: Tab) => void;
 }
 
-function a11yProps(index: number) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
-export default function MyTabs() {
-    const [value, setValue] = React.useState(0);
+export default function MyTabs({ onTabChange }: TabsProps) {
+    const [value, setValue] = useState<number>(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
+        if (onTabChange) {
+            const selectedTab = newValue === 0 ? 'videos' : newValue === 1 ? 'playlists' : 'liked';
+            onTabChange(selectedTab);
+        }
     };
 
     return (
         <Box sx={{ width: '100%' }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="Videos" {...a11yProps(0)} sx={{ textTransform: 'none' }} />
-                    <Tab label="Playlists" {...a11yProps(1)} sx={{ textTransform: 'none' }} />
-                    <Tab label="Liked" {...a11yProps(2)} sx={{ textTransform: 'none' }} />
+            <Box>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    aria-label="basic tabs example"
+                    TabIndicatorProps={{
+                        style: {
+                            backgroundColor: 'black',
+                        },
+                    }}
+                >
+                    <Tab
+                        label="Videos"
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: 'medium',
+                            '&.Mui-selected': {
+                                color: 'black',
+                            },
+                        }}
+                    />
+                    <Tab
+                        label="Playlists"
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: 'medium',
+                            '&.Mui-selected': {
+                                color: 'black',
+                            },
+                        }}
+                    />
+                    <Tab
+                        label="Liked"
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: 'medium',
+                            '&.Mui-selected': {
+                                color: 'black',
+                            },
+                        }}
+                    />
                 </Tabs>
             </Box>
         </Box>

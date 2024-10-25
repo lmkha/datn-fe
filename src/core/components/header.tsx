@@ -14,6 +14,10 @@ import {
     Button,
     Box,
     Drawer,
+    Popper,
+    Paper,
+    List,
+    ListItem,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useState, MouseEvent } from 'react';
@@ -24,7 +28,14 @@ import AddIcon from '@mui/icons-material/Add';
 import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 
-export default function Header() {
+interface HeaderProps {
+    onOpenDrawerChange?: () => void;
+    onSearch?: (query: string) => void;
+    onUpload?: () => void;
+    onNotification?: () => void;
+}
+
+export default function Header({ onOpenDrawerChange: onOpenDrawer, onSearch, onUpload, onNotification }: HeaderProps) {
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     const toggleDrawer = (open: boolean) => () => {
@@ -41,7 +52,13 @@ export default function Header() {
             }}>
                 <Grid2 size={1}>
                     <Stack direction={'row'} sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <DrawerControl toggleDrawer={toggleDrawer} />
+                        {/* <DrawerControl toggleDrawer={toggleDrawer} /> */}
+
+                        {/* Use fixed drawer */}
+                        <IconButton onClick={onOpenDrawer}>
+                            <MenuIcon />
+                        </IconButton>
+
                         <WebIcon />
                     </Stack>
                 </Grid2>
@@ -199,33 +216,102 @@ function Account() {
     )
 }
 
+// function Search() {
+//     return (
+//         <TextField
+//             size="small"
+//             sx={{
+//                 width: '50%',
+//                 '& .MuiOutlinedInput-root': {
+//                     borderRadius: 10,
+//                     '&:hover fieldset': {
+//                         borderColor: 'black',
+//                     },
+//                     '&.Mui-focused fieldset': {
+//                         borderColor: '#EA284E',
+//                     },
+//                 },
+//             }}
+//             slotProps={{
+//                 input: {
+//                     endAdornment: (
+//                         <InputAdornment position="end">
+//                             <IconButton>
+//                                 <SearchIcon />
+//                             </IconButton>
+//                         </InputAdornment>
+//                     )
+//                 }
+//             }}
+//         />
+//     );
+// }
+
 function Search() {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [inputValue, setInputValue] = useState<string>('');
+    const [open, setOpen] = useState<boolean>(false);
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setInputValue(value);
+
+        if (value.trim()) {
+            setAnchorEl(event.currentTarget); // Set the TextField as anchor
+            setOpen(true); // Show Popper when there's input
+        } else {
+            setOpen(false); // Hide Popper when input is empty
+        }
+    };
+
     return (
-        <TextField
-            size="small"
-            sx={{
-                width: '50%',
-                '& .MuiOutlinedInput-root': {
-                    borderRadius: 10,
-                    '&:hover fieldset': {
-                        borderColor: 'black',
+        <>
+            <TextField
+                size="small"
+                value={inputValue}
+                onChange={handleInputChange}
+                sx={{
+                    width: '50%',
+                    '& .MuiOutlinedInput-root': {
+                        borderRadius: 10,
+                        '&:hover fieldset': {
+                            borderColor: 'black',
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#EA284E',
+                        },
                     },
-                    '&.Mui-focused fieldset': {
-                        borderColor: '#EA284E',
-                    },
-                },
-            }}
-            slotProps={{
-                input: {
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <IconButton>
-                                <SearchIcon />
-                            </IconButton>
-                        </InputAdornment>
-                    )
-                }
-            }}
-        />
+                }}
+                slotProps={{
+                    input: {
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton>
+                                    <SearchIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        )
+                    }
+                }}
+            />
+
+            {/* Popper below the search field */}
+            <Popper open={open} anchorEl={anchorEl} placement="bottom-start" style={{ width: anchorEl?.offsetWidth }}>
+                <Paper elevation={3} sx={{ borderRadius: 3 }}>
+                    <List>
+                        <ListItem>Search suggestion 1</ListItem>
+                        <ListItem>Search suggestion 2</ListItem>
+                        <ListItem>Search suggestion 3</ListItem>
+                        <ListItem>Search suggestion 4</ListItem>
+                        <ListItem>Search suggestion 5</ListItem>
+                        <ListItem>Search suggestion 6</ListItem>
+                        <ListItem>Search suggestion 7</ListItem>
+                        <ListItem>Search suggestion 8</ListItem>
+                        <ListItem>Search suggestion 9</ListItem>
+                        <ListItem>Search suggestion 10</ListItem>
+                    </List>
+                </Paper>
+            </Popper>
+        </>
     );
 }

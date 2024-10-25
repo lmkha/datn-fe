@@ -19,7 +19,7 @@ export default function LoginForm() {
                 Enter your email and password to access your account
             </Typography>
 
-            <TextField label="Email" variant="outlined" fullWidth sx={{
+            <TextField label="Username" variant="outlined" fullWidth sx={{
                 '& .MuiOutlinedInput-root': {
                     borderRadius: 3,
                     '&:hover fieldset': {

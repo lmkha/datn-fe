@@ -1,15 +1,19 @@
 'use client';
 
 import Header from "@/core/components/header";
-import { Avatar, Box, Button, Divider, Grid2, IconButton, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Divider, Fade, Grid2, IconButton, Stack, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { IoIosShareAlt } from "react-icons/io";
-import MyTabs from "./components/tabs";
+import MyTabs, { Tab } from "./components/tabs";
 import Filter from "./components/filter";
+import { useState } from "react";
 
 export default function Profile() {
     const params = useParams();
+    const [openDrawer, setOpenDrawer] = useState<boolean>(true);
+    const [selectedTab, setSelectedTab] = useState<Tab>();
+
     return (
         <Box sx={{
             width: '100%',
@@ -24,26 +28,33 @@ export default function Profile() {
                 zIndex: 1000,
                 borderBottom: '1px solid lightgray',
             }}>
-                <Header />
+                <Header
+                    onOpenDrawerChange={() => setOpenDrawer(!openDrawer)}
+                />
             </Box>
             <Grid2 container direction={'row'} sx={{ height: '92%' }}>
                 {/* Drawer */}
-                <Grid2 size={2} sx={{
-                    borderRight: '1px solid lightgray',
-                }}>
+                <Box
+                    sx={{
+                        flexBasis: openDrawer ? '16.66%' : '0%', // Equivalent to Grid size={2} for a 12-column layout
+                        transition: 'flex-basis 0.3s ease', // Smooth transition on flex-basis
+                        overflow: 'hidden',
+                        borderRight: openDrawer ? '1px solid lightgray' : 'none',
+                    }}
+                >
                     <Stack direction={'column'} sx={{
                         width: '100%',
                         height: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        justifyContent: 'start',
+                        alignItems: 'start',
                     }}>
-                        <Typography variant={'h5'}>Manage Account</Typography>
+                        <Typography variant={'h5'}>Home</Typography>
                         <Typography variant={'h5'}>Following</Typography>
                     </Stack>
-                </Grid2>
+                </Box>
 
                 {/* Content */}
-                <Grid2 size={10} padding={1}>
+                <Grid2 size={10} padding={1} sx={{ flexGrow: 1 }}>
                     <Stack direction={'column'} spacing={2}>
                         {/* Section 1: Userinfo */}
                         <Grid2 container direction={'row'} spacing={20}>
@@ -84,12 +95,6 @@ export default function Profile() {
                                             textTransform: 'none',
                                             fontWeight: 'bold',
                                         }}>Edit Profile</Button>
-                                        {/* <Button variant={'contained'} sx={{
-                                            backgroundColor: 'lightgrey',
-                                            textTransform: 'none',
-                                            color: 'black',
-                                            fontWeight: 'bold',
-                                        }}>Promote post</Button> */}
                                         <Button variant="contained" sx={{
                                             minWidth: 'auto',
                                             display: 'flex',
@@ -135,9 +140,13 @@ export default function Profile() {
                         </Grid2>
 
                         {/* Section 2: Tabs, filter */}
-                        <Grid2 container direction={'row'}>
+                        <Grid2 container direction={'row'} sx={{
+                            borderBottom: '1px solid lightgray',
+                        }}>
                             <Grid2 size={6}>
-                                <MyTabs />
+                                <MyTabs
+                                    onTabChange={(tab: Tab) => setSelectedTab(tab)}
+                                />
                             </Grid2>
                             <Grid2 size={6} sx={{
                                 display: 'flex',
@@ -148,8 +157,87 @@ export default function Profile() {
                             </Grid2>
                         </Grid2>
 
-
                         {/* Section 3: Videos or playlists */}
+                        <Box >
+                            <Grid2 container spacing={4}>
+                                {
+                                    selectedTab === 'videos' ? (
+                                        [...Array(10)].map((_, index) => (
+                                            <Grid2
+                                                key={index}
+                                                minHeight={170}
+                                                size={{
+                                                    xs: 12,
+                                                    sm: 6,
+                                                    md: 4,
+                                                    lg: 4,
+                                                }}
+                                                sx={{
+                                                    backgroundColor: 'lightgray',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    borderRadius: 2,
+                                                }}
+                                            >
+                                                <Typography variant="h6" gutterBottom>
+                                                    Video {index + 1}
+                                                </Typography>
+                                            </Grid2>
+                                        ))
+                                    ) : selectedTab === 'playlists' ? (
+                                        [...Array(5)].map((_, index) => (
+                                            <Grid2
+                                                key={index}
+                                                minHeight={100}
+                                                size={{
+                                                    xs: 12,
+                                                    sm: 6,
+                                                    md: 4,
+                                                    lg: 6,
+                                                }}
+                                                sx={{
+                                                    backgroundColor: 'lightgray',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    borderRadius: 2,
+                                                }}
+                                            >
+                                                <Typography variant="h6" gutterBottom>
+                                                    Playlist {index + 1}
+                                                </Typography>
+                                            </Grid2>
+                                        ))
+                                    ) : (
+                                        // Liked videos
+                                        [...Array(10)].map((_, index) => (
+                                            <Grid2
+                                                key={index}
+                                                minHeight={170}
+                                                size={{
+                                                    xs: 12,
+                                                    sm: 6,
+                                                    md: 4,
+                                                    lg: 3,
+                                                }}
+                                                sx={{
+                                                    backgroundColor: 'lightgray',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    borderRadius: 2,
+                                                }}
+                                            >
+                                                <Typography variant="h6" gutterBottom>
+                                                    Liked video {index + 1}
+                                                </Typography>
+                                            </Grid2>
+                                        ))
+                                    )
+                                }
+                            </Grid2>
+                        </Box>
                     </Stack>
                 </Grid2>
             </Grid2>

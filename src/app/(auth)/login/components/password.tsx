@@ -42,9 +42,6 @@ export default function Password(
                         borderColor: 'black',
                     },
                 },
-                '& .MuiInputLabel-root': {
-                    color: 'black',
-                },
                 '& .MuiInputLabel-root.Mui-focused': {
                     color: 'black',
                 },

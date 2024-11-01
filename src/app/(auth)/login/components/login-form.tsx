@@ -4,8 +4,11 @@ import { Button, TextField, Typography, Checkbox, FormControlLabel, Box } from '
 import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
 import Password from './password';
+import { useState } from 'react';
 
 export default function LoginForm() {
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
         <Box sx={{
             width: '100%',
@@ -14,6 +17,8 @@ export default function LoginForm() {
             flexDirection: 'column',
             gap: 2,
         }}>
+            {/* Add Icon Here */}
+
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>Welcome to MeTube</Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
                 Enter your email and password to access your account
@@ -29,21 +34,18 @@ export default function LoginForm() {
                         borderColor: 'black',
                     },
                 },
-                '& .MuiInputLabel-root': {
-                    color: 'black',
-                },
                 '& .MuiInputLabel-root.Mui-focused': {
                     color: 'black',
                 },
             }} />
 
             <Password
-                showPassword={false}
+                showPassword={showPassword}
                 isError={false}
                 helperText=''
                 onChange={() => { }}
                 validatePassword={() => { }}
-                onChangeShowPassword={() => { }}
+                onChangeShowPassword={() => setShowPassword(!showPassword)}
             />
 
             <FormControlLabel
@@ -66,7 +68,19 @@ export default function LoginForm() {
             </Button>
 
             <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                Don't have an account? <Link href="/signup" className='font-bold'>Sign up</Link>
+                <Box display="flex" justifyContent="center" alignItems="center">
+                    Don’t have an account?&nbsp;
+                    <Link href="/signup">
+                        <Typography variant="body2" sx={{
+                            color: '#EA284E',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            '&:hover': { textDecoration: 'underline' }
+                        }}>
+                            Sign up
+                        </Typography>
+                    </Link>
+                </Box>
             </Typography>
         </Box>
     );

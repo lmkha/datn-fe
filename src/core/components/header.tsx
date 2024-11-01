@@ -216,37 +216,6 @@ function Account() {
     )
 }
 
-// function Search() {
-//     return (
-//         <TextField
-//             size="small"
-//             sx={{
-//                 width: '50%',
-//                 '& .MuiOutlinedInput-root': {
-//                     borderRadius: 10,
-//                     '&:hover fieldset': {
-//                         borderColor: 'black',
-//                     },
-//                     '&.Mui-focused fieldset': {
-//                         borderColor: '#EA284E',
-//                     },
-//                 },
-//             }}
-//             slotProps={{
-//                 input: {
-//                     endAdornment: (
-//                         <InputAdornment position="end">
-//                             <IconButton>
-//                                 <SearchIcon />
-//                             </IconButton>
-//                         </InputAdornment>
-//                     )
-//                 }
-//             }}
-//         />
-//     );
-// }
-
 function Search() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [inputValue, setInputValue] = useState<string>('');

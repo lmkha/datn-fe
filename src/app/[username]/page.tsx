@@ -1,13 +1,17 @@
 'use client';
 
 import Header from "@/core/components/header";
-import { Avatar, Box, Button, Divider, Fade, Grid2, IconButton, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Grid2, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { IoIosShareAlt } from "react-icons/io";
 import MyTabs, { Tab } from "./components/tabs";
 import Filter from "./components/filter";
 import { useState } from "react";
+import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
+import HomeIcon from '@mui/icons-material/Home';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import SendIcon from '@mui/icons-material/Send';
 
 export default function Profile() {
     const params = useParams();
@@ -36,25 +40,80 @@ export default function Profile() {
                 {/* Drawer */}
                 <Box
                     sx={{
-                        flexBasis: openDrawer ? '16.66%' : '0%', // Equivalent to Grid size={2} for a 12-column layout
-                        transition: 'flex-basis 0.3s ease', // Smooth transition on flex-basis
+                        position: 'fixed',
+                        top: 58, // Giả sử chiều cao của Header là 64px
+                        left: 0,
+                        width: openDrawer ? '16.66%' : '0%',
+                        height: 'calc(100% - 64px)', // Trừ đi chiều cao của Header
+                        transition: 'width 0.3s ease',
                         overflow: 'hidden',
                         borderRight: openDrawer ? '1px solid lightgray' : 'none',
+                        zIndex: 1200, // Đảm bảo Drawer nằm trên nội dung
+                        backgroundColor: 'white',
                     }}
                 >
-                    <Stack direction={'column'} sx={{
-                        width: '100%',
-                        height: '100%',
-                        justifyContent: 'start',
-                        alignItems: 'start',
-                    }}>
-                        <Typography variant={'h5'}>Home</Typography>
-                        <Typography variant={'h5'}>Following</Typography>
-                    </Stack>
+                    <MenuList sx={{ width: '100%' }}>
+                        <MenuItem sx={{ height: 50 }}>
+                            <ListItemIcon>
+                                <HomeIcon />
+                            </ListItemIcon>
+                            <ListItemText>
+                                For you
+                            </ListItemText>
+                        </MenuItem>
+
+                        <MenuItem>
+                            <ListItemIcon>
+                                <ExploreOutlinedIcon />
+                            </ListItemIcon>
+                            <ListItemText>
+                                Explore
+                            </ListItemText>
+                        </MenuItem>
+
+                        <MenuItem>
+                            <ListItemIcon>
+                                <PeopleAltIcon />
+                            </ListItemIcon>
+                            <ListItemText>
+                                Following
+                            </ListItemText>
+                        </MenuItem>
+
+                        <MenuItem>
+                            <ListItemIcon>
+                                <SendIcon />
+                            </ListItemIcon>
+                            <ListItemText>
+                                Messages
+                            </ListItemText>
+                        </MenuItem>
+
+                        <MenuItem>
+                            <ListItemIcon>
+                                <Avatar
+                                    src="/images/avatar.jpg"
+                                    alt="avatar"
+                                    sx={{
+                                        width: 25,
+                                        height: 25,
+                                    }}
+                                />
+                            </ListItemIcon>
+                            <ListItemText>
+                                Profile
+                            </ListItemText>
+                        </MenuItem>
+                    </MenuList>
                 </Box>
 
                 {/* Content */}
-                <Grid2 size={10} padding={1} sx={{ flexGrow: 1 }}>
+                <Box sx={{
+                    flexGrow: 1,
+                    marginLeft: openDrawer ? '16.66%' : '0%',
+                    transition: 'margin-left 0.3s ease',
+                    padding: 2,
+                }}>
                     <Stack direction={'column'} spacing={2}>
                         {/* Section 1: Userinfo */}
                         <Grid2 container direction={'row'} spacing={20}>
@@ -83,8 +142,12 @@ export default function Profile() {
                                     height: '100%',
                                     gap: 1,
                                 }}>
-                                    <Stack direction={'row'} spacing={2}>
-                                        <Typography>{params.username}</Typography>
+                                    {/* Username, profile name */}
+                                    <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                                        <Typography sx={{
+                                            fontWeight: 'bold',
+                                            fontSize: '1.5rem',
+                                        }}>{params.username}</Typography>
                                         <Typography>Le Minh Kha</Typography>
                                     </Stack>
 
@@ -134,6 +197,7 @@ export default function Profile() {
                                         </Stack>
                                     </Stack>
 
+                                    {/* Bio */}
                                     <Typography>I'm a the best developer!</Typography>
                                 </Box>
                             </Grid2>
@@ -239,7 +303,7 @@ export default function Profile() {
                             </Grid2>
                         </Box>
                     </Stack>
-                </Grid2>
+                </Box>
             </Grid2>
         </Box >
     );

@@ -5,9 +5,19 @@ import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
 import Password from './password';
 import { useState } from 'react';
+import { checkUsernameAvailable, login } from '@/services/login';
 
 export default function LoginForm() {
-    const [showPassword, setShowPassword] = useState(false);
+    const [username, setUsername] = useState<string>();
+    const [password, setPassword] = useState<string>();
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+
+    const handleLogin = () => {
+        username && password && login({
+            username: username,
+            password: password
+        });
+    };
 
     return (
         <Box sx={{
@@ -37,13 +47,15 @@ export default function LoginForm() {
                 '& .MuiInputLabel-root.Mui-focused': {
                     color: 'black',
                 },
-            }} />
+            }}
+                onChange={(e) => setUsername(e.target.value)}
+            />
 
             <Password
                 showPassword={showPassword}
                 isError={false}
                 helperText=''
-                onChange={() => { }}
+                onChange={(value) => { setPassword(value) }}
                 validatePassword={() => { }}
                 onChangeShowPassword={() => setShowPassword(!showPassword)}
             />
@@ -57,7 +69,9 @@ export default function LoginForm() {
                 mt: 2, mb: 2,
                 textTransform: 'none',
                 backgroundColor: '#EA284E',
-            }}>Sign In</Button>
+            }}
+                onClick={() => handleLogin()}
+            >Sign In</Button>
 
             <Button startIcon={<GoogleIcon />} variant="outlined" fullWidth sx={{
                 textTransform: 'none',

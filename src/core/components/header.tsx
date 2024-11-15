@@ -85,7 +85,6 @@ export default function Header({ onOpenDrawerChange: onOpenDrawer, onSearch, onU
     );
 }
 
-
 interface DrawerContentProps {
     anchor: 'left' | 'right' | 'top' | 'bottom';
     open: boolean;

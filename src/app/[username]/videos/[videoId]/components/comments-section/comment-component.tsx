@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Avatar, Box, IconButton, Stack, Typography } from "@mui/material";
@@ -7,11 +6,17 @@ import ThumbUpRoundedIcon from '@mui/icons-material/ThumbUpRounded';
 import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
 import ThumbDownRoundedIcon from '@mui/icons-material/ThumbDownRounded';
 import { useState } from "react";
+import { Comment } from "../../types";
 
-export default function CommentComponent() {
-    const [expanded, setExpanded] = useState(false);
+interface CommentProps {
+    comment?: Comment;
+    onLike?: () => void;
+    onDislike?: () => void;
+}
+export default function CommentComponent(props: CommentProps) {
     const [liked, setLiked] = useState(false);
     const [disliked, setDisliked] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
     return (
         <Stack direction={'row'} sx={{
@@ -40,10 +45,10 @@ export default function CommentComponent() {
             <Stack sx={{ overflowY: 'auto' }}>
                 <Stack direction={'row'} spacing={2} alignItems={'center'}>
                     <Typography variant="body1" fontWeight={'bold'}>
-                        lmkha
+                        {props?.comment?.username}
                     </Typography>
                     <Typography variant="body2">
-                        1 year ago
+                        {props?.comment?.createdAt}
                     </Typography>
                 </Stack>
                 <Typography
@@ -55,14 +60,12 @@ export default function CommentComponent() {
                         textOverflow: 'revert',
                         WebkitLineClamp: expanded ? 'none' : 2,
                     }}
-                >
-                    xem lại thực sự quá cảm xúc đây chính xác là trận chung kết hay nhất lịch sử wc từ 90 giây của Mbappe, từ màn rượt đuổi tỉ số của cả hai đội, đặc biệt trận đấu này giúp Messi có được danh hiệu còn sót lại cuối cùng của anh và cũng giúp anh khẳng định được vị thế vĩ đại số 1 trong ngôi đền huyền thoại lịch sử bóng đá.
-                    chúc mừng anh lần nữa Leo Messi
-                </Typography>
+                >{props?.comment?.content}</Typography>
                 <Stack direction={'row'} spacing={1}>
                     <IconButton onClick={(event) => {
                         event.stopPropagation();
                         setLiked(!liked);
+                        props.onLike && props.onLike();
                         if (disliked) {
                             setDisliked(false);
                         }
@@ -72,6 +75,7 @@ export default function CommentComponent() {
                     <IconButton onClick={(event) => {
                         event.stopPropagation();
                         setDisliked(!disliked);
+                        props.onDislike && props.onDislike();
                         if (liked) {
                             setLiked(false);
                         }

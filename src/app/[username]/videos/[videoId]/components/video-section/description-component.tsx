@@ -8,7 +8,6 @@ export default function DescriptionComponent() {
     return (
         <Box
             sx={{
-                marginTop: 1,
                 width: "100%",
                 height: showMore ? "auto" : undefined,
                 maxHeight: showMore ? "1000px" : "50px",
@@ -16,34 +15,27 @@ export default function DescriptionComponent() {
                 position: "relative",
                 cursor: "pointer",
                 border: "1px solid lightgray",
-                borderRadius: "10px",
+                borderTop: "none",
                 transition: "max-height 0.3s ease",
+                borderBottomLeftRadius: "10px",
+                borderBottomRightRadius: "10px",
             }}
             onClick={() => setShowMore(!showMore)}
         >
-            <Box
-                sx={{
-                    padding: "10px",
-                }}
-            >
-                <Typography
-                    variant="body2"
-                    sx={{
-                        whiteSpace: "pre-wrap",
-                    }}
-                >
-                    -------------------------------------------------
-                    Kênh Youtube về thể thao của Đài Truyền hình Việt Nam
-                    Subscribe kênh: / @vtvthethaoofficial
-                    Web: https://thethao.vtv.vn/
-                    Fanpage: / banthethaovtv
-                    Tiktok: / thethaovtvofficial
-                    -------------------------------------------------
-                    © Bản quyền thuộc về Ban Thể thao - Đài Truyền hình Việt Nam
-                    #fifaworldcup #worldcup #worldcup2022 #thethao.vtv #vtv #vtvsports #bongda #thethao #bongdavtv #SEAGames #thethao247 #SEAGames31
-                </Typography>
+            <Box>
+                <Box component="div" sx={{ whiteSpace: 'pre-wrap' }}>
+                    <Typography variant="body1">VTV Thể Thao</Typography>
+                    <Typography variant="body1"> Kênh Youtube về thể thao của Đài Truyền hình Việt Nam</Typography>
+                    <Typography variant="body1"> Hãy đăng ký kênh để cập nhật những thông tin mới nhất về thể thao Việt Nam và thế giới</Typography>
+                    <Typography variant="body1"> Subscribe kênh: / @vtvthethaoofficial</Typography>
+                    <Typography variant="body1"> Web: https://thethao.vtv.vn/</Typography>
+                    <Typography variant="body1"> Fanpage: / banthethaovtv</Typography>
+                    <Typography variant="body1"> Tiktok: / thethaovtvofficial</Typography>
+                    <Typography variant="body1"> -------------------------------------------------</Typography>
+                    <Typography variant="body1"> © Bản quyền thuộc về Ban Thể thao - Đài Truyền hình Việt Nam</Typography>
+                    <Typography variant="body1"> #fifaworldcup #worldcup #worldcup2022 #thethao.vtv #vtv #vtvsports #bongda #thethao #bongdavtv #SEAGames #thethao247 #SEAGames31</Typography>
+                </Box>
             </Box>
-
 
             {!showMore && (
                 <Box

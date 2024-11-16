@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { CircularProgress } from '@mui/material';
 
 export default function TestPage() {
     const [data, setData] = useState<string[]>([]);
@@ -11,7 +12,7 @@ export default function TestPage() {
     const fetchData = async (page: number) => {
         console.log("Fetching data from page:", page);
         setIsFetching(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
         setData((prevData) => [...prevData, ...Array.from({ length: 10 }, (_, i) => `Item ${prevData.length + i + 1}`)]);
         setIsFetching(false);
@@ -50,11 +51,9 @@ export default function TestPage() {
                     <li key={index}>{item}</li>
                 ))}
             </ul>
-            <div
-                ref={observerRef}
-                className="h-20 bg-transparent"
-            />
-            {isFetching && <p>Loading more data...</p>}
+            <div ref={observerRef}>
+                {isFetching && <CircularProgress />}
+            </div>
         </div>
     );
 };

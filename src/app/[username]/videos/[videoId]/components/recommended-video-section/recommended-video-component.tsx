@@ -1,6 +1,10 @@
 import { Box } from "@mui/material";
+import { RecommendedVideo } from "../../types";
 
-export default function RecommendVideoComponent() {
+interface RecommendVideoComponentProps {
+    recommendedVideo?: RecommendedVideo;
+}
+export default function RecommendVideoComponent(props: RecommendVideoComponentProps) {
     return (
         <Box sx={{
             backgroundColor: 'gray',

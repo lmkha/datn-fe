@@ -1,6 +1,9 @@
 import { Chip } from "@mui/material";
 
-export default function HashtagComponent(props: { text: string }) {
+interface HashtagComponentProps {
+    text: string;
+}
+export default function HashtagComponent(props: HashtagComponentProps) {
     return (
         <Chip label={props.text} onClick={() => { }} />
     );

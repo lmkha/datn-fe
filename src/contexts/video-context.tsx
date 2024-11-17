@@ -19,7 +19,7 @@ export type VideoAction =
 
 export const initialVideoState: VideoState = {
     comments: [],
-    theaterMode: false,
+    theaterMode: true,
     topRecommendVideos: [],
     bottomRecommendVideos: [],
 };

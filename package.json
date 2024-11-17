@@ -16,6 +16,7 @@
     "@mui/material": "^6.1.5",
     "@toolpad/core": "^0.8.1",
     "axios": "^1.7.7",
+    "dashjs": "^4.7.4",
     "newman": "^6.2.1",
     "next": "14.2.15",
     "react": "^18",

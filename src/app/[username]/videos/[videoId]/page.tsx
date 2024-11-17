@@ -30,7 +30,6 @@ export default function VideoPage() {
             // Fetch recommended videos
             getRecommendedVideos(videoId as string).then((result) => {
                 if (result.success) {
-                    console.log(result.recommendedVideos);
                     const topRecommendVideos = result.recommendedVideos?.slice(0, 3) || [];
                     const bottomRecommendVideos = result.recommendedVideos?.slice(3) || [];
                     dispatch({ type: 'SET_TOP_RECOMMEND_VIDEOS', payload: topRecommendVideos as RecommendedVideo[] });
@@ -59,9 +58,11 @@ export default function VideoPage() {
                     <VideoSection changeTheaterMode={toggleTheaterMode} />
                 </Grid2>
 
-                <Grid2 size={state.theaterMode ? 0 : 3} >
-                    <RecommendedVideoSection recommendedVideos={state.topRecommendVideos} />
-                </Grid2>
+                {!state?.theaterMode && (
+                    <Grid2 size={3} >
+                        <RecommendedVideoSection recommendedVideos={state.topRecommendVideos} />
+                    </Grid2>
+                )}
             </Grid2>
 
             <Grid2 container>

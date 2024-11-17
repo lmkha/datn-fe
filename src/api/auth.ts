@@ -1,12 +1,9 @@
 import Base from "./base";
 
 class Auth extends Base {
-    async login({ username, password }: { username: string, password: string }) {
+    async login(data: { username: string, password: string }) {
         try {
-            const response = await this.post("/auth/signIn", {
-                username: username,
-                password: password,
-            });
+            const response = await this.post("/auth/signIn", data);
             return {
                 success: true,
                 token: response.token,
@@ -14,12 +11,12 @@ class Auth extends Base {
         } catch (err: any) {
             return {
                 success: false,
-                // message: err.response.data.message,
+                message: err.response.data.message,
             }
         }
     }
 
-    async registerUser({ username, password, email, phone, dateOfBirth }: {
+    async registerUser(data: {
         username: string,
         password: string,
         email: string,
@@ -27,14 +24,7 @@ class Auth extends Base {
         dateOfBirth: string,
     }) {
         try {
-            const response = await this.post("/auth/signUp", {
-                username: username,
-                password: password,
-                email: email,
-                phone: phone,
-                isPrivate: false,
-                dateOfBirth: dateOfBirth,
-            });
+            const response = await this.post("/auth/signUp", data);
             return {
                 success: response.success,
                 message: response.message,
@@ -48,11 +38,9 @@ class Auth extends Base {
         }
     }
 
-    async checkUsernameExist({ username }: { username: string }) {
+    async checkUsernameExist(params: { username: string }) {
         try {
-            const response = await this.get('/auth/checkUsernameAvailability/', {
-                username: username,
-            });
+            const response = await this.get('/auth/checkUsernameAvailability/', params);
             return {
                 success: response.success,
                 message: response.message,
@@ -66,11 +54,9 @@ class Auth extends Base {
         }
     }
 
-    async checkEmailExist({ email }: { email: string }) {
+    async checkEmailExist(params: { email: string }) {
         try {
-            const response = await this.get('/auth/checkEmailAvailability', {
-                email: email,
-            });
+            const response = await this.get('/auth/checkEmailAvailability', params);
             return {
                 success: response.success,
                 message: response.message,

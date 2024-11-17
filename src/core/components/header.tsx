@@ -29,19 +29,16 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 
 interface HeaderProps {
+    title?: string;
+    logo?: React.ReactNode;
+    logoClickRoute?: string;
     onOpenDrawerChange?: () => void;
     onSearch?: (query: string) => void;
     onUpload?: () => void;
     onNotification?: () => void;
 }
 
-export default function Header({ onOpenDrawerChange: onOpenDrawer, onSearch, onUpload, onNotification }: HeaderProps) {
-    const [drawerOpen, setDrawerOpen] = useState(false);
-
-    const toggleDrawer = (open: boolean) => () => {
-        setDrawerOpen(open);
-    };
-
+export default function Header(props: HeaderProps) {
     return (
         <>
             <Grid2 container sx={{
@@ -50,119 +47,87 @@ export default function Header({ onOpenDrawerChange: onOpenDrawer, onSearch, onU
                 alignItems: 'center',
                 backgroundColor: 'white',
             }}>
-                <Grid2 size={1}>
-                    <Stack direction={'row'} sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                        {/* <DrawerControl toggleDrawer={toggleDrawer} /> */}
-
-                        {/* Use fixed drawer */}
-                        <IconButton onClick={onOpenDrawer}>
-                            <MenuIcon />
-                        </IconButton>
-
-                        <WebIcon />
+                {/* Toggle drawer, Logo, Title */}
+                <Grid2 size={2}>
+                    <Stack direction={'row'} sx={{ pl: 1, justifyContent: 'start', alignItems: 'center' }}>
+                        {props?.onOpenDrawerChange && (
+                            <IconButton onClick={props.onOpenDrawerChange}>
+                                <MenuIcon />
+                            </IconButton>
+                        )}
+                        {/* <Link href={`/${props.logoClickRoute}`}> */}
+                        <Link href={`${props?.logoClickRoute || '/'}`}>
+                            <Stack direction="row" paddingLeft={1}>
+                                {props?.logo}
+                                <Typography variant="body1" fontWeight={'bold'}>{props?.title}</Typography>
+                            </Stack>
+                        </Link>
                     </Stack>
                 </Grid2>
 
-                <Grid2 size={9} justifyContent={'center'} alignItems={'center'} display={'flex'}>
-                    <Search />
+                {/* Search */}
+                <Grid2 size={8} justifyContent={'center'} alignItems={'center'} display={'flex'}>
+                    {props?.onSearch && (
+                        <Search />
+                    )}
                 </Grid2>
 
+                {/* Upload button, Notification, Account */}
                 <Grid2 size={2}>
                     <Stack direction="row" spacing={2} sx={{
-                        justifyContent: 'center',
+                        justifyContent: 'end',
                         alignItems: 'center',
                         width: '100%',
                     }}>
-                        <UploadButton />
-                        <NotificationButton />
+                        {/* UploadButton */}
+                        {props?.onUpload && (
+                            <Button
+                                onClick={props.onUpload}
+                                variant="outlined"
+                                startIcon={<AddIcon fontSize="large" />}
+                                sx={{
+                                    textTransform: 'none',
+                                    width: 'auto',
+                                    height: '40px',
+                                    fontWeight: 'bold',
+                                    color: 'black',
+                                    border: '2px solid black',
+                                    ":hover": {
+                                        backgroundColor: '#EA284E',
+                                        color: 'white',
+                                        borderColor: 'transparent',
+                                    }
+                                }}
+                            >
+                                Upload
+                            </Button>
+                        )}
+
+                        {/* Notification */}
+                        {props?.onNotification && (
+                            <IconButton
+                                sx={{
+                                    width: 'auto',
+                                    height: 'auto',
+                                }}
+                            >
+                                <CircleNotificationsIcon fontSize="large" />
+                            </IconButton>
+                        )}
                         <Account />
                     </Stack>
                 </Grid2>
             </Grid2>
-
-            <DrawerContent anchor="left" open={drawerOpen} toggleDrawer={toggleDrawer} />
         </>
     );
 }
 
-interface DrawerContentProps {
-    anchor: 'left' | 'right' | 'top' | 'bottom';
-    open: boolean;
-    toggleDrawer: (open: boolean) => () => void;
-}
-
-function DrawerContent({ anchor, open, toggleDrawer }: DrawerContentProps) {
-    return (
-        <Drawer
-            anchor={anchor}
-            open={open}
-            onClose={toggleDrawer(false)}
-        >
-            <Box
-                sx={{ width: 250 }}
-                role="presentation"
-                onClick={toggleDrawer(false)}
-                onKeyDown={toggleDrawer(false)}
-            >
-                <Typography variant="h6" sx={{ padding: 2 }}>Menu</Typography>
-                {/* Thêm các mục menu ở đây */}
-                <MenuItem component={Link} href="/">
-                    Home
-                </MenuItem>
-                <MenuItem component={Link} href="/about">
-                    About
-                </MenuItem>
-            </Box>
-        </Drawer>
-    );
-}
-
-function DrawerControl({ toggleDrawer }: { toggleDrawer: (open: boolean) => () => void }) {
-    return (
-        <IconButton onClick={toggleDrawer(true)}>
-            <MenuIcon />
-        </IconButton>
-    );
-}
-
-function WebIcon() {
+function DefaultLogoAndTitle() {
     return (
         <Stack direction="row" paddingLeft={1}>
             <Link href={'/'}>MeTube</Link>
         </Stack>
-    );
-}
-
-function NotificationButton() {
-    return (
-        <IconButton
-            sx={{
-                width: 'auto',
-                height: 'auto',
-            }}
-        >
-            <CircleNotificationsIcon fontSize="large" />
-        </IconButton>
-    );
-}
-
-function UploadButton() {
-    return (
-        <Button
-            variant="outlined"
-            startIcon={<AddIcon fontSize="large" />}
-            sx={{
-                textTransform: 'none',
-                width: 'auto',
-                height: '40px',
-                fontWeight: 'bold',
-                color: 'black',
-                borderColor: 'black',
-            }}
-        >
-            Upload
-        </Button>
-    );
+    )
 }
 
 function Account() {
@@ -225,10 +190,10 @@ function Search() {
         setInputValue(value);
 
         if (value.trim()) {
-            setAnchorEl(event.currentTarget); // Set the TextField as anchor
-            setOpen(true); // Show Popper when there's input
+            setAnchorEl(event.currentTarget);
+            setOpen(true);
         } else {
-            setOpen(false); // Hide Popper when input is empty
+            setOpen(false);
         }
     };
 

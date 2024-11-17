@@ -49,11 +49,12 @@ export default function VideoPage() {
 
     return (
         <Stack sx={{
-            height: '100vh',
-            overflowY: 'auto',
-            px: 1,
+            height: '100%',
         }}>
-            <Grid2 container>
+            <Grid2 container spacing={1} sx={{
+                border: state.theaterMode ? '1px solid lightgray' : 'none',
+                borderRadius: '10px'
+            }}>
                 <Grid2 size={state.theaterMode ? 12 : 9}>
                     <VideoSection changeTheaterMode={toggleTheaterMode} />
                 </Grid2>
@@ -65,7 +66,7 @@ export default function VideoPage() {
                 )}
             </Grid2>
 
-            <Grid2 container>
+            <Grid2 container spacing={1}>
                 <Grid2 size={9}>
                     <Stack>
                         <DescriptionComponent />
@@ -73,7 +74,9 @@ export default function VideoPage() {
                     </Stack>
                 </Grid2>
 
-                <Grid2 size={3}>
+                <Grid2 size={3} sx={{
+                    marginTop: state.theaterMode ? 0 : '4px'
+                }}>
                     <RecommendedVideoSection recommendedVideos={state.bottomRecommendVideos} />
                 </Grid2>
             </Grid2>

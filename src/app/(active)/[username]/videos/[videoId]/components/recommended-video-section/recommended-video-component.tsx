@@ -10,7 +10,6 @@ export default function RecommendVideoComponent(props: RecommendVideoComponentPr
             backgroundColor: 'gray',
             width: '100%',
             height: '215px',
-            padding: '10px',
             borderRadius: '10px',
         }}>
             Recommend video

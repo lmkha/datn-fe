@@ -10,7 +10,7 @@ interface RecommendedVideoSectionProps {
 export default function RecommendedVideoSection(props: RecommendedVideoSectionProps) {
     return (
 
-        <Stack spacing={1} px={1}>
+        <Stack spacing={1}>
             {props?.recommendedVideos?.map((recommendVideo, index) => (
                 <RecommendVideoComponent key={index} recommendedVideo={recommendVideo} />
             ))}

@@ -24,7 +24,7 @@ export default function VideoSection(props: VideoSectionProps) {
             <Stack sx={{
                 borderLeft: '1px solid lightgray',
                 borderRight: '1px solid lightgray',
-                paddingBottom: 1,
+                // paddingBottom: 1,
             }}>
                 {/* Title, author info, heart, comment, share */}
                 <Grid2 container alignItems={'center'} sx={{ width: '100%' }}>

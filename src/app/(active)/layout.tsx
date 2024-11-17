@@ -4,7 +4,7 @@ import Header from "@/core/components/header";
 import { Box } from "@mui/material";
 import Drawer from "./components/drawer";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Layout({
     children,
@@ -13,6 +13,7 @@ export default function Layout({
 }>) {
     const [openDrawer, setOpenDrawer] = useState<boolean>(true);
     const pathname = usePathname();
+    const router = useRouter();
 
     useEffect(() => {
         if (pathname.startsWith('/@') && pathname.includes('/videos/')) {
@@ -34,19 +35,28 @@ export default function Layout({
             {/* Header */}
             <Box
                 sx={{
-                    position: "sticky",
+                    position: "fixed",
                     top: 0,
                     left: 0,
                     width: "100%",
                     zIndex: 1000,
                     borderBottom: "1px solid lightgray",
+                    height: "57px",
                 }}
             >
-                <Header onOpenDrawerChange={() => setOpenDrawer(!openDrawer)} />
+                <Header
+                    title="MeTube"
+                    logoClickRoute="/"
+                    onOpenDrawerChange={() => setOpenDrawer(!openDrawer)}
+                    onSearch={() => { }}
+                    onNotification={() => { }}
+                    onUpload={() => router.push('/studio/upload')}
+                />
             </Box>
             {/* Content (Drawer + Main) */}
             <Box
                 sx={{
+                    marginTop: "57px",
                     display: "flex",
                     flexDirection: "row",
                     flexGrow: 1,
@@ -70,7 +80,4 @@ export default function Layout({
             </Box>
         </Box>
     );
-
-
-
 }

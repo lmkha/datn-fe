@@ -1,30 +1,49 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, useReducer, ReactNode, useContext } from "react";
 
-interface AuthContextType {
+interface AuthState {
     isLogged: boolean;
-    login: () => void;
-    logout: () => void;
 }
 
-const authContext = createContext<AuthContextType | undefined>(undefined);
+type AuthAction =
+    | { type: 'LOGIN' }
+    | { type: 'LOGOUT' };
+
+const initialAuthState: AuthState = {
+    isLogged: false,
+};
+
+const authReducer = (state: AuthState, action: AuthAction): AuthState => {
+    switch (action.type) {
+        case 'LOGIN':
+            return { isLogged: true };
+        case 'LOGOUT':
+            return { isLogged: false };
+        default:
+            return state;
+    }
+};
+
+interface AuthContextProps {
+    state: AuthState;
+    dispatch: React.Dispatch<AuthAction>;
+}
+
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [isLogged, setIsLogged] = useState(false);
-    return (
-        <authContext.Provider value={{
-            isLogged,
-            login: () => setIsLogged(true),
-            logout: () => setIsLogged(false)
-        }}>
-            {children}
-        </authContext.Provider>
-    );
-}
+    const [state, dispatch] = useReducer(authReducer, initialAuthState);
 
-export const useAuthContext = () => {
-    const context = useContext(authContext);
-    if (context === undefined) {
-        throw new Error("useAuthContext must be used within a AuthProvider");
+    return (
+        <AuthContext.Provider value={{ state, dispatch }}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
+
+export const useAuthContext = (): AuthContextProps => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuthContext must be used within an AuthProvider");
     }
     return context;
 };

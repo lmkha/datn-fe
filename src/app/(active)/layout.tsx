@@ -1,7 +1,7 @@
 'use client';
 
 import Header from "@/core/components/header";
-import { Box, Grid2, Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import Drawer from "./components/drawer";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";

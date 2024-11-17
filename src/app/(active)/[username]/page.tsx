@@ -4,8 +4,8 @@ import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { IoIosShareAlt } from "react-icons/io";
-import MyTabs, { Tab } from "./components/tabs";
-import Filter from "./components/filter";
+import MyTabs, { Tab } from "../components/tabs";
+import Filter from "../components/filter";
 import { useState } from "react";
 
 export default function Profile() {

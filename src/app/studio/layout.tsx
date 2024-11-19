@@ -73,15 +73,6 @@ function LayoutContent({
                 >
                     {children}
                 </Box>
-                {/* <Paper elevation={0} sx={{
-                    width: '100%',
-                    height: '100%',
-                    overflowY: 'auto',
-                }}>
-                    <Stack>
-                        {children}
-                    </Stack>
-                </Paper> */}
             </Box>
         </Box>
     );

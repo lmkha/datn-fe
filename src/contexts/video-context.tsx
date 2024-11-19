@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Comment, RecommendedVideo } from "@/app/(active)/[username]/videos/[videoId]/types";
+import { Comment, RecommendedVideo } from "@/app/(content)/[username]/videos/[videoId]/types";
 import React, { createContext, useReducer, ReactNode, useContext } from "react";
 
 export interface VideoState {

@@ -5,7 +5,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
 import Password from './password';
 import { useState } from 'react';
-import { checkUsernameAvailable, login } from '@/services/login';
+import { login } from '@/services/real/auth';
 
 export default function LoginForm() {
     const [username, setUsername] = useState<string>();

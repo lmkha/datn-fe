@@ -27,6 +27,8 @@ import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 import AddIcon from '@mui/icons-material/Add';
 import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
+import { useRouter } from "next/navigation";
+import { useUserContext } from "@/contexts/user-context";
 
 interface HeaderProps {
     title?: string;
@@ -122,15 +124,9 @@ export default function Header(props: HeaderProps) {
     );
 }
 
-function DefaultLogoAndTitle() {
-    return (
-        <Stack direction="row" paddingLeft={1}>
-            <Link href={'/'}>MeTube</Link>
-        </Stack>
-    )
-}
-
 function Account() {
+    const router = useRouter();
+    const { state } = useUserContext();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -162,13 +158,27 @@ function Account() {
                 }}
             >
                 <div>
+                    <MenuItem onClick={() => {
+                        router.push(`/@${state.username}`);
+                        handleClose();
+                    }}>
+                        <ListItemIcon>
+                            <SettingsIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography variant="inherit">Profile</Typography>
+                    </MenuItem>
+
                     <MenuItem onClick={handleClose}>
                         <ListItemIcon>
                             <SettingsIcon fontSize="small" />
                         </ListItemIcon>
                         <Typography variant="inherit">Settings</Typography>
                     </MenuItem>
-                    <MenuItem onClick={handleClose}>
+
+                    <MenuItem onClick={() => {
+                        router.replace('/login');
+                        handleClose();
+                    }}>
                         <ListItemIcon>
                             <LogoutIcon fontSize="small" />
                         </ListItemIcon>

@@ -1,16 +1,313 @@
 'use client';
 
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import ShortcutIcon from '@mui/icons-material/Shortcut';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+
 import { useStudioContext } from "@/contexts/studio-context";
-import { useEffect } from "react";
+import { formatNumberToShortText } from "@/core/logic/convert";
+import { Avatar, Box, Button, FormControl, Grid2, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function StudioDashBoard() {
+    const router = useRouter();
     const { state, dispatch } = useStudioContext();
     useEffect(() => {
         dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Dashboard' });
     }, []);
     return (
         <>
-            <h1>Studio Dashboard</h1>
+            <Stack spacing={2} sx={{
+                paddingTop: 1,
+                display: 'flex',
+                justifyContent: 'start',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+                backgroundColor: '#F8F8F8',
+                position: 'relative',
+            }}>
+                <Grid2 container direction={'row'} spacing={1} sx={{
+                    width: '90%',
+                    borderRadius: '10px',
+                }}>
+                    {/* Left side */}
+                    <Grid2 size={8}>
+                        <Stack spacing={2}>
+                            {/* Key metrics, contain: Video views, Likes, Comments, Shares */}
+                            <Stack spacing={1} sx={{
+                                backgroundColor: 'white',
+                                padding: 1,
+                                borderRadius: '10px',
+                            }}>
+                                <Stack direction="row"
+                                    sx={{
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Typography variant="h5" fontWeight={'bold'}>Key metrics</Typography>
+                                    <TimeSelect />
+                                </Stack>
+
+                                {/* Video views, Likes */}
+                                <Stack direction={'row'} justifyContent={'space-between'}>
+                                    {/* Video views */}
+                                    <KeyMetricItem
+                                        title="Video views"
+                                        value={2552675}
+                                        compareValue={532564}
+                                        compareTime="Nov 8 - Nov 14"
+                                    />
+                                    {/* Likes */}
+                                    <KeyMetricItem
+                                        title="Likes"
+                                        value={121456}
+                                        compareValue={45324}
+                                        compareTime="Nov 8 - Nov 14"
+                                    />
+                                </Stack>
+
+                                {/* Comments, Shared */}
+                                <Stack direction={'row'} justifyContent={'space-between'}>
+                                    {/* Comment */}
+                                    <KeyMetricItem
+                                        title="Comments"
+                                        value={17342}
+                                        compareValue={3256}
+                                        compareTime="Nov 8 - Nov 14"
+                                    />
+                                    {/* Shared */}
+                                    <KeyMetricItem
+                                        title="Shares"
+                                        value={5426}
+                                        compareValue={347}
+                                        compareTime="Nov 8 - Nov 14"
+                                    />
+                                </Stack>
+                            </Stack>
+
+                            {/* Recent post */}
+                            <Stack spacing={1} sx={{
+                                backgroundColor: 'white',
+                                padding: 1,
+                                borderRadius: '10px',
+                            }}>
+                                <Typography variant="h5" fontWeight={'bold'}>Recent post</Typography>
+                                <RecentPost />
+                                <RecentPost />
+                                <RecentPost />
+                                <RecentPost />
+                                <RecentPost />
+                                <Button variant='outlined' color='inherit'
+                                    sx={{
+                                        textTransform: 'none',
+                                    }}
+                                    onClick={() => router.push('/studio/post')}
+                                >Show all</Button>
+                            </Stack>
+                        </Stack>
+                    </Grid2>
+
+                    {/* Right side */}
+                    <Grid2 size={4}>
+                        <Stack spacing={2}>
+                            <AccountInfo />
+
+                            <Stack spacing={1} sx={{
+                                backgroundColor: 'white',
+                                padding: 2,
+                                borderRadius: '10px',
+                            }}>
+                                <Typography variant="h5" fontWeight={'bold'}>Recent comments</Typography>
+                                <RecentComment />
+                                <RecentComment />
+                                <RecentComment />
+                                <RecentComment />
+                                <RecentComment />
+                                <RecentComment />
+                                <Button variant='outlined' color='inherit'
+                                    sx={{
+                                        textTransform: 'none',
+                                    }}
+                                    onClick={() => router.push('/studio/comment')}
+                                >Show all</Button>
+                            </Stack>
+                        </Stack>
+                    </Grid2>
+                </Grid2>
+            </Stack>
         </>
+    );
+}
+
+function TimeSelect() {
+    const [selectedTime, setSelectedTime] = useState('Today'); // Giá trị mặc định là 'Today'
+
+    const handleChange = (event: SelectChangeEvent<string>) => {
+        setSelectedTime(event.target.value);
+    };
+
+    return (
+        <Box sx={{ width: '30%' }}> {/* Đảm bảo Box mở rộng theo chiều ngang */}
+            <FormControl fullWidth>
+                <Select
+                    size="small"
+                    value={selectedTime}
+                    onChange={handleChange}
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Time period selection' }} // Đặt accessible name
+                    sx={{
+                        border: '1px solid lightgray',
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'black',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'black',
+                        },
+                    }}
+                >
+                    <MenuItem value="Today">Today</MenuItem>
+                    <MenuItem value="Last 7 days">Last 7 days</MenuItem>
+                    <MenuItem value="Last month">Last month</MenuItem>
+                    <MenuItem value="Last 3 months">Last 3 months</MenuItem>
+                    <MenuItem value="Last 6 months">Last 6 months</MenuItem>
+                    <MenuItem value="Last year">Last year</MenuItem>
+                </Select>
+            </FormControl>
+        </Box>
+    );
+}
+
+interface KeyMetricItemProps {
+    title?: string;
+    value?: number;
+    compareValue?: number;
+    compareTime?: string;
+}
+
+function KeyMetricItem(props: KeyMetricItemProps) {
+    return (
+        <Stack sx={{
+            backgroundColor: 'lightgrey',
+            padding: 2,
+            width: '49%',
+            borderRadius: '10px',
+
+        }}>
+            <Typography variant="h6" color="textSecondary">{props?.title || 'Metric'}</Typography>
+            <Typography variant="h5" fontWeight={'bold'}>
+                {props?.value ? formatNumberToShortText(props.value) : '0'}
+            </Typography>
+            <Stack direction={'row'} spacing={1}>
+                <Typography>
+                    {props?.compareValue ?
+                        (props.compareValue > 0 ? `+${formatNumberToShortText(props.compareValue)}`
+                            : formatNumberToShortText(props.compareValue))
+                        : 0}
+                </Typography>
+                <Typography>vs.</Typography>
+                <Typography>{props?.compareTime || ''}</Typography>
+            </Stack>
+        </Stack>
+    );
+}
+
+function RecentPost() {
+    return (
+        <Grid2 container direction={'row'} spacing={2} sx={{
+            width: '100%',
+            backgroundColor: 'lightgray',
+            borderRadius: '10px',
+        }}>
+            <Grid2 size={3}>
+                <Box sx={{
+                    width: '100%',
+                    height: '100px',
+                    backgroundColor: 'black',
+                    borderRadius: '10px',
+                }} />
+            </Grid2>
+            <Grid2 size={9}>
+                <Stack justifyContent={'space-between'} sx={{ height: '100%' }}>
+                    <Typography variant="h6" fontWeight={500}>How to became the best developer</Typography>
+                    <Stack>
+                        <Stack direction={'row'} spacing={2}>
+                            <Stack direction={'row'}>
+                                <PlayArrowOutlinedIcon />
+                                <Typography>125K</Typography>
+                            </Stack>
+                            <Stack direction={'row'}>
+                                <FavoriteBorderOutlinedIcon />
+                                <Typography>125K</Typography>
+                            </Stack>
+                            <Stack direction={'row'}>
+                                <ChatBubbleOutlineOutlinedIcon />
+                                <Typography>125K</Typography>
+                            </Stack>
+                            <Stack direction={'row'}>
+                                <ShortcutIcon />
+                                <Typography>125K</Typography>
+                            </Stack>
+                        </Stack>
+                        <Typography>Posted date</Typography>
+                    </Stack>
+                </Stack>
+            </Grid2>
+        </Grid2>
+    );
+}
+
+function AccountInfo() {
+    return (
+        <Stack spacing={1} sx={{
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            padding: 2,
+        }}>
+            <Stack direction={'row'} spacing={2}>
+                <Avatar
+                    alt="Avt"
+                    src="/images/avatar.jpg"
+                    sx={{
+                        width: 100,
+                        height: 100,
+                    }}
+                />
+                <Stack>
+                    <Typography variant="h5" fontWeight={'bold'}>@lmkha</Typography>
+                    <Typography variant="body1">Lê Minh Kha</Typography>
+                </Stack>
+            </Stack>
+            <Stack direction={'row'} justifyContent={'space-between'}>
+                <Stack justifyContent={'center'} alignItems={'center'}>
+                    <Typography variant='h6' fontWeight={600}>0</Typography>
+                    <Typography color='textSecondary'>Followers</Typography>
+                </Stack>
+
+                <Stack justifyContent={'center'} alignItems={'center'}>
+                    <Typography variant='h6' fontWeight={600}>0</Typography>
+                    <Typography color='textSecondary'>Following</Typography>
+                </Stack>
+
+                <Stack justifyContent={'center'} alignItems={'center'}>
+                    <Typography variant='h6' fontWeight={600}>0</Typography>
+                    <Typography color='textSecondary'>Profile views</Typography>
+                </Stack>
+            </Stack>
+        </Stack>
+    );
+}
+
+function RecentComment() {
+    return (
+        <Box sx={{
+            width: '100%',
+            height: '100px',
+            backgroundColor: 'lightgray',
+            borderRadius: '10px',
+        }} />
     );
 }

@@ -303,11 +303,77 @@ function AccountInfo() {
 
 function RecentComment() {
     return (
-        <Box sx={{
+        <Grid2 container direction={'row'} sx={{
             width: '100%',
-            height: '100px',
+            height: 'auto',
             backgroundColor: 'lightgray',
             borderRadius: '10px',
-        }} />
+            alignItems: 'center',
+        }}>
+            <Grid2 size={9}>
+                <Grid2 container direction={'row'} spacing={1} sx={{
+                    alignItems: 'center',
+                }}>
+                    <Grid2 size={2}>
+                        <Avatar
+                            alt="Avt"
+                            src="/images/avatar.jpg"
+                            sx={{
+                                width: '100%',
+                                height: 'auto',
+                                aspectRatio: '1',
+                                borderRadius: '50%',
+                            }}
+                        />
+                    </Grid2>
+                    <Grid2 size={10}>
+                        <Stack>
+                            <Stack direction={'row'} spacing={1}>
+                                <Typography fontWeight={'bold'}>@lmkha0201</Typography>
+                                <Typography sx={{ color: '#EA284E' }}>Viewer</Typography>
+                                <Typography color='textSecondary'>2h ago</Typography>
+                            </Stack>
+                            <Typography
+                                sx={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                }}
+                                color='textSecondary'
+                            >This is the best comment in the world</Typography>
+                            <Stack direction={'row'} spacing={2}>
+                                <Stack direction={'row'}>
+                                    <FavoriteBorderOutlinedIcon />
+                                    <Typography>125K</Typography>
+                                </Stack>
+                                <Stack direction={'row'}>
+                                    <ChatBubbleOutlineOutlinedIcon />
+                                    <Typography>19 replies</Typography>
+                                </Stack>
+                            </Stack>
+                        </Stack>
+                    </Grid2>
+                </Grid2>
+                <Typography
+                    variant='body1'
+                    sx={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    }}
+                >
+                    How to became the best developer in the world
+                </Typography>
+            </Grid2>
+
+            <Grid2 size={3} height={'100%'}>
+                <Box sx={{
+                    width: '100%',
+                    height: '100px',
+                    backgroundColor: 'black',
+                    borderRadius: '10px',
+                }}></Box>
+            </Grid2>
+        </Grid2>
     );
 }

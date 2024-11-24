@@ -143,10 +143,10 @@ export default function UploadVideoPage() {
                             <HashtagInput />
                             {/* Description */}
                             <TextField
-                                label='Description (optional)'
+                                label='Description'
                                 placeholder="Add a title that describes your video"
                                 multiline={true}
-                                rows={7}
+                                rows={10}
                                 fullWidth={true}
                                 variant="outlined"
                                 sx={{
@@ -191,6 +191,8 @@ export default function UploadVideoPage() {
                             </Box>
                             {/* Who can view video */}
                             <WhoCanWatchViewSelect />
+                            {/* Playlist */}
+                            <PlayListSelect />
                             {/* Submit button */}
                             <Button
                                 variant="contained"
@@ -275,32 +277,88 @@ function HashtagInput() {
 }
 
 function WhoCanWatchViewSelect() {
-    const [age, setAge] = React.useState('');
+    const [visibility, setVisibility] = React.useState('public');
 
     const handleChange = (event: SelectChangeEvent) => {
-        setAge(event.target.value);
+        setVisibility(event.target.value);
     };
 
     return (
         <Box>
-            <Typography fontWeight={'bold'}>Who can watch this video</Typography>
-            <FormControl sx={{
-                width: '100%',
-
-            }}>
+            <Typography fontWeight="bold" mb={1}>
+                Who can watch this video
+            </Typography>
+            <FormControl fullWidth>
                 <Select
-                    value={age}
+                    size="small"
+                    value={visibility}
                     onChange={handleChange}
                     displayEmpty
-                    inputProps={{ 'aria-label': 'Without label' }}
-
+                    inputProps={{ 'aria-label': 'Select visibility' }}
                 >
-                    <MenuItem value={0}>Every one</MenuItem>
-                    <MenuItem value={10}>Follower</MenuItem>
-                    <MenuItem value={20}>Only you</MenuItem>
+                    <MenuItem value="public">Everyone</MenuItem>
+                    <MenuItem value="followers">Followers</MenuItem>
+                    <MenuItem value="private">Only you</MenuItem>
                 </Select>
             </FormControl>
         </Box>
     );
 }
 
+function PlayListSelect() {
+    const [playlist, setPlaylist] = React.useState('');
+
+    const handleChange = (event: SelectChangeEvent) => {
+        setPlaylist(event.target.value);
+    };
+
+    return (
+        <Box>
+            <Typography fontWeight="bold" mb={1}>
+                Select Playlist
+            </Typography>
+            <Grid2 container spacing={1} direction={'row'} sx={{
+                justifyContent: 'start',
+                alignItems: 'center',
+            }}>
+                <Grid2 size={9}>
+                    <FormControl fullWidth>
+                        <Select
+                            size="small"
+                            value={playlist}
+                            onChange={handleChange}
+                            displayEmpty
+                            inputProps={{ 'aria-label': 'Select a playlist' }}
+                        >
+                            <MenuItem value="" disabled>
+                                Choose a playlist
+                            </MenuItem>
+                            <MenuItem value="1">My Favorites</MenuItem>
+                            <MenuItem value="2">Workout Mix</MenuItem>
+                            <MenuItem value="3">Relaxing Music</MenuItem>
+                            <MenuItem value="4">Top Hits</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={3} height={'100%'} sx={{
+                    display: 'flex',
+                    justifyContent: 'end',
+                    alignItems: 'center',
+                }}>
+                    <Button
+                        variant="outlined"
+                        color="inherit"
+                        sx={{
+                            textTransform: 'none',
+                            width: 'auto',
+                            height: '100%',
+                        }}
+                    >
+                        <Typography>Create</Typography>
+                    </Button>
+                </Grid2>
+            </Grid2>
+
+        </Box>
+    );
+}

@@ -4,7 +4,6 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import ShortcutIcon from '@mui/icons-material/Shortcut';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
-
 import { useStudioContext } from "@/contexts/studio-context";
 import { formatNumberToShortText } from "@/core/logic/convert";
 import { Avatar, Box, Button, FormControl, Grid2, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
@@ -114,8 +113,10 @@ export default function StudioDashBoard() {
                     {/* Right side */}
                     <Grid2 size={4}>
                         <Stack spacing={2}>
+                            {/* Account info */}
                             <AccountInfo />
 
+                            {/* Recent comments */}
                             <Stack spacing={1} sx={{
                                 backgroundColor: 'white',
                                 padding: 2,
@@ -219,7 +220,7 @@ function RecentPost() {
     return (
         <Grid2 container direction={'row'} spacing={2} sx={{
             width: '100%',
-            backgroundColor: 'lightgray',
+            backgroundColor: '#F8F8F8',
             borderRadius: '10px',
         }}>
             <Grid2 size={3}>
@@ -306,7 +307,7 @@ function RecentComment() {
         <Grid2 container direction={'row'} sx={{
             width: '100%',
             height: 'auto',
-            backgroundColor: 'lightgray',
+            backgroundColor: '#F8F8F8',
             borderRadius: '10px',
             alignItems: 'center',
         }}>

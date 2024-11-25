@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useStudioContext } from "@/contexts/studio-context";
-import { Box, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Typography } from "@mui/material";
+import { Box, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
@@ -13,8 +13,10 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import Chip from '@mui/material/Chip';
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function PostPage() {
+    const router = useRouter();
     const { state, dispatch } = useStudioContext();
     useEffect(() => {
         dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Posts' });
@@ -100,14 +102,14 @@ export default function PostPage() {
                         </Grid2>
 
                         {/* Action: edit, delete */}
-                        <Grid2 size={1}>
+                        <Grid2 size={2}>
                             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <Typography variant="body1" fontWeight={'bold'}>Actions</Typography>
                             </Box>
                         </Grid2>
 
                         {/* Status info: status, last changed */}
-                        <Grid2 size={3}>
+                        <Grid2 size={2}>
                             <Typography variant="body1" fontWeight={'bold'}>Status info</Typography>
                         </Grid2>
 
@@ -194,7 +196,10 @@ function SelectComponent(props: SelectComponentProps) {
     );
 }
 
+interface PostItemProps {
+}
 function PostItem() {
+    const router = useRouter();
     return (
         <Grid2 container direction={'row'} spacing={2} sx={{
             borderRadius: '10px',
@@ -268,19 +273,31 @@ function PostItem() {
             </Grid2>
 
             {/* Action: edit, delete */}
-            <Grid2 size={1}>
-                <Stack direction={'row'} spacing={1}>
-                    <IconButton>
-                        <EditOutlinedIcon />
-                    </IconButton>
-                    <IconButton>
-                        <DeleteForeverOutlinedIcon />
-                    </IconButton>
+            <Grid2 size={2}>
+                <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'center'}>
+                    <Tooltip title="Comments">
+                        <IconButton onClick={() => {
+                            router.push('/studio/post/tempPostId/comments');
+                        }}>
+                            <ChatBubbleOutlineOutlinedIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit post">
+                        <IconButton>
+                            <EditOutlinedIcon />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Delete post">
+                        <IconButton>
+                            <DeleteForeverOutlinedIcon />
+                        </IconButton>
+                    </Tooltip>
                 </Stack>
             </Grid2>
 
             {/* Status info: status, last changed */}
-            <Grid2 size={3}>
+            <Grid2 size={2}>
                 <Stack direction={'row'} spacing={1} alignItems={'center'}>
                     <Chip
                         label="Posted"

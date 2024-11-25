@@ -244,7 +244,7 @@ function RecentPost() {
             </Grid2>
             <Grid2 size={9}>
                 <Stack justifyContent={'space-between'} sx={{ height: '100%' }}>
-                    <Typography variant="h6" fontWeight={500}>How to became the best developer</Typography>
+                    <Typography variant="body1" fontWeight={'bold'}>How to became the best developer</Typography>
                     <Stack>
                         <Stack direction={'row'} spacing={2}>
                             <Stack direction={'row'}>
@@ -264,7 +264,10 @@ function RecentPost() {
                                 <Typography>125K</Typography>
                             </Stack>
                         </Stack>
-                        <Typography>Posted date</Typography>
+                        <Stack direction={'row'} spacing={2}>
+                            <Typography>Every one</Typography>
+                            <Typography>Nov 17, 2024</Typography>
+                        </Stack>
                     </Stack>
                 </Stack>
             </Grid2>

@@ -16,12 +16,14 @@ import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import ThumbUpRoundedIcon from '@mui/icons-material/ThumbUpRounded';
 import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
 import ThumbDownRoundedIcon from '@mui/icons-material/ThumbDownRounded';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useEffect, useState } from "react";
 import SendIcon from '@mui/icons-material/Send';
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function CommentPage() {
+export default function CommentDetailPage() {
+    const router = useRouter();
     const { state, dispatch } = useStudioContext();
     useEffect(() => {
         dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Comments' });
@@ -43,8 +45,88 @@ export default function CommentPage() {
                 borderRadius: '10px',
                 backgroundColor: 'white',
             }}>
-                {/* Page title */}
-                <Typography variant="h5" fontWeight={'bold'}>Manage and interact with comments</Typography>
+                {/* Title(clickable -> back to all comments) */}
+                <Button
+                    onClick={() => router.back()}
+                    sx={{
+                        textTransform: 'none',
+                        color: 'black',
+                        justifyContent: 'start',
+                        fontWeight: 'bold',
+                        fontSize: '1.5rem',
+                    }}
+                    startIcon={<ArrowBackIosIcon sx={{ fontWeight: 'bold' }} />}>
+                    Back to posts
+                </Button>
+                <Typography variant="h5" fontWeight={'bold'}>All comments of this post</Typography>
+
+                {/* Current comment, post info */}
+                <Box sx={{
+                    width: '100%',
+                    height: '300px',
+                    border: '1px solid #E0E0E0',
+                    borderRadius: '10px',
+                }}>
+                    <Grid2 container direction={'row'} height={'100%'}>
+                        <Grid2 size={4} padding={1}>
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    height: '100%',
+                                    borderRadius: '10px',
+                                    overflow: 'hidden',
+                                    position: 'relative',
+                                }}
+                            >
+                                <Image
+                                    src="/images/video-image.jpg"
+                                    alt="Image"
+                                    layout="fill"
+                                    objectFit="cover"
+                                />
+                            </Box>
+                        </Grid2>
+                        <Grid2 size={8}>
+                            {/* Title, metrics, reply input */}
+                            <Grid2 size={8} height={'100%'} width={'100%'} padding={1}>
+                                <Stack sx={{ justifyContent: 'space-between', height: '100%', width: '100%' }}>
+                                    <Stack spacing={1}>
+                                        {/* Title */}
+                                        <Typography variant="h6" fontWeight={'bold'}
+                                            sx={{
+                                                width: '100%',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                            }}
+                                        >
+                                            This is the title of the post that is very long and should be truncated
+                                        </Typography>
+                                        {/* Metrics */}
+                                        <Stack direction={'row'} spacing={2}>
+                                            <Stack direction={'row'} >
+                                                <PlayArrowOutlinedIcon />
+                                                <Typography variant="body2">1000</Typography>
+                                            </Stack>
+                                            <Stack direction={'row'}>
+                                                <FavoriteBorderOutlinedIcon />
+                                                <Typography variant="body2">1000</Typography>
+                                            </Stack>
+                                            <Stack direction={'row'}>
+                                                <ChatBubbleOutlineOutlinedIcon />
+                                                <Typography variant="body2">1000</Typography>
+                                            </Stack>
+                                            <Stack direction={'row'}>
+                                                <ShortcutIcon />
+                                                <Typography variant="body2">1000</Typography>
+                                            </Stack>
+                                        </Stack>
+                                    </Stack>
+                                </Stack>
+                            </Grid2>
+                        </Grid2>
+                    </Grid2>
+                </Box>
                 {/* Search title */}
                 <TextField
                     size="small"
@@ -163,13 +245,11 @@ function SelectComponent(props: SelectComponentProps) {
 }
 
 function CommentItem() {
-    const router = useRouter();
     const [openReply, setOpenReply] = useState(false);
     return (
         <>
             <Grid2 container direction={'row'} spacing={2} sx={{
-                // height: 'auto',
-                justifyContent: 'center',
+                justifyContent: 'start',
                 alignItems: 'center',
             }}>
                 {/* Comment */}
@@ -275,79 +355,6 @@ function CommentItem() {
                                 )}
                             </Stack>
 
-                        </Grid2>
-                    </Grid2>
-                </Grid2>
-
-                {/* Post of comment */}
-                <Grid2 size={5} height={'100%'}>
-                    <Grid2 container direction={'row'} height={'100%'}>
-                        <Grid2 size={4}>
-                            <Box
-                                sx={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: '10px',
-                                    overflow: 'hidden',
-                                    position: 'relative',
-                                }}
-                            >
-                                <Image
-                                    src="/images/video-image.jpg"
-                                    alt="Image"
-                                    layout="fill"
-                                    objectFit="cover"
-                                />
-                            </Box>
-                        </Grid2>
-                        <Grid2 size={8}>
-                            {/* Title, metrics */}
-                            <Grid2 size={8} height={'100%'} width={'100%'}>
-                                <Stack sx={{ justifyContent: 'space-between', height: '100%', width: '100%' }}>
-                                    <Stack spacing={1}>
-                                        {/* Title */}
-                                        <Typography variant="body1"
-                                            sx={{
-                                                width: '100%',
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                            }}
-                                        >
-                                            This is the title of the post that is very long and should be truncated
-                                        </Typography>
-                                        {/* Metrics */}
-                                        <Stack direction={'row'} spacing={2}>
-                                            <Stack direction={'row'} >
-                                                <PlayArrowOutlinedIcon />
-                                                <Typography variant="body2">1000</Typography>
-                                            </Stack>
-                                            <Stack direction={'row'}>
-                                                <FavoriteBorderOutlinedIcon />
-                                                <Typography variant="body2">1000</Typography>
-                                            </Stack>
-                                            <Stack direction={'row'}>
-                                                <ChatBubbleOutlineOutlinedIcon />
-                                                <Typography variant="body2">1000</Typography>
-                                            </Stack>
-                                            <Stack direction={'row'}>
-                                                <ShortcutIcon />
-                                                <Typography variant="body2">1000</Typography>
-                                            </Stack>
-                                        </Stack>
-                                        <Button
-                                            onClick={() => router.push('/studio/post/tempPostId/comments/tempCommentId')}
-                                            sx={{
-                                                textTransform: 'none',
-                                                fontWeight: 'bold',
-                                                color: '#EA284E',
-                                            }}
-                                        >
-                                            Open all comments
-                                        </Button>
-                                    </Stack>
-                                </Stack>
-                            </Grid2>
                         </Grid2>
                     </Grid2>
                 </Grid2>

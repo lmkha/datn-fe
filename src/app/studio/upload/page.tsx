@@ -205,7 +205,7 @@ export default function UploadVideoPage() {
                                     textTransform: 'none',
                                 }}
                             >
-                                <Typography fontWeight={'bold'}>Post</Typography>
+                                <Typography variant="h6" fontWeight={'bold'}>Post</Typography>
                             </Button>
                         </Stack>
                     </Grid2>

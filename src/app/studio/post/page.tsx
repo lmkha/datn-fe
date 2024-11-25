@@ -12,6 +12,7 @@ import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import Chip from '@mui/material/Chip';
+import Image from "next/image";
 
 export default function PostPage() {
     const { state, dispatch } = useStudioContext();
@@ -210,13 +211,30 @@ function PostItem() {
                         height: '100%',
                         backgroundColor: 'black',
                         borderRadius: '10px',
-                    }}>hi</Grid2>
+                    }}>
+                        <Box
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                borderRadius: '10px',
+                                overflow: 'hidden',
+                                position: 'relative',
+                            }}
+                        >
+                            <Image
+                                src="/images/video-image.jpg"
+                                alt="Image"
+                                layout="fill"
+                                objectFit="cover"
+                            />
+                        </Box>
+                    </Grid2>
 
                     {/* Title, metrics */}
                     <Grid2 size={8}>
                         <Stack sx={{ justifyContent: 'space-between', height: '100%' }}>
                             {/* Title */}
-                            <Typography variant="body1"
+                            <Typography variant="body1" fontWeight={'bold'}
                                 sx={{
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',

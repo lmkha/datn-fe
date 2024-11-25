@@ -25,6 +25,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 import AddIcon from '@mui/icons-material/Add';
+import GamepadIcon from '@mui/icons-material/Gamepad';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from "next/navigation";
@@ -163,9 +165,19 @@ function Account() {
                         handleClose();
                     }}>
                         <ListItemIcon>
-                            <SettingsIcon fontSize="small" />
+                            <AccountCircleRoundedIcon fontSize="small" />
                         </ListItemIcon>
                         <Typography variant="inherit">Profile</Typography>
+                    </MenuItem>
+
+                    <MenuItem onClick={() => {
+                        router.push('/studio');
+                        handleClose();
+                    }}>
+                        <ListItemIcon>
+                            <GamepadIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography variant="inherit">Studio</Typography>
                     </MenuItem>
 
                     <MenuItem onClick={handleClose}>

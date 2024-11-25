@@ -9,6 +9,7 @@ import { formatNumberToShortText } from "@/core/logic/convert";
 import { Avatar, Box, Button, FormControl, Grid2, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function StudioDashBoard() {
     const router = useRouter();
@@ -224,12 +225,22 @@ function RecentPost() {
             borderRadius: '10px',
         }}>
             <Grid2 size={3}>
-                <Box sx={{
-                    width: '100%',
-                    height: '100px',
-                    backgroundColor: 'black',
-                    borderRadius: '10px',
-                }} />
+                <Box
+                    sx={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                    }}
+                >
+                    <Image
+                        src="/images/video-image.jpg"
+                        alt="Image"
+                        layout="fill"
+                        objectFit="cover"
+                    />
+                </Box>
             </Grid2>
             <Grid2 size={9}>
                 <Stack justifyContent={'space-between'} sx={{ height: '100%' }}>
@@ -368,12 +379,22 @@ function RecentComment() {
             </Grid2>
 
             <Grid2 size={3} height={'100%'}>
-                <Box sx={{
-                    width: '100%',
-                    height: '100px',
-                    backgroundColor: 'black',
-                    borderRadius: '10px',
-                }}></Box>
+                <Box
+                    sx={{
+                        width: '100%',
+                        height: '100px',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                    }}
+                >
+                    <Image
+                        src="/images/video-image.jpg"
+                        alt="Image"
+                        layout="fill"
+                        objectFit="cover"
+                    />
+                </Box>
             </Grid2>
         </Grid2>
     );

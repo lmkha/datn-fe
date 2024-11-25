@@ -11,8 +11,11 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import Image from "next/legacy/image";
+import { useRouter } from "next/navigation";
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
-export default function UploadVideoPage() {
+export default function EditPostPage() {
+    const router = useRouter();
     const { state, dispatch } = useStudioContext();
     useEffect(() => {
         dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Upload' });
@@ -30,7 +33,32 @@ export default function UploadVideoPage() {
                 backgroundColor: '#F8F8F8',
                 position: 'relative',
             }}>
-                {/* Meta data, preview video player */}
+                <Box sx={{
+                    width: '80%',
+                    display: 'flex',
+                    justifyContent: 'start',
+                    alignItems: 'center',
+                    backgroundColor: 'white',
+                    borderRadius: '10px',
+                    padding: 1,
+                    position: 'relative',
+                }}>
+                    <Button
+                        onClick={() => router.back()}
+                        sx={{
+                            textTransform: 'none',
+                            width: '100%',
+                            color: 'black',
+                            justifyContent: 'start',
+                            fontWeight: 'bold',
+                            fontSize: '1.5rem',
+                        }}
+                        startIcon={<ArrowBackIosIcon sx={{ fontWeight: 'bold' }} />}>
+                        Back to Posts
+                    </Button>
+
+                </Box>
+                {/* Meta data, Thumbnail */}
                 <Grid2 container direction={'row'} spacing={1} sx={{
                     width: '80%',
                     padding: 1,
@@ -44,7 +72,6 @@ export default function UploadVideoPage() {
                         <Card sx={{
                             height: '100%',
                             borderRadius: '10px',
-                            borderBottom: '5px solid #00C39B',
                             position: 'relative',
                         }}>
                             <Stack spacing={2} padding={1}>
@@ -64,50 +91,46 @@ export default function UploadVideoPage() {
                                         <Typography fontWeight={'bold'}>1:30:00</Typography>
                                     </Stack>
                                 </Stack>
-                                <Button
-                                    variant="outlined"
-                                    color="inherit"
-                                    sx={{
-                                        textTransform: 'none',
-                                        width: '200px',
-                                    }}
-                                >
-                                    <Typography>Change video</Typography>
-                                </Button>
                             </Stack>
-                            <Box sx={{
-                                position: 'absolute',
-                                bottom: 4,
-                                right: 4,
-                                display: 'flex',
-                                justifyContent: 'end',
-                                alignItems: 'end',
-                            }}>
-                                75% uploaded
-                            </Box>
                         </Card>
                     </Grid2>
-
-                    {/* Preview video player */}
+                    {/* Thumbnail */}
                     <Grid2 size={4} sx={{
                         height: '100%',
                         backgroundColor: 'black',
                         borderRadius: '10px',
                     }}>
-                        <Typography>Small video player</Typography>
+                        <Box
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                borderRadius: '10px',
+                                overflow: 'hidden',
+                                position: 'relative',
+                            }}
+                        >
+                            <Image
+                                src="/images/video-image.jpg"
+                                alt="Image"
+                                layout="fill"
+                                objectFit="cover"
+                            />
+                        </Box>
                     </Grid2>
                 </Grid2>
-                {/* </Paper> */}
 
                 {/* Post Title, HashTag, Mention, Thumbnail, Post button */}
                 <Grid2 container direction={'row'} spacing={1} sx={{
                     width: '80%',
                     padding: 1,
-                    backgroundColor: 'white',
                     borderRadius: '10px',
                 }}>
                     {/* Title, HashTag, Description */}
-                    <Grid2 size={8}>
+                    <Grid2 size={8} sx={{
+                        backgroundColor: 'white',
+                        borderRadius: '10px',
+                        padding: 1,
+                    }}>
                         <Stack spacing={2} sx={{
                             backgroundColor: 'white',
                             borderRadius: '10px',
@@ -181,19 +204,13 @@ export default function UploadVideoPage() {
                         </Stack>
                     </Grid2>
 
-                    {/* Thumbnail, who can view video, Post button */}
-                    <Grid2 size={4}>
+                    {/* Who can view video, Post button */}
+                    <Grid2 size={4} sx={{
+                        backgroundColor: 'white',
+                        padding: 1,
+                        borderRadius: '10px',
+                    }}>
                         <Stack spacing={2}>
-                            {/* Thumbnail */}
-                            <Box sx={{
-                                width: '100%',
-                                height: '170px',
-                                backgroundColor: 'black',
-                                borderRadius: '10px',
-                                border: '1px solid lightgray',
-                            }}>
-                                {/* <Typography>Thumbnail</Typography> */}
-                            </Box>
                             {/* Who can view video */}
                             <WhoCanWatchViewSelect />
                             {/* Playlist */}
@@ -210,7 +227,7 @@ export default function UploadVideoPage() {
                                     textTransform: 'none',
                                 }}
                             >
-                                <Typography variant="h6" fontWeight={'bold'}>Post</Typography>
+                                <Typography variant="h6" fontWeight={'bold'}>Save</Typography>
                             </Button>
                         </Stack>
                     </Grid2>

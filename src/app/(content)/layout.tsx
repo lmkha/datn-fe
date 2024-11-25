@@ -5,8 +5,21 @@ import { Box } from "@mui/material";
 import Drawer from "./components/drawer";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { ContentProvider } from "@/contexts/content-context";
 
 export default function Layout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <ContentProvider>
+            <LayoutContent>{children}</LayoutContent>
+        </ContentProvider>
+    );
+}
+
+function LayoutContent({
     children,
 }: Readonly<{
     children: React.ReactNode;

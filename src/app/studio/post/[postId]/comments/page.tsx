@@ -19,7 +19,7 @@ import ThumbDownRoundedIcon from '@mui/icons-material/ThumbDownRounded';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useEffect, useState } from "react";
 import SendIcon from '@mui/icons-material/Send';
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 
 export default function CommentDetailPage() {

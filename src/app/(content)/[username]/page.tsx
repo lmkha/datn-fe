@@ -14,7 +14,7 @@ export default function Profile() {
     const [selectedTab, setSelectedTab] = useState<Tab>();
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
     return (
-        <Stack direction={'column'} spacing={2}>
+        (<Stack direction={'column'} spacing={2}>
             {/* Section 1: Userinfo */}
             <Grid2 container direction={'row'} spacing={20}>
                 {/* Avatar */}
@@ -102,7 +102,6 @@ export default function Profile() {
                     </Box>
                 </Grid2>
             </Grid2>
-
             {/* Section 2: Tabs, filter */}
             <Grid2 container direction={'row'} sx={{
                 borderBottom: '1px solid lightgray',
@@ -120,7 +119,6 @@ export default function Profile() {
                     <Filter />
                 </Grid2>
             </Grid2>
-
             {/* Section 3: Videos or playlists */}
             <Box >
                 <Grid2 container spacing={4}>
@@ -175,7 +173,7 @@ export default function Profile() {
                             ))
                         ) : (
                             // Liked videos
-                            [...Array(10)].map((_, index) => (
+                            ([...Array(10)].map((_, index) => (
                                 <Grid2
                                     key={index}
                                     minHeight={170}
@@ -197,11 +195,11 @@ export default function Profile() {
                                         Liked video {index + 1}
                                     </Typography>
                                 </Grid2>
-                            ))
+                            )))
                         )
                     }
                 </Grid2>
             </Box>
-        </Stack>
+        </Stack>)
     );
 }

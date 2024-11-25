@@ -12,7 +12,7 @@ import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import Chip from '@mui/material/Chip';
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 
 export default function PostPage() {

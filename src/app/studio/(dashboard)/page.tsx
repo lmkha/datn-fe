@@ -9,7 +9,7 @@ import { formatNumberToShortText } from "@/core/logic/convert";
 import { Avatar, Box, Button, FormControl, Grid2, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 
 export default function StudioDashBoard() {
     const router = useRouter();

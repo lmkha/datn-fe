@@ -31,6 +31,8 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/contexts/user-context";
+import { get } from "@/hooks/use-local-storage";
+import { logout } from "@/services/real/auth";
 
 interface HeaderProps {
     title?: string;
@@ -127,6 +129,7 @@ export default function Header(props: HeaderProps) {
 }
 
 function Account() {
+    const username = get('user')?.username;
     const router = useRouter();
     const { state } = useUserContext();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -161,7 +164,7 @@ function Account() {
             >
                 <div>
                     <MenuItem onClick={() => {
-                        router.push(`/@${state.username}`);
+                        router.push(`/@${username}`);
                         handleClose();
                     }}>
                         <ListItemIcon>
@@ -189,6 +192,7 @@ function Account() {
 
                     <MenuItem onClick={() => {
                         router.replace('/login');
+                        logout();
                         handleClose();
                     }}>
                         <ListItemIcon>

@@ -1,23 +1,29 @@
-// video-player.tsx
-import React, { useEffect, useRef } from 'react';
-import dashjs from 'dashjs';
+import React, { useEffect } from 'react';
+import videojs from 'video.js';
 
-const VideoPlayer: React.FC<{ src: string }> = ({ src }) => {
-    const videoRef = useRef<HTMLVideoElement>(null);
+interface VideoPlayerProps {
+    url: string;
+}
+
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
+    const videoRef = React.useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
-        if (typeof window !== "undefined" && videoRef.current) {
-            const player = dashjs.MediaPlayer().create();
-            player.initialize(videoRef.current, src, true);
-        }
-    }, [src]);
+        if (videoRef.current) {
+            const player = videojs(videoRef.current, { controls: true, autoplay: false });
+            player.src({ src: url, type: 'video/mp4' });
 
-    return <
-        video
-        ref={videoRef}
-        controls
-        className='video-js vjs-default-skin vjs-big-play-centered'
-    />;
+            return () => {
+                player.dispose(); // Cleanup
+            };
+        }
+    }, [url]);
+
+    return (
+        <div>
+            <video ref={videoRef} className="video-js" />
+        </div>
+    );
 };
 
 export default VideoPlayer;

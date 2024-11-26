@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+type Key = 'accessToken' | 'user';
+
 export default function useLocalStorage(key: string, defaultValue: any) {
     const [value, setValue] = useState(defaultValue);
     useEffect(() => {
@@ -14,11 +16,11 @@ export default function useLocalStorage(key: string, defaultValue: any) {
     return [value, setValue];
 }
 
-export function set(key: string, value: any) {
+export function set(key: Key, value: any) {
     window.localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function get(key: string) {
+export function get(key: Key) {
     if (typeof window == "undefined") {
         return null;
     }

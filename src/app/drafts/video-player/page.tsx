@@ -1,7 +1,5 @@
 'use client'
 
-import React from "react";
-import VideoPlayer from "./video-player";
 
 export default function StreamTestPage() {
     // if (typeof window === "undefined") return null;

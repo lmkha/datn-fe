@@ -6,8 +6,10 @@ import Link from 'next/link';
 import Password from './password';
 import { useState } from 'react';
 import { login } from '@/services/real/auth';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
+    const router = useRouter();
     const [username, setUsername] = useState<string>();
     const [password, setPassword] = useState<string>();
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -16,6 +18,10 @@ export default function LoginForm() {
         username && password && login({
             username: username,
             password: password
+        }).then((result) => {
+            if (result.success) {
+                router.push('/');
+            }
         });
     };
 

@@ -1,8 +1,8 @@
 'use client';
 
 import { useStudioContext } from "@/contexts/studio-context";
-import { Box, Button, Card, Grid2, IconButton, Input, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Button, Card, CircularProgress, Grid2, IconButton, Input, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
+import { useEffect, useState, useMemo, useReducer } from "react";
 import { Chip } from '@mui/material';
 import * as React from 'react';
 import FormControl from '@mui/material/FormControl';
@@ -11,12 +11,91 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import Image from "next/legacy/image";
+import { useRef } from 'react';
+import { formatDuration, formatSize } from "@/core/logic/convert";
+import { postVideo } from "@/services/real/video";
+
+interface VideoFileMetadata {
+    size?: string;
+    duration?: string;
+}
+
+interface PageState {
+    isUploading?: boolean;
+    title?: string;
+    description?: string;
+    hashtags?: string[];
+    visibility?: string;
+    playlist?: string;
+    thumbnail?: string;
+    videoFile?: File;
+    success?: boolean;
+}
 
 export default function UploadVideoPage() {
     const { state, dispatch } = useStudioContext();
+    const [pageState, setPageState] = useState<PageState>();
+    const [videoMetadata, setVideoMetadata] = useState<VideoFileMetadata>();
+
+    const videoURL = useMemo(() => {
+        if (pageState?.videoFile) {
+            return URL.createObjectURL(pageState.videoFile);
+        }
+        return null;
+    }, [pageState?.videoFile]);
+
+    useEffect(() => {
+        return () => {
+            if (videoURL) {
+                URL.revokeObjectURL(videoURL);
+            }
+        };
+    }, [videoURL]);
+
+    const setVideoFileMetadata = (file: File) => {
+        const videoURL = URL.createObjectURL(file);
+        const video = document.createElement('video');
+        video.src = videoURL;
+
+        video.onloadedmetadata = () => {
+            const formattedDuration = formatDuration(video.duration);
+            const formattedSize = formatSize(file.size);
+
+            setVideoMetadata({
+                size: formattedSize,
+                duration: formattedDuration,
+            });
+
+            URL.revokeObjectURL(videoURL);
+        };
+
+        video.onerror = () => {
+            console.error('Error loading video metadata');
+        };
+    };
+
     useEffect(() => {
         dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Upload' });
     }, []);
+
+    useEffect(() => {
+        if (pageState?.videoFile) {
+            setVideoFileMetadata(pageState.videoFile);
+        }
+    }, [pageState]);
+
+    const handleUpload = async () => {
+        setPageState({ ...pageState, isUploading: true });
+        postVideo({
+            title: pageState?.title || '',
+            isPrivate: pageState?.visibility === 'private',
+            file: pageState?.videoFile || new File([], ''),
+            description: pageState?.description,
+            tags: pageState?.hashtags,
+        }).then((response) => {
+            setPageState({ ...pageState, isUploading: false, success: response.success });
+        })
+    };
 
     return (
         <>
@@ -50,30 +129,21 @@ export default function UploadVideoPage() {
                             <Stack spacing={2} padding={1}>
                                 {/* file name */}
                                 <Typography variant="h5" fontWeight={'bold'}>
-                                    Andres Iniesta - The Last of his Kind - HD.mp4
+                                    {pageState?.videoFile?.name || 'No file selected'}
                                 </Typography>
                                 <Stack direction={'row'} spacing={6}>
                                     {/* Size */}
                                     <Stack direction={'row'} spacing={1}>
                                         <Typography>Size</Typography>
-                                        <Typography fontWeight={'bold'}>1.2 GB</Typography>
+                                        <Typography fontWeight={'bold'}>{videoMetadata?.size || ''}</Typography>
                                     </Stack>
                                     {/* Duration */}
                                     <Stack direction={'row'} spacing={1}>
                                         <Typography>Duration</Typography>
-                                        <Typography fontWeight={'bold'}>1:30:00</Typography>
+                                        <Typography fontWeight={'bold'}>{videoMetadata?.duration || ''}</Typography>
                                     </Stack>
                                 </Stack>
-                                <Button
-                                    variant="outlined"
-                                    color="inherit"
-                                    sx={{
-                                        textTransform: 'none',
-                                        width: '200px',
-                                    }}
-                                >
-                                    <Typography>Change video</Typography>
-                                </Button>
+                                <VideoUploadButton onChange={(file) => setPageState({ ...pageState, videoFile: file })} />
                             </Stack>
                             <Box sx={{
                                 position: 'absolute',
@@ -94,7 +164,16 @@ export default function UploadVideoPage() {
                         backgroundColor: 'black',
                         borderRadius: '10px',
                     }}>
-                        <Typography>Small video player</Typography>
+                        {videoURL && (
+                            <video
+                                src={videoURL}
+                                controls
+                                autoPlay={true}
+                                width="100%"
+                                height="100%"
+                                className="rounded-lg"
+                            />
+                        )}
                     </Grid2>
                 </Grid2>
                 {/* </Paper> */}
@@ -114,6 +193,7 @@ export default function UploadVideoPage() {
                         }}>
                             {/* Title */}
                             <TextField
+                                onChange={(e) => setPageState({ ...pageState, title: e.target.value })}
                                 label='Title (required)'
                                 placeholder="Add a title that describes your video"
                                 multiline={true}
@@ -145,9 +225,10 @@ export default function UploadVideoPage() {
                                 }}
                             />
                             {/* HashTag */}
-                            <HashtagInput />
+                            <HashtagInput onChange={(hashtags) => setPageState({ ...pageState, hashtags: hashtags })} />
                             {/* Description */}
                             <TextField
+                                onChange={(e) => setPageState({ ...pageState, description: e.target.value })}
                                 label='Description'
                                 placeholder="Add a title that describes your video"
                                 multiline={true}
@@ -200,6 +281,7 @@ export default function UploadVideoPage() {
                             <PlayListSelect />
                             {/* Submit button */}
                             <Button
+                                onClick={handleUpload}
                                 variant="contained"
                                 sx={{
                                     width: '100%',
@@ -208,10 +290,27 @@ export default function UploadVideoPage() {
                                     color: 'white',
                                     borderRadius: '10px',
                                     textTransform: 'none',
+                                    position: 'relative',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
                                 }}
+                                disabled={pageState?.isUploading || pageState?.success}
                             >
-                                <Typography variant="h6" fontWeight={'bold'}>Post</Typography>
+                                {pageState?.isUploading ? (
+                                    <CircularProgress
+                                        size={24}
+                                        sx={{
+                                            color: 'white',
+                                        }}
+                                    />
+                                ) : (
+                                    <Typography variant="h6" fontWeight={'bold'}>
+                                        {pageState?.success ? 'Post successfully' : 'Post'}
+                                    </Typography>
+                                )}
                             </Button>
+
                         </Stack>
                     </Grid2>
                 </Grid2>
@@ -220,7 +319,53 @@ export default function UploadVideoPage() {
     );
 }
 
-function HashtagInput() {
+interface VideoUploadButtonProps {
+    onChange?: (file: File) => void;
+}
+function VideoUploadButton(props: VideoUploadButtonProps) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleButtonClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            props.onChange?.(file);
+        }
+    };
+
+    return (
+        <>
+            <Button
+                variant="outlined"
+                color="inherit"
+                sx={{
+                    textTransform: 'none',
+                    width: '200px',
+                }}
+                onClick={handleButtonClick}
+            >
+                <Typography>Change video</Typography>
+            </Button>
+
+            <input
+                type="file"
+                accept="video/*"
+                ref={fileInputRef}
+                hidden
+                onChange={handleFileChange}
+            />
+        </>
+    );
+};
+interface HashtagInputProps {
+    onChange?: (hashtags: string[]) => void;
+}
+function HashtagInput(props: HashtagInputProps) {
     const [inputValue, setInputValue] = useState('');
     const [hashtags, setHashtags] = useState<string[]>([]);
 
@@ -231,6 +376,9 @@ function HashtagInput() {
                     ...prevHashtags,
                     inputValue.trim()
                 ]);
+                props.onChange?.(
+                    [...hashtags, inputValue.trim()]
+                );
                 setInputValue('');
             }
         }
@@ -240,6 +388,7 @@ function HashtagInput() {
         setHashtags((prevHashtags) =>
             prevHashtags.filter((hashtag) => hashtag !== hashtagToDelete)
         );
+        props.onChange?.(hashtags);
     };
 
     return (
@@ -372,7 +521,6 @@ function PlayListSelect() {
         </Box>
     );
 }
-
 interface CreateNewPlayListModalProps {
     open: boolean;
     onClose: () => void;

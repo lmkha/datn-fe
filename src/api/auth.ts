@@ -11,7 +11,7 @@ class Auth extends Base {
         } catch (err: any) {
             return {
                 success: false,
-                message: err.response.data.message,
+                message: err?.response?.data?.message || "Login failed",
             }
         }
     }
@@ -33,7 +33,7 @@ class Auth extends Base {
         } catch (err: any) {
             return {
                 success: false,
-                message: err.response.data.message,
+                message: err?.response?.data?.message || "Register failed",
             }
         }
     }
@@ -49,7 +49,7 @@ class Auth extends Base {
         } catch (err: any) {
             return {
                 success: false,
-                message: err.response.data.message,
+                message: err?.response?.data?.message || "Check username failed",
             }
         }
     }
@@ -65,7 +65,44 @@ class Auth extends Base {
         } catch (err: any) {
             return {
                 success: false,
-                message: err.response.data.message,
+                message: err?.response?.data?.message || "Check email failed",
+            }
+        }
+    }
+
+    async resetPassword(data: { email: string }) {
+        try {
+            const response = await this.post(`/auth/reset-password/?email=${data.email}`, {});
+            return {
+                success: response.success,
+                message: response.message,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Reset password failed",
+            }
+        }
+    }
+
+    async resetPasswordVerification(data: {
+        user: {
+            username: string,
+            email: string,
+            password: string,
+        },
+        otpCode: string,
+    }) {
+        try {
+            const response = await this.post('/auth/reset-password-verification', data);
+            return {
+                success: response.success,
+                message: response.message,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Reset password verification failed",
             }
         }
     }

@@ -1,18 +1,25 @@
 export function formatNumberToShortText(number: number): string {
-    if (number < 1000) return number.toString(); // Số nhỏ hơn 1000 không cần đổi
+    if (number < 1000) return number.toString();
 
-    const units = ["", "K", "M", "B", "T"]; // Đơn vị: nghìn, triệu, tỷ, nghìn tỷ
-    const unitIndex = Math.floor(Math.log10(number) / 3); // Xác định chỉ số đơn vị
-    const scaledNumber = number / Math.pow(1000, unitIndex); // Chia số theo đơn vị
+    const units = ["", "K", "M", "B", "T"];
+    const unitIndex = Math.floor(Math.log10(number) / 3);
+    const scaledNumber = number / Math.pow(1000, unitIndex);
 
-    // Làm tròn số với tối đa 1 chữ số thập phân nếu cần
     const formattedNumber = scaledNumber % 1 === 0 ? scaledNumber.toFixed(0) : scaledNumber.toFixed(1);
 
     return `${formattedNumber}${units[unitIndex]}`;
 }
 
-// Test cases
-console.log(formatNumberToShortText(1000000)); // Output: "1M"
-console.log(formatNumberToShortText(176432)); // Output: "176K"
-console.log(formatNumberToShortText(5642000000)); // Output: "5.6B"
-console.log(formatNumberToShortText(500)); // Output: "500"
+export const formatDuration = (durationInSeconds: number): string => {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds % 3600) / 60);
+    const seconds = Math.floor(durationInSeconds % 60);
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+export const formatSize = (sizeInBytes: number): string => {
+    if (sizeInBytes >= 1024 * 1024 * 1024) {
+        return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+    }
+    return `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`;
+};

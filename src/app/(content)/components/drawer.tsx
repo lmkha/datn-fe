@@ -6,15 +6,14 @@ import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import { useRouter } from "next/navigation";
-import { useContentContext } from "@/contexts/content-context";
 
 interface DrawerProps {
     openDrawer: boolean;
+    selectedRoute: 'FOR_YOU' | 'EXPLORE' | 'FOLLOWING' | 'PROFILE';
 }
 
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
-    const { state } = useContentContext();
 
     return (
         < Box
@@ -34,7 +33,7 @@ export default function Drawer(props: DrawerProps) {
                     icon={<HomeIcon />}
                     text={'For you'}
                     sx={{ height: 50 }}
-                    selected={state.currentDrawerItem === 'FOR_YOU'}
+                    selected={props.selectedRoute === 'FOR_YOU'}
                 />
 
                 <DrawerMenuItem
@@ -42,7 +41,7 @@ export default function Drawer(props: DrawerProps) {
                     icon={<ExploreOutlinedIcon />}
                     text={'Explore'}
                     sx={{ height: 50 }}
-                    selected={state.currentDrawerItem === 'EXPLORE'}
+                    selected={props.selectedRoute === 'EXPLORE'}
                 />
 
                 <DrawerMenuItem
@@ -50,7 +49,7 @@ export default function Drawer(props: DrawerProps) {
                     icon={<PeopleAltIcon />}
                     text={'Following'}
                     sx={{ height: 50 }}
-                    selected={state.currentDrawerItem === 'FOLLOWING'}
+                    selected={props.selectedRoute === 'FOLLOWING'}
                 />
 
                 <DrawerMenuItem
@@ -65,7 +64,7 @@ export default function Drawer(props: DrawerProps) {
                     />}
                     text={'Profile'}
                     sx={{ height: 50 }}
-                    selected={state.currentDrawerItem === 'PROFILE'}
+                    selected={props.selectedRoute === 'PROFILE'}
                 />
 
             </MenuList>

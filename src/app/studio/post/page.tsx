@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useStudioContext } from "@/contexts/studio-context";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
@@ -17,12 +16,7 @@ import { useRouter } from "next/navigation";
 
 export default function PostPage() {
     const router = useRouter();
-    const { state, dispatch } = useStudioContext();
     const [openDeletePostConfirmDialog, setOpenDeletePostConfirmDialog] = useState(false);
-
-    useEffect(() => {
-        dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Posts' });
-    }, []);
 
     return (
         <>

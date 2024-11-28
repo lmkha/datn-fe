@@ -58,6 +58,22 @@ class Video extends Base {
             }
         }
     }
+
+    async getVideoStreamLink(params: { videoId: string }) {
+        try {
+            const response = await this.get(`/${params.videoId}/output.mpd`);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            };
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get video stream link failed",
+            }
+        }
+    }
 }
 
 const videoAPI = new Video();

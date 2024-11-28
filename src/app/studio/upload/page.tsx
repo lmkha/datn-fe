@@ -1,6 +1,5 @@
 'use client';
 
-import { useStudioContext } from "@/contexts/studio-context";
 import { Box, Button, Card, CircularProgress, Grid2, IconButton, Input, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState, useMemo, useReducer } from "react";
 import { Chip } from '@mui/material';
@@ -33,7 +32,6 @@ interface PageState {
 }
 
 export default function UploadVideoPage() {
-    const { state, dispatch } = useStudioContext();
     const [pageState, setPageState] = useState<PageState>();
     const [videoMetadata, setVideoMetadata] = useState<VideoFileMetadata>();
 
@@ -73,10 +71,6 @@ export default function UploadVideoPage() {
             console.error('Error loading video metadata');
         };
     };
-
-    useEffect(() => {
-        dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Upload' });
-    }, []);
 
     useEffect(() => {
         if (pageState?.videoFile) {

@@ -13,13 +13,11 @@ export default function VideoPlayerComponent(props: VideoPlayerProps) {
                 width: '100%',
                 height: '530px',
                 borderRadius: '10px',
-            }}
-            // onClick={() => { props.changeTheaterMode && props.changeTheaterMode() }}
-            >
+            }}>
                 {/* Video player */}
                 <ReactPlayer
-                    forcedash={true}
-                    url="/videos/test-video-01.mp4"
+                    forcedash="true"
+                    url="http://localhost:8080/6746cb0b695f97155597ee35/output.mpd"
                     controls={true}
                     width="100%"
                     height="100%"

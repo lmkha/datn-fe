@@ -4,7 +4,6 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import ShortcutIcon from '@mui/icons-material/Shortcut';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
-import { useStudioContext } from "@/contexts/studio-context";
 import { formatNumberToShortText } from "@/core/logic/convert";
 import { Avatar, Box, Button, FormControl, Grid2, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -13,10 +12,7 @@ import Image from "next/legacy/image";
 
 export default function StudioDashBoard() {
     const router = useRouter();
-    const { state, dispatch } = useStudioContext();
-    useEffect(() => {
-        dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Dashboard' });
-    }, []);
+
     return (
         <>
             <Stack spacing={2} sx={{

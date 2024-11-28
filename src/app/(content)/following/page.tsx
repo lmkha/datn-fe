@@ -1,17 +1,10 @@
 'use client';
 
-import { useContentContext } from "@/contexts/content-context";
 import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid2, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function FollowingPage() {
-    const { dispatch } = useContentContext();
-
-    useEffect(() => {
-        dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'FOLLOWING' });
-    }, []);
-
     return (
         <Stack spacing={2} sx={{
             paddingTop: 1,

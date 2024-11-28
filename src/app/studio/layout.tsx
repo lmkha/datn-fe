@@ -3,7 +3,10 @@
 import Header from "@/core/components/header";
 import { Box, Paper, Stack } from "@mui/material";
 import Drawer from "./components/drawer";
-import { StudioProvider, useStudioContext } from "@/contexts/studio-context";
+import { DrawerItem, StudioProvider, useStudioContext } from "@/contexts/studio-context";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Layout({
     children,
@@ -22,7 +25,22 @@ function LayoutContent({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { state, dispatch } = useStudioContext();
+    const { state } = useStudioContext();
+    const pathname = usePathname();
+    const [selectedDrawerItem, setSelectedDrawerItem] = useState<DrawerItem>('Upload');
+
+    useEffect(() => {
+        if (pathname.startsWith('/studio/upload')) {
+            setSelectedDrawerItem('Upload');
+        } else if (pathname.startsWith('/studio/post')) {
+            setSelectedDrawerItem('Posts');
+        } else if (pathname.startsWith('/studio/comment')) {
+            setSelectedDrawerItem('Comments');
+        } else if (pathname.startsWith('/studio')) {
+            setSelectedDrawerItem('Dashboard');
+        }
+    }, [pathname]);
+
     return (
         <Box
             sx={{
@@ -60,7 +78,10 @@ function LayoutContent({
                 }}
             >
                 {/* Drawer */}
-                <Drawer openDrawer={state?.openDrawer || false} />
+                <Drawer
+                    openDrawer={state?.openDrawer || false}
+                    selectedDrawerItem={selectedDrawerItem}
+                />
                 {/* Main */}
                 <Box
                     sx={{

@@ -6,7 +6,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { IoIosShareAlt } from "react-icons/io";
 import MyTabs, { Tab } from "../components/tabs";
 import Filter from "../components/filter";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useContentContext } from "@/contexts/content-context";
 
 export default function Profile() {
@@ -15,13 +15,6 @@ export default function Profile() {
     const { username } = params;
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
     const [selectedTab, setSelectedTab] = useState<Tab>();
-
-    useEffect(() => {
-        dispatch({
-            type: 'SET_CURRENT_DRAWER_ITEM',
-            payload: 'PROFILE',
-        });
-    }, []);
 
     return (
         (<Stack direction={'column'} spacing={2}>

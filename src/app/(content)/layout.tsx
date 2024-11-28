@@ -27,12 +27,25 @@ function LayoutContent({
     const [openDrawer, setOpenDrawer] = useState<boolean>(true);
     const pathname = usePathname();
     const router = useRouter();
+    const [selectedRoute, setSelectedRoute] = useState<'FOR_YOU' | 'EXPLORE' | 'FOLLOWING' | 'PROFILE'>('FOR_YOU');
 
     useEffect(() => {
         if (pathname.startsWith('/@') && pathname.includes('/videos/')) {
             setOpenDrawer(false);
         } else {
             setOpenDrawer(true);
+        }
+        if (pathname === '/') {
+            setSelectedRoute('FOR_YOU');
+        }
+        if (pathname === '/explore') {
+            setSelectedRoute('EXPLORE');
+        }
+        if (pathname === '/following') {
+            setSelectedRoute('FOLLOWING');
+        }
+        if (pathname.startsWith('/@')) {
+            setSelectedRoute('PROFILE');
         }
     }, [pathname]);
 
@@ -77,7 +90,10 @@ function LayoutContent({
                 }}
             >
                 {/* Drawer */}
-                <Drawer openDrawer={openDrawer} />
+                <Drawer
+                    openDrawer={openDrawer}
+                    selectedRoute={selectedRoute}
+                />
                 {/* Main */}
                 <Box
                     sx={{

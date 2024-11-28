@@ -15,32 +15,27 @@ import { useRouter } from "next/navigation";
 
 interface DrawerProps {
     openDrawer: boolean;
+    selectedDrawerItem: DrawerItem;
 }
 
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
-    const { state, dispatch } = useStudioContext();
 
     const handleDrawerItemClick = (item: DrawerItem) => {
         switch (item) {
             case 'Upload':
-                dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Upload' });
                 router.push('/studio/upload');
                 break;
             case 'Dashboard':
-                dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Dashboard' });
                 router.push('/studio');
                 break;
             case 'Posts':
-                dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Posts' });
                 router.push('/studio/post');
                 break;
             case 'Comments':
-                dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Comments' });
                 router.push('/studio/comment');
                 break;
             case 'GoBack':
-                dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'GoBack' });
                 router.push('/');
                 break;
             default:
@@ -67,11 +62,11 @@ export default function Drawer(props: DrawerProps) {
                     height: 50,
                     fontWeight: 'bold',
                     fontSize: 18,
-                    color: state.currentDrawerItem === 'Upload' ? 'gray' : 'white',
-                    backgroundColor: state.currentDrawerItem === 'Upload' ? 'lightgray' : '#EA284E',
+                    color: props.selectedDrawerItem === 'Upload' ? 'gray' : 'white',
+                    backgroundColor: props.selectedDrawerItem === 'Upload' ? 'lightgray' : '#EA284E',
                 }}
                     onClick={() => handleDrawerItemClick('Upload')}
-                    disabled={state.currentDrawerItem === 'Upload'}
+                    disabled={props.selectedDrawerItem === 'Upload'}
                 >
                     Upload
                 </Button>
@@ -85,7 +80,7 @@ export default function Drawer(props: DrawerProps) {
                         text={'Dashboard'}
                         sx={{ height: 50 }}
                         onClick={() => handleDrawerItemClick('Dashboard')}
-                        selected={state.currentDrawerItem === 'Dashboard'}
+                        selected={props.selectedDrawerItem === 'Dashboard'}
                     />
 
                     <DrawerMenuItem
@@ -93,7 +88,7 @@ export default function Drawer(props: DrawerProps) {
                         text={'Posts'}
                         sx={{ height: 50 }}
                         onClick={() => handleDrawerItemClick('Posts')}
-                        selected={state.currentDrawerItem === 'Posts'}
+                        selected={props.selectedDrawerItem === 'Posts'}
                     />
 
                     <DrawerMenuItem
@@ -101,7 +96,7 @@ export default function Drawer(props: DrawerProps) {
                         text={'Comments'}
                         sx={{ height: 50 }}
                         onClick={() => handleDrawerItemClick('Comments')}
-                        selected={state.currentDrawerItem === 'Comments'}
+                        selected={props.selectedDrawerItem === 'Comments'}
                     />
 
                     <DrawerMenuItem
@@ -109,7 +104,7 @@ export default function Drawer(props: DrawerProps) {
                         text={'Back to MeTube'}
                         sx={{ height: 50 }}
                         onClick={() => handleDrawerItemClick('GoBack')}
-                        selected={state.currentDrawerItem === 'GoBack'}
+                        selected={props.selectedDrawerItem === 'GoBack'}
                     />
                 </MenuList>
             </Stack>

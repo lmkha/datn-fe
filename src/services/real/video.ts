@@ -25,3 +25,8 @@ export const postVideo = async (data: {
 
     return finalResult;
 };
+
+export const getVideoStreamLink = async (videoId: string) => {
+    const response = await videoAPI.getVideoStreamLink({ videoId });
+    return response;
+};

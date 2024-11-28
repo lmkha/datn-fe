@@ -1,7 +1,5 @@
 'use client';
 
-
-import { useStudioContext } from "@/contexts/studio-context";
 import { Avatar, Box, Button, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
@@ -24,10 +22,6 @@ import { useRouter } from "next/navigation";
 
 export default function CommentDetailPage() {
     const router = useRouter();
-    const { state, dispatch } = useStudioContext();
-    useEffect(() => {
-        dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Comments' });
-    }, []);
 
     return (
         <Stack spacing={2} sx={{

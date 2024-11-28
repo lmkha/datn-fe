@@ -8,10 +8,6 @@ import * as React from 'react';
 import FormControl from '@mui/material/FormControl';
 
 export default function UploadVideoPage() {
-    const { state, dispatch } = useStudioContext();
-    useEffect(() => {
-        dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Upload' });
-    }, []);
 
     return (
         <>

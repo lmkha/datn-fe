@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-type Key = 'accessToken' | 'user';
+type Key = 'accessToken' | 'user' | 'searchQuery';
 
-export default function useLocalStorage(key: string, defaultValue: any) {
+export default function useLocalStorage(key: Key, defaultValue: any) {
     const [value, setValue] = useState(defaultValue);
     useEffect(() => {
         const storedValue = window.localStorage.getItem(key);
@@ -31,6 +31,6 @@ export function get(key: Key) {
     return null;
 }
 
-export function deleteLocal(key: string) {
+export function remove(key: Key) {
     window.localStorage.removeItem(key);
 }

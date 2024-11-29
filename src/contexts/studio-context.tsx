@@ -2,20 +2,16 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-export type DrawerItem = 'Upload' | 'Dashboard' | 'Posts' | 'Comments' | 'GoBack';
 export interface StudioState {
     openDrawer?: boolean;
-    currentDrawerItem: DrawerItem;
 }
 
 export type StudioAction =
     | { type: 'DUMMY' }
     | { type: 'TOGGLE_DRAWER' }
-    | { type: 'SET_CURRENT_DRAWER_ITEM'; payload: DrawerItem };
 
 export const initialStudioState: StudioState = {
     openDrawer: true,
-    currentDrawerItem: 'Dashboard',
 };
 
 export const studioReducer = (state: StudioState, action: StudioAction): StudioState => {
@@ -24,8 +20,6 @@ export const studioReducer = (state: StudioState, action: StudioAction): StudioS
             return state;
         case 'TOGGLE_DRAWER':
             return { ...state, openDrawer: !state.openDrawer };
-        case 'SET_CURRENT_DRAWER_ITEM':
-            return { ...state, currentDrawerItem: action.payload };
         default:
             return state;
     }

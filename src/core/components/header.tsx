@@ -12,15 +12,13 @@ import {
     ListItemIcon,
     Grid2,
     Button,
-    Box,
-    Drawer,
     Popper,
     Paper,
     List,
     ListItem,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import React, { useState, MouseEvent } from 'react';
+import React, { useState, MouseEvent, useEffect } from 'react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
@@ -31,8 +29,8 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/contexts/user-context";
-import { get } from "@/hooks/use-local-storage";
 import { logout } from "@/services/real/auth";
+import { get, set } from "@/hooks/use-local-storage";
 
 interface HeaderProps {
     title?: string;
@@ -129,9 +127,8 @@ export default function Header(props: HeaderProps) {
 }
 
 function Account() {
-    const username = get('user')?.username;
     const router = useRouter();
-    const { state } = useUserContext();
+    const { state: userState } = useUserContext();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -164,7 +161,7 @@ function Account() {
             >
                 <div>
                     <MenuItem onClick={() => {
-                        router.push(`/@${username}`);
+                        userState?.username && router.push(`/@${userState.username}`);
                         handleClose();
                     }}>
                         <ListItemIcon>
@@ -207,28 +204,38 @@ function Account() {
 }
 
 function Search() {
+    const router = useRouter();
+    const [searchQuery, setSearchQuery] = useState<string>(() => get("searchQuery") || "");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [inputValue, setInputValue] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
-        setInputValue(value);
-
-        if (value.trim()) {
+        setSearchQuery(value);
+        set("searchQuery", value);
+        if (value.length > 0) {
             setAnchorEl(event.currentTarget);
             setOpen(true);
-        } else {
-            setOpen(false);
         }
     };
+
+    useEffect(() => {
+        const storedQuery = get("searchQuery") || "";
+        setSearchQuery(storedQuery);
+    }, []);
 
     return (
         <>
             <TextField
                 size="small"
-                value={inputValue}
+                value={searchQuery}
                 onChange={handleInputChange}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        router.push(`/result?q=${searchQuery}`);
+                    }
+                    setOpen(false);
+                }}
                 sx={{
                     width: '50%',
                     '& .MuiOutlinedInput-root': {

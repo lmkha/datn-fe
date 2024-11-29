@@ -4,17 +4,22 @@ import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { IoIosShareAlt } from "react-icons/io";
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import ShortcutIcon from '@mui/icons-material/Shortcut';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import MyTabs, { Tab } from "../components/tabs";
 import Filter from "../components/filter";
 import { useState } from "react";
-import { useContentContext } from "@/contexts/content-context";
+import { useUserContext } from "@/contexts/user-context";
+import Image from "next/legacy/image";
 
 export default function Profile() {
-    const { dispatch } = useContentContext();
+    const { state: userState } = useUserContext();
     const params = useParams();
     const { username } = params;
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
-    const [selectedTab, setSelectedTab] = useState<Tab>();
+    const [selectedTab, setSelectedTab] = useState<Tab>('videos');
 
     return (
         (<Stack direction={'column'} spacing={2}>
@@ -51,7 +56,7 @@ export default function Profile() {
                                 fontWeight: 'bold',
                                 fontSize: '1.5rem',
                             }}>{actualUsername}</Typography>
-                            <Typography>Le Minh Kha</Typography>
+                            <Typography>{userState.fullName || 'No name'}</Typography>
                         </Stack>
 
                         {/* Buttons */}
@@ -60,7 +65,9 @@ export default function Profile() {
                                 backgroundColor: '#EA284E',
                                 textTransform: 'none',
                                 fontWeight: 'bold',
-                            }}>Edit Profile</Button>
+                            }}>
+                                {actualUsername === userState.username ? 'Edit Profile' : 'Follow'}
+                            </Button>
                             <Button variant="contained" sx={{
                                 minWidth: 'auto',
                                 display: 'flex',
@@ -70,16 +77,6 @@ export default function Profile() {
                                 color: 'black',
                                 backgroundColor: 'lightgrey',
                             }}><SettingsIcon /></Button>
-
-                            <Button variant="contained" sx={{
-                                minWidth: 'auto',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                fontSize: 'large',
-                                color: 'black',
-                                backgroundColor: 'lightgrey',
-                            }}><IoIosShareAlt /></Button>
                         </Stack>
 
                         {/* Following, followers, likes */}
@@ -124,13 +121,13 @@ export default function Profile() {
             </Grid2>
             {/* Section 3: Videos or playlists */}
             <Box >
-                <Grid2 container spacing={4}>
+                <Grid2 container spacing={2}>
                     {
                         selectedTab === 'videos' ? (
                             [...Array(10)].map((_, index) => (
                                 <Grid2
                                     key={index}
-                                    minHeight={170}
+                                    minHeight={250}
                                     size={{
                                         xs: 12,
                                         sm: 6,
@@ -138,17 +135,91 @@ export default function Profile() {
                                         lg: 4,
                                     }}
                                     sx={{
+                                        position: 'relative',
                                         backgroundColor: 'lightgray',
                                         display: 'flex',
                                         justifyContent: 'center',
-                                        alignItems: 'center',
                                         borderRadius: 2,
+                                        overflow: 'hidden',
+                                        '&:hover .video-title': {
+                                            opacity: 1,
+                                            visibility: 'visible',
+                                        },
                                     }}
                                 >
-                                    <Typography variant="h6" gutterBottom>
-                                        Video {index + 1}
-                                    </Typography>
+                                    {/* Content */}
+                                    <Box
+                                        sx={{
+                                            width: '100%',
+                                            height: '100%',
+                                            borderRadius: '10px',
+                                            overflow: 'hidden',
+                                            position: 'relative',
+                                        }}
+                                    >
+                                        <Image
+                                            src="/images/video-image.jpg"
+                                            alt="Image"
+                                            layout="fill"
+                                            objectFit="cover"
+                                        />
+                                    </Box>
+
+                                    {/* Video overlay */}
+                                    <Box
+                                        onClick={() => console.log('Video clicked')}
+                                        className="video-title"
+                                        sx={{
+                                            cursor: 'pointer',
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                            backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8))',
+                                            display: 'flex',
+                                            color: 'white',
+                                            fontSize: '1.5rem',
+                                            fontWeight: 'bold',
+                                            textAlign: 'center',
+                                            borderRadius: '10px',
+                                            opacity: 0,
+                                            visibility: 'hidden',
+                                            transition: 'opacity 0.3s ease, visibility 0.3s ease',
+                                            justifyContent: 'start',
+                                            alignItems: 'end',
+                                        }}
+                                    >
+                                        <Stack padding={2}>
+                                            <Typography variant="h6">The best attacking trio in football history</Typography>
+                                            <Stack>
+                                                <Stack direction={'row'} spacing={2}>
+                                                    <Stack direction={'row'}>
+                                                        <PlayArrowOutlinedIcon />
+                                                        <Typography>125K</Typography>
+                                                    </Stack>
+                                                    <Stack direction={'row'}>
+                                                        <FavoriteBorderOutlinedIcon />
+                                                        <Typography>125K</Typography>
+                                                    </Stack>
+                                                    <Stack direction={'row'}>
+                                                        <ChatBubbleOutlineOutlinedIcon />
+                                                        <Typography>125K</Typography>
+                                                    </Stack>
+                                                    <Stack direction={'row'}>
+                                                        <ShortcutIcon />
+                                                        <Typography>125K</Typography>
+                                                    </Stack>
+                                                </Stack>
+                                                <Stack direction={'row'} spacing={2}>
+                                                    <Typography>Every one</Typography>
+                                                    <Typography>Nov 17, 2024</Typography>
+                                                </Stack>
+                                            </Stack>
+                                        </Stack>
+                                    </Box>
                                 </Grid2>
+
                             ))
                         ) : selectedTab === 'playlists' ? (
                             [...Array(5)].map((_, index) => (

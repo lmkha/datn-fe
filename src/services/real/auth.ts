@@ -1,5 +1,5 @@
 import auth from "@/api/auth"
-import { set } from "@/hooks/use-local-storage";
+import { set, remove } from "@/hooks/use-local-storage";
 import { getUserByUsername } from "./user";
 
 export const login = async ({ username, password }: { username: string, password: string }) => {
@@ -22,8 +22,8 @@ export const login = async ({ username, password }: { username: string, password
 }
 
 export const logout = () => {
-    set("accessToken", null);
-    set("user", null);
+    remove('accessToken');
+    remove('user');
 }
 
 export const checkUsernameAvailable = async (username: string) => {

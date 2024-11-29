@@ -6,6 +6,7 @@ import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import { useRouter } from "next/navigation";
+import { useUserContext } from "@/contexts/user-context";
 
 interface DrawerProps {
     openDrawer: boolean;
@@ -14,6 +15,7 @@ interface DrawerProps {
 
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
+    const { state: userState } = useUserContext();
 
     return (
         < Box
@@ -53,7 +55,7 @@ export default function Drawer(props: DrawerProps) {
                 />
 
                 <DrawerMenuItem
-                    onClick={() => { router.push('/@lmkha') }}
+                    onClick={() => { router.push(`/@${userState.username}`) }}
                     icon={<Avatar
                         src="/images/avatar.jpg"
                         alt="avatar"

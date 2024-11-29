@@ -1,24 +1,35 @@
-'use client';
-
-import React, { createContext, useReducer, ReactNode, useContext } from "react";
+import React, { createContext, useReducer, ReactNode, useContext, useEffect } from "react";
+import useLocalStorage, { get } from "@/hooks/use-local-storage";
 
 // Define the shape of the User state
 interface UserState {
     userId: string | null;
     username: string | null;
-    token: string | null;
+    email: string | null;
+    fullName: string | null;
+    phone: string | null;
+    isPrivate: boolean | null;
+    dateOfBirth: string | null;
+    followingCount: number | null;
+    followersCount: number | null;
 }
 
 // Define the types of actions
 type UserAction =
-    | { type: "SET_USER"; payload: { userId: string; username: string; token: string } }
+    | { type: "SET_USER"; payload: Partial<UserState> }
     | { type: "CLEAR_USER" };
 
 // Define the initial state
 const initialUserState: UserState = {
     userId: null,
-    username: 'lmkha',
-    token: null,
+    username: null,
+    email: null,
+    fullName: null,
+    phone: null,
+    isPrivate: null,
+    dateOfBirth: null,
+    followingCount: null,
+    followersCount: null,
 };
 
 // Define the reducer function
@@ -27,16 +38,11 @@ const userReducer = (state: UserState, action: UserAction): UserState => {
         case "SET_USER":
             return {
                 ...state,
-                userId: action.payload.userId,
-                username: action.payload.username,
-                token: action.payload.token,
+                ...action.payload, // Merge the state with the payload
             };
         case "CLEAR_USER":
             return {
-                ...state,
-                userId: null,
-                username: null,
-                token: null,
+                ...initialUserState,
             };
         default:
             return state;
@@ -54,7 +60,19 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 // Create the provider component
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [state, dispatch] = useReducer(userReducer, initialUserState);
+    const user = get("user");
+    const [state, dispatch] = useReducer(userReducer, {
+        ...initialUserState,
+        userId: user?.userId || null,
+        username: user?.username || null,
+        email: user?.email || null,
+        fullName: user?.fullName || null,
+        phone: user?.phone || null,
+        isPrivate: user?.isPrivate || null,
+        dateOfBirth: user?.dateOfBirth || null,
+        followingCount: user?.followingCount || null,
+        followersCount: user?.followersCount || null,
+    });
 
     return (
         <UserContext.Provider value={{ state, dispatch }}>

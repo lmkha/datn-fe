@@ -1,8 +1,14 @@
+'use client';
+
 import { Avatar, Box, Grid2, Skeleton, Stack, Typography } from "@mui/material";
 import Image from "next/legacy/image";
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from "react";
 
 export default function SearchResultPage() {
+    const searchParams = useSearchParams();
+    const query = searchParams.get('q');
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -23,10 +29,16 @@ export default function SearchResultPage() {
             <Box sx={{
                 width: '90%',
                 height: '50px',
-                backgroundColor: 'black',
+                backgroundColor: 'green',
             }}>
-
+                <Typography variant="h5" fontWeight={'bold'} sx={{
+                    color: 'white',
+                    padding: 2,
+                }}>
+                    Search results for "{query}"
+                </Typography>
             </Box>
+
             <Stack spacing={2} sx={{
                 padding: 1,
                 width: '90%',

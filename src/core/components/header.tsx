@@ -180,7 +180,10 @@ function Account() {
                         <Typography variant="inherit">Studio</Typography>
                     </MenuItem>
 
-                    <MenuItem onClick={handleClose}>
+                    <MenuItem onClick={() => {
+                        userState?.username && router.push('/settings');
+                        handleClose();
+                    }}>
                         <ListItemIcon>
                             <SettingsIcon fontSize="small" />
                         </ListItemIcon>

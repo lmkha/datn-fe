@@ -1,6 +1,5 @@
 'use client';
 
-import { useStudioContext } from "@/contexts/studio-context";
 import { Box, Button, Card, Grid2, IconButton, Input, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Chip } from '@mui/material';
@@ -16,10 +15,6 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 export default function EditPostPage() {
     const router = useRouter();
-    const { state, dispatch } = useStudioContext();
-    useEffect(() => {
-        dispatch({ type: 'SET_CURRENT_DRAWER_ITEM', payload: 'Upload' });
-    }, []);
 
     return (
         <>

@@ -3,18 +3,19 @@
 import { Avatar, Box, Grid2, Skeleton, Stack, Typography } from "@mui/material";
 import Image from "next/legacy/image";
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
 
 export default function SearchResultPage() {
+    return (
+        <Suspense fallback={<PageContentSkeleton />}>
+            <PageContent />
+        </Suspense>
+    );
+}
+
+function PageContent() {
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
-
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 2000);
-        return () => clearTimeout(timer);
-    }, []);
 
     return (
         <Stack spacing={2} sx={{
@@ -46,11 +47,44 @@ export default function SearchResultPage() {
                 backgroundColor: 'white',
             }}>
                 {
-                    [...Array(11)].map((_, index) => (
-                        isLoading
-                            ? <VideoItemSkeleton key={index} />
-                            : <VideoItem key={index} index={index} />
-                    ))
+                    [...Array(11)].map((_, index) => <VideoItem index={index} />)
+                }
+            </Stack>
+        </Stack>
+    );
+}
+
+function PageContentSkeleton() {
+    return (
+        <Stack spacing={2} sx={{
+            paddingTop: 1,
+            display: 'flex',
+            justifyContent: 'start',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#F8F8F8',
+        }}>
+            <Box sx={{
+                width: '90%',
+                height: '50px',
+                backgroundColor: 'green',
+            }}>
+                <Typography variant="h5" fontWeight={'bold'} sx={{
+                    color: 'white',
+                    padding: 2,
+                }}>
+                </Typography>
+            </Box>
+
+            <Stack spacing={2} sx={{
+                padding: 1,
+                width: '90%',
+                borderRadius: '10px',
+                backgroundColor: 'white',
+            }}>
+                {
+                    [...Array(11)].map((_, index) => <VideoItemSkeleton key={index} />)
                 }
             </Stack>
         </Stack>

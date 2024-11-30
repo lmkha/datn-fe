@@ -1,10 +1,9 @@
 'use client';
 
 import Header from "@/core/components/header";
-import { Box, Paper, Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import Drawer from "./components/drawer";
-import { DrawerItem, StudioProvider, useStudioContext } from "@/contexts/studio-context";
-import { useRouter } from "next/router";
+import { StudioProvider, useStudioContext } from "@/contexts/studio-context";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -27,7 +26,7 @@ function LayoutContent({
 }>) {
     const { state } = useStudioContext();
     const pathname = usePathname();
-    const [selectedDrawerItem, setSelectedDrawerItem] = useState<DrawerItem>('Upload');
+    const [selectedDrawerItem, setSelectedDrawerItem] = useState<'Upload' | 'Dashboard' | 'Posts' | 'Comments' | 'GoBack'>('Dashboard');
 
     useEffect(() => {
         if (pathname.startsWith('/studio/upload')) {

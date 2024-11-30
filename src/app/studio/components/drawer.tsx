@@ -10,18 +10,17 @@ import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBullete
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MessageRoundedIcon from '@mui/icons-material/MessageRounded';
 import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
-import { DrawerItem, useStudioContext } from "@/contexts/studio-context";
 import { useRouter } from "next/navigation";
 
 interface DrawerProps {
     openDrawer: boolean;
-    selectedDrawerItem: DrawerItem;
+    selectedDrawerItem: 'Upload' | 'Dashboard' | 'Posts' | 'Comments' | 'GoBack';
 }
 
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
 
-    const handleDrawerItemClick = (item: DrawerItem) => {
+    const handleDrawerItemClick = (item: 'Upload' | 'Dashboard' | 'Posts' | 'Comments' | 'GoBack') => {
         switch (item) {
             case 'Upload':
                 router.push('/studio/upload');

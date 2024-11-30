@@ -1,20 +1,13 @@
 'use client';
 
-import { useContentContext } from "@/contexts/content-context";
 import { Avatar, Box, Grid2, Skeleton, Stack, Typography } from "@mui/material";
 import Image from "next/legacy/image";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-    const { dispatch } = useContentContext();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        dispatch({
-            type: 'SET_CURRENT_DRAWER_ITEM',
-            payload: 'FOR_YOU',
-        });
-
         const timer = setTimeout(() => setIsLoading(false), 2000);
         return () => clearTimeout(timer);
     }, []);

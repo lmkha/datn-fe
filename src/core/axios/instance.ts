@@ -7,15 +7,27 @@ const axiosInstance = axios.create({
     withCredentials: true,
 });
 
+const noAuthRequiredApiEndpoints = [
+    "/auth/signIn",
+    "/auth/register",
+    "/users/checkUsernameAvailability",
+    '/users/checkEmailAvailability',
+    '/auth/account-otp-verification',
+];
 
 axiosInstance.interceptors.request.use(
     (config) => {
         console.log("Axios request!");
         const accessToken = get("accessToken");
         const language = localStorage.getItem("language") || "vi";
-        if (config.url !== "/auth/signIn" && accessToken) {
+
+        const isNoAuthRequired = noAuthRequiredApiEndpoints.some((endpoint) => {
+            return config.url?.startsWith(endpoint);
+        });
+        if (!isNoAuthRequired && accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
+
         config.headers["Accept-Language"] = language;
         return config;
     },

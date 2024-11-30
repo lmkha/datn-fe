@@ -10,6 +10,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 interface PasswordProps {
+    label?: string;
     showPassword: boolean;
     isError?: boolean;
     helperText?: string;
@@ -19,7 +20,15 @@ interface PasswordProps {
 }
 
 export default function Password(
-    { showPassword, isError = false, helperText = '', onChange, validatePassword, onChangeShowPassword }: PasswordProps
+    {
+        label = 'Password',
+        showPassword,
+        isError = false,
+        helperText = '',
+        onChange,
+        validatePassword,
+        onChangeShowPassword,
+    }: PasswordProps
 ) {
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -46,7 +55,7 @@ export default function Password(
                     color: 'black',
                 },
             }}>
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
                 <OutlinedInput
                     id="outlined-adornment-password"
                     fullWidth

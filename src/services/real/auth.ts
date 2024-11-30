@@ -26,6 +26,31 @@ export const logout = () => {
     remove('user');
 }
 
-export const checkUsernameAvailable = async (username: string) => {
-    return await auth.checkUsernameExist({ username });
+export const isUsernameTaken = async (username: string) => {
+    return (await auth.checkUsernameExist({ username })).success;
 }
+
+export const isEmailTaken = async (email: string) => {
+    return (await auth.checkEmailExist({ email })).success;
+}
+
+export const createAccount = async (data: { fullName: string, email: string, username: string, password: string }) => {
+    const result = await auth.registerUser({
+        ...data,
+        phone: "",
+        dateOfBirth: "",
+        isPrivate: false
+    });
+    return {
+        success: result.success,
+        message: result.message
+    }
+};
+
+export const verifyAccount = async (data: { username: string, otpCode: string }) => {
+    const result = await auth.verifyAccount(data);
+    return {
+        success: result.success,
+        message: result.message
+    }
+};

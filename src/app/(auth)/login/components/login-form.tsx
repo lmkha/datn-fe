@@ -7,20 +7,42 @@ import Password from './password';
 import { useState } from 'react';
 import { login } from '@/services/real/auth';
 import { useRouter } from 'next/navigation';
+import VerifyAccountModal from '../../verify-modal';
+import { LoginFormErrorField, validateLoginForm } from '@/validators/login-validator';
 
+export interface LoginFormState {
+    username: string;
+    password: string;
+    showPassword: boolean;
+    openVerifyModal: boolean;
+    isProcessing: boolean;
+    errors?: LoginFormErrorField[],
+
+}
 export default function LoginForm() {
     const router = useRouter();
-    const [username, setUsername] = useState<string>();
-    const [password, setPassword] = useState<string>();
-    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [state, setState] = useState<LoginFormState>({
+        username: '',
+        password: '',
+        showPassword: false,
+        openVerifyModal: false,
+        isProcessing: false,
+    });
 
-    const handleLogin = () => {
-        username && password && login({
-            username: username,
-            password: password
-        }).then((result) => {
+    const handleSubmit = async () => {
+        setState({ ...state, isProcessing: true })
+        const validateResult = await validateLoginForm(state);
+        if (validateResult.length > 0) {
+            setState({ ...state, isProcessing: false, errors: validateResult });
+            return;
+        }
+        await login({ username: state.username, password: state.password }).then((result) => {
             if (result.success) {
                 router.push('/');
+            } else {
+                if (result.message === 'Verifying you account, please check you email inbox!') {
+                    setState({ ...state, isProcessing: false, openVerifyModal: true });
+                }
             }
         });
     };
@@ -54,16 +76,16 @@ export default function LoginForm() {
                     color: 'black',
                 },
             }}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => setState({ ...state, username: e.target.value })}
             />
 
             <Password
-                showPassword={showPassword}
+                showPassword={state.showPassword}
                 isError={false}
                 helperText=''
-                onChange={(value) => { setPassword(value) }}
+                onChange={(value) => setState({ ...state, password: value })}
                 validatePassword={() => { }}
-                onChangeShowPassword={() => setShowPassword(!showPassword)}
+                onChangeShowPassword={() => setState({ ...state, showPassword: !state.showPassword })}
             />
 
             <FormControlLabel
@@ -76,7 +98,7 @@ export default function LoginForm() {
                 textTransform: 'none',
                 backgroundColor: '#EA284E',
             }}
-                onClick={() => handleLogin()}
+                onClick={() => handleSubmit()}
             >Sign In</Button>
 
             <Button startIcon={<GoogleIcon />} variant="outlined" fullWidth sx={{
@@ -102,6 +124,11 @@ export default function LoginForm() {
                     </Link>
                 </Box>
             </Typography>
+
+            <VerifyAccountModal
+                open={state.openVerifyModal}
+                username={state.username || ''}
+            />
         </Box>
     );
 };

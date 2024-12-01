@@ -3,7 +3,8 @@ import Base from "./base";
 class Playlist extends Base {
     async createAPlaylist(data: {
         name: string,
-        thumbnail?: string,
+        description: string,
+        videoIdsList?: string[],
     }) {
         try {
             const response = await this.post("/playlists", data);
@@ -20,9 +21,9 @@ class Playlist extends Base {
         }
     }
 
-    async getPlaylists() {
+    async getAllPlaylistsByUserId(userId: string) {
         try {
-            const response = await this.get("/playlists");
+            const response = await this.get(`/playlists/user/${userId}`);
             return {
                 success: response.success,
                 message: response.message,
@@ -31,7 +32,7 @@ class Playlist extends Base {
         } catch (err: any) {
             return {
                 success: false,
-                message: err?.response?.data?.message || "Get playlists failed",
+                message: err?.response?.data?.message || "Get all playlists by user id failed",
             }
         }
     }
@@ -57,7 +58,7 @@ class Playlist extends Base {
         videoId: string,
     }) {
         try {
-            const response = await this.patch(`/playlists/${data.playlistId}/add?videoId=${data.videoId}`, {});
+            const response = await this.patch(`/playlists/${data.playlistId}/?videoId=${data.videoId}`, {});
             return {
                 success: response.success,
                 message: response.message,

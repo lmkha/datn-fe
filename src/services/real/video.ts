@@ -32,3 +32,13 @@ export const getVideoStreamLink = (videoId: string) => {
     const result = `http://localhost:8080/${videoId}/output.mpd`
     return result;
 };
+
+export const getVideosByUserId = async (userId: string) => {
+    const response = await videoAPI.getVideosByUserId({ userId });
+    return response;
+};
+
+export const getVideoByVideoId = async (videoId: string) => {
+    const response = await videoAPI.getVideoByVideoId({ videoId });
+    return response;
+};

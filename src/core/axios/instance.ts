@@ -13,6 +13,7 @@ const noAuthRequiredApiEndpoints = [
     "/users/checkUsernameAvailability",
     '/users/checkEmailAvailability',
     '/auth/account-otp-verification',
+    "/videos/user"
 ];
 
 axiosInstance.interceptors.request.use(

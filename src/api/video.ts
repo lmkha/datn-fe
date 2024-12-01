@@ -75,6 +75,38 @@ class Video extends Base {
             }
         }
     }
+
+    async getVideosByUserId(params: { userId: string }) {
+        try {
+            const response = await this.get(`/videos/user/${params.userId}`);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            };
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get videos by user id failed",
+            }
+        }
+    }
+
+    async getVideoByVideoId(params: { videoId: string }) {
+        try {
+            const response = await this.get(`/videos/${params.videoId}`);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            };
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get video by video id failed",
+            }
+        }
+    }
 }
 
 const videoAPI = new Video();

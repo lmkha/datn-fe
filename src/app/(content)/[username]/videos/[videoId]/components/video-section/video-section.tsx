@@ -10,6 +10,7 @@ import VideoPlayerComponent from "./video-player";
 
 interface VideoSectionProps {
     videoLink: string;
+    video: any,
     changeTheaterMode: () => void;
 }
 export default function VideoSection(props: VideoSectionProps) {
@@ -35,8 +36,11 @@ export default function VideoSection(props: VideoSectionProps) {
                     {/* Title, author info */}
                     <Grid2 size={10} justifyContent={'center'} alignItems={'center'} pt={1}>
                         <Stack>
-                            <Typography variant="h6" fontWeight={'bold'}>
+                            {/* <Typography variant="h6" fontWeight={'bold'}>
                                 M10 Humiliates Cr7 And Real Madrid In The 2011 Champions Semifinal
+                            </Typography> */}
+                            <Typography variant="h6" fontWeight={'bold'}>
+                                {props?.video?.title || 'Title'}
                             </Typography>
                             <AuthorInfoComponent
                                 username="lmkha"

@@ -9,16 +9,31 @@ import ShortcutIcon from '@mui/icons-material/Shortcut';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import MyTabs, { Tab } from "../components/tabs";
 import Filter from "../components/filter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserContext } from "@/contexts/user-context";
 import Image from "next/legacy/image";
+import { getUserByUsername } from "@/services/real/user";
+import { getVideosByUserId } from "@/services/real/video";
 
 export default function Profile() {
-    const { state: userState } = useUserContext();
+    const [user, setUser] = useState<any>(null);
+    const [videos, setVideos] = useState<any[]>([]);
     const params = useParams();
     const { username } = params;
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
     const [selectedTab, setSelectedTab] = useState<Tab>('videos');
+
+    useEffect(() => {
+        getUserByUsername({ username: actualUsername }).then((result) => {
+            if (result.success) {
+                setUser(result.user);
+                getVideosByUserId(result.user.id).then((videosResult) => {
+                    setVideos(videosResult.data);
+                });
+            }
+        });
+    }, []);
+
 
     return (
         (<Stack direction={'column'} spacing={2}>
@@ -55,7 +70,8 @@ export default function Profile() {
                                 fontWeight: 'bold',
                                 fontSize: '1.5rem',
                             }}>{actualUsername}</Typography>
-                            <Typography>{userState.fullName || 'No name'}</Typography>
+                            {/* <Typography>{userState.fullName || 'No name'}</Typography> */}
+                            <Typography>{user?.fullName || 'No name'}</Typography>
                         </Stack>
 
                         {/* Buttons */}
@@ -65,7 +81,8 @@ export default function Profile() {
                                 textTransform: 'none',
                                 fontWeight: 'bold',
                             }}>
-                                {actualUsername === userState.username ? 'Edit Profile' : 'Follow'}
+                                {/* {actualUsername === userState.username ? 'Edit Profile' : 'Follow'} */}
+                                {actualUsername === user?.username ? 'Edit Profile' : 'Follow'}
                             </Button>
                             <Button variant="contained" sx={{
                                 minWidth: 'auto',
@@ -81,23 +98,27 @@ export default function Profile() {
                         {/* Following, followers, likes */}
                         <Stack direction={'row'} spacing={4}>
                             <Stack direction={'row'} spacing={1}>
-                                <Typography sx={{ fontWeight: 'bold' }}>27</Typography>
+                                {/* <Typography sx={{ fontWeight: 'bold' }}>27</Typography> */}
+                                <Typography sx={{ fontWeight: 'bold' }}>{user?.followingCount || 0}</Typography>
                                 <Typography sx={{ color: 'gray' }}>Following</Typography>
                             </Stack>
 
                             <Stack direction={'row'} spacing={1}>
-                                <Typography sx={{ fontWeight: 'bold' }}>120K</Typography>
+                                {/* <Typography sx={{ fontWeight: 'bold' }}>120K</Typography> */}
+                                <Typography sx={{ fontWeight: 'bold' }}>{user?.followerCount || 0}</Typography>
                                 <Typography sx={{ color: 'gray' }}>Followers</Typography>
                             </Stack>
 
                             <Stack direction={'row'} spacing={1}>
-                                <Typography sx={{ fontWeight: 'bold' }}>2M</Typography>
+                                {/* <Typography sx={{ fontWeight: 'bold' }}>2M</Typography> */}
+                                <Typography sx={{ fontWeight: 'bold' }}>{user?.likes || 0}</Typography>
                                 <Typography sx={{ color: 'gray' }}>Likes</Typography>
                             </Stack>
                         </Stack>
 
                         {/* Bio */}
-                        <Typography>I'm a the best developer!</Typography>
+                        {/* <Typography>I'm a the best developer!</Typography> */}
+                        <Typography>{user?.bio || 'No bio yet'}</Typography>
                     </Box>
                 </Grid2>
             </Grid2>
@@ -123,7 +144,17 @@ export default function Profile() {
                 <Grid2 container spacing={2}>
                     {
                         selectedTab === 'videos' ? (
-                            [...Array(10)].map((_, index) => <VideoItem key={index} index={index} />)
+                            // [...Array(10)].map((_, index) => <VideoItem key={index} index={index} />)
+                            videos.map((video, index) =>
+                                <VideoItem
+                                    videoId={video.id}
+                                    username={user?.username || ''}
+                                    key={index}
+                                    index={index}
+                                    title={video.title}
+                                    description={video.description}
+
+                                />)
                         ) : selectedTab === 'playlists' ? (
                             [...Array(5)].map((_, index) => <PlaylistItem key={index} index={index} />)
                         ) : (
@@ -138,7 +169,11 @@ export default function Profile() {
 }
 
 interface VideoItemProps {
+    videoId: string;
+    username: string;
     index: number;
+    title: string;
+    description: string;
 }
 function VideoItem(props: VideoItemProps) {
     const router = useRouter();
@@ -186,7 +221,7 @@ function VideoItem(props: VideoItemProps) {
 
             {/* Video overlay */}
             <Box
-                onClick={() => console.log('Video clicked')}
+                onClick={() => router.push(`/@${props.username}/videos/${props.videoId}`)}
                 className="video-title"
                 sx={{
                     cursor: 'pointer',
@@ -210,7 +245,8 @@ function VideoItem(props: VideoItemProps) {
                 }}
             >
                 <Stack padding={2}>
-                    <Typography variant="h6">The best attacking trio in football history</Typography>
+                    {/* <Typography variant="h6">The best attacking trio in football history</Typography> */}
+                    <Typography variant="h6">{props.title}</Typography>
                     <Stack>
                         <Stack direction={'row'} spacing={2}>
                             <Stack direction={'row'}>

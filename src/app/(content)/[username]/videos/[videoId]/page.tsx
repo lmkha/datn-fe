@@ -4,18 +4,27 @@ import { Grid2, Stack } from "@mui/material";
 import RecommendedVideoSection from "./components/recommended-video-section/recommended-video-section";
 import CommentSection from "./components/comments-section/comment-section";
 import VideoSection from "./components/video-section/video-section";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getCommentByVideoId } from "@/services/mock/comment";
 import DescriptionComponent from "./components/video-section/description-component";
 import { useVideoContext } from "@/contexts/video-context";
 import { getRecommendedVideos, getVideoById } from "@/services/mock/video";
 import { RecommendedVideo } from "./types";
-import { getVideoStreamLink } from "@/services/real/video";
+import { getVideoByVideoId as realGetVideoById, getVideoStreamLink } from "@/services/real/video";
 
 export default function VideoPage() {
     const { username, videoId } = useParams();
     const { state, dispatch } = useVideoContext();
+    const [video, setVideo] = useState<any>(null);
+
+    useEffect(() => {
+        realGetVideoById(videoId as string).then((result) => {
+            if (result.success) {
+                setVideo(result.data);
+            }
+        });
+    }, []);
 
     const fetchData = async () => {
         if (username && videoId) {
@@ -58,6 +67,7 @@ export default function VideoPage() {
             }}>
                 <Grid2 size={state.theaterMode ? 12 : 9}>
                     <VideoSection
+                        video={video}
                         videoLink={getVideoStreamLink(videoId as string)}
                         changeTheaterMode={toggleTheaterMode}
                     />

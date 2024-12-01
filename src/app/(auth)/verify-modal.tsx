@@ -170,7 +170,7 @@ export default function VerifyAccountModal(props: ModalProps) {
                                 mt: 2, textTransform: 'none',
                                 backgroundColor: '#EA284E',
                                 width: '100%',
-
+                                height: 40,
                             }}>
                             {state?.isSubmitting ? (
                                 <CircularProgress
@@ -208,7 +208,6 @@ export default function VerifyAccountModal(props: ModalProps) {
                         </Box>
                     </Grid2>
                 </Grid2>
-
             </Box>
         </Modal>
     );

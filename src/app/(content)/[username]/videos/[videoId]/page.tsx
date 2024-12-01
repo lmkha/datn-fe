@@ -11,6 +11,7 @@ import DescriptionComponent from "./components/video-section/description-compone
 import { useVideoContext } from "@/contexts/video-context";
 import { getRecommendedVideos, getVideoById } from "@/services/mock/video";
 import { RecommendedVideo } from "./types";
+import { getVideoStreamLink } from "@/services/real/video";
 
 export default function VideoPage() {
     const { username, videoId } = useParams();
@@ -56,7 +57,10 @@ export default function VideoPage() {
                 borderRadius: '10px'
             }}>
                 <Grid2 size={state.theaterMode ? 12 : 9}>
-                    <VideoSection changeTheaterMode={toggleTheaterMode} />
+                    <VideoSection
+                        videoLink={getVideoStreamLink(videoId as string)}
+                        changeTheaterMode={toggleTheaterMode}
+                    />
                 </Grid2>
 
                 {!state?.theaterMode && (

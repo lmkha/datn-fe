@@ -57,9 +57,7 @@ class Playlist extends Base {
         videoId: string,
     }) {
         try {
-            const response = await this.put(`/playlists/${data.playlistId}/videos`, {
-                videoId: data.videoId,
-            });
+            const response = await this.patch(`/playlists/${data.playlistId}/add?videoId=${data.videoId}`, {});
             return {
                 success: response.success,
                 message: response.message,
@@ -77,7 +75,7 @@ class Playlist extends Base {
         videoId: string,
     }) {
         try {
-            const response = await this.delete(`/playlists/${data.playlistId}/videos/${data.videoId}`);
+            const response = await this.patch(`/playlists/${data.playlistId}/remove?videoId=${data.videoId}`, {});
             return {
                 success: response.success,
                 message: response.message,
@@ -86,6 +84,26 @@ class Playlist extends Base {
             return {
                 success: false,
                 message: err?.response?.data?.message || "Remove video from playlist failed",
+            }
+        }
+    }
+
+    async uploadThumbnailForPlaylist(data: {
+        playlistId: string,
+        thumbnail: string,
+    }) {
+        try {
+            const response = await this.patch(`/playlists/${data.playlistId}/thumbnail`, {
+                thumbnail: data.thumbnail,
+            });
+            return {
+                success: response.success,
+                message: response.message,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Upload thumbnail for playlist failed",
             }
         }
     }

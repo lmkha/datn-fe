@@ -20,6 +20,7 @@ class Video extends Base {
     async uploadVideoMetaData(data: {
         title: string,
         isPrivate: boolean,
+        commentOff: boolean,
         description?: string,
         tags?: string[],
     }) {

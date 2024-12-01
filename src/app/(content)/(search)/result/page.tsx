@@ -1,8 +1,10 @@
 'use client';
 
-import { Avatar, Box, Grid2, Skeleton, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Grid2, Skeleton, Stack, Typography } from "@mui/material";
 import Image from "next/legacy/image";
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { Tabs, Tab } from '@mui/material';
 import { Suspense } from "react";
 
 export default function SearchResultPage() {
@@ -16,6 +18,7 @@ export default function SearchResultPage() {
 function PageContent() {
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
+    const [tab, setTab] = useState<Tab>('Videos');
 
     return (
         <Stack spacing={2} sx={{
@@ -30,14 +33,12 @@ function PageContent() {
             <Box sx={{
                 width: '90%',
                 height: '50px',
-                backgroundColor: 'green',
+                backgroundColor: 'white',
+                borderRadius: '10px',
             }}>
-                <Typography variant="h5" fontWeight={'bold'} sx={{
-                    color: 'white',
-                    padding: 2,
-                }}>
-                    Search results for "{query}"
-                </Typography>
+                <MyTabs
+                    onTabChange={(selectedTab) => setTab(selectedTab)}
+                />
             </Box>
 
             <Stack spacing={2} sx={{
@@ -47,7 +48,11 @@ function PageContent() {
                 backgroundColor: 'white',
             }}>
                 {
-                    [...Array(11)].map((_, index) => <VideoItem index={index} />)
+                    tab === 'Videos' ? (
+                        [...Array(11)].map((_, index) => <VideoItem key={index} index={index} />)
+                    ) : (
+                        [...Array(1)].map((_, index) => <FollowingItem key={index} />)
+                    )
                 }
             </Stack>
         </Stack>
@@ -251,3 +256,138 @@ function VideoItemSkeleton() {
     );
 }
 
+export type Tab = 'Videos' | 'Users';
+
+interface TabsProps {
+    onTabChange?: (tab: Tab) => void;
+}
+function MyTabs({ onTabChange }: TabsProps) {
+    const [value, setValue] = useState<number>(0);
+
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+        if (onTabChange) {
+            const selectedTab = newValue === 0 ? 'Videos' : 'Users';
+            onTabChange(selectedTab);
+        }
+    };
+
+    return (
+        <Box sx={{ width: '100%', height: '100%' }}>
+            <Box>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    aria-label="basic tabs example"
+                    TabIndicatorProps={{
+                        style: {
+                            backgroundColor: 'black',
+                        },
+                    }}
+                >
+                    <Tab
+                        label="Videos"
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: 'medium',
+                            '&.Mui-selected': {
+                                color: 'black',
+                            },
+                        }}
+                    />
+                    <Tab
+                        label="Users"
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: 'medium',
+                            '&.Mui-selected': {
+                                color: 'black',
+                            },
+                        }}
+                    />
+                </Tabs>
+            </Box>
+        </Box>
+    );
+}
+
+function FollowingItem() {
+    const router = useRouter();
+    const [followed, setFollowed] = useState<boolean>(false);
+
+    return (
+        <>
+            <Grid2 container direction={'row'} sx={{
+                height: '120px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#F8F8F8',
+                borderRadius: '10px',
+                padding: 1
+            }}>
+                {/* Avatar */}
+                <Grid2 size={2} height={'100%'}>
+                    <Avatar
+                        alt="Avt"
+                        src="/images/avatar.jpg"
+                        sx={{
+                            height: '100%',
+                            width: 'auto',
+                            aspectRatio: '1',
+                            cursor: 'pointer',
+                        }}
+                        onClick={() => router.push('/@lmkha')}
+                    />
+                </Grid2>
+                {/* Info */}
+                <Grid2 size={8}>
+                    <Stack>
+                        {/* FullName */}
+                        <Typography variant="h6" fontWeight={'bold'} onClick={() => router.push('/@lmkha')} sx={{
+                            cursor: 'pointer',
+                        }}>Lê Minh Kha</Typography>
+                        {/* Username */}
+                        <Typography variant="h6" onClick={() => router.push('/@lmkha')} sx={{
+                            cursor: 'pointer',
+                        }}>@lmkha</Typography>
+                        {/* Bio */}
+                        <Typography variant="body1">I'm a the best developer!</Typography>
+                        {/* Metrics */}
+                        <Stack direction={'row'} spacing={2}>
+                            <Stack direction={'row'} spacing={1}>
+                                <Typography variant="body1">27</Typography>
+                                <Typography variant="body1" color="textSecondary">Following</Typography>
+                            </Stack>
+                            <Stack direction={'row'} spacing={1}>
+                                <Typography variant="body1">27</Typography>
+                                <Typography variant="body1" color="textSecondary">Following</Typography>
+                            </Stack>
+                            <Stack direction={'row'} spacing={1}>
+                                <Typography variant="body1">27</Typography>
+                                <Typography variant="body1" color="textSecondary">Likes</Typography>
+                            </Stack>
+                        </Stack>
+                    </Stack>
+                </Grid2>
+                {/* UnFollow button */}
+                <Grid2 size={2}>
+                    <Button sx={{
+                        width: '100%',
+                        height: '50px',
+                        backgroundColor: followed ? 'lightgray' : '#EA284E',
+                        color: followed ? 'black' : 'white',
+                        textTransform: 'none',
+                    }}
+                        onClick={() => {
+                            setFollowed(!followed);
+                        }}
+                    >
+                        <Typography variant="body1" fontWeight={'bold'}>
+                            {followed ? 'Unfollow' : 'Follow'}
+                        </Typography>
+                    </Button>
+                </Grid2>
+            </Grid2>
+        </>
+    );
+}

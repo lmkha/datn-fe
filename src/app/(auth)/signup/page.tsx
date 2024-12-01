@@ -29,7 +29,7 @@ export default function SignUpPage() {
         username: '',
         password: '',
         confirmPassword: '',
-        openVerifyModal: true,
+        openVerifyModal: false,
     });
 
     const handleSubmit = async (event: React.FormEvent) => {

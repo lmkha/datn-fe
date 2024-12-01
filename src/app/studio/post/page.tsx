@@ -457,7 +457,7 @@ function DeletePostConfirmDialog(props: DeletePostConfirmDialogProps) {
                         textTransform: 'none',
                     }}
                 >
-                    <Typography variant="body1" fontWeight={'bold'}>Unfollow</Typography>
+                    <Typography variant="body1" fontWeight={'bold'}>Delete</Typography>
                 </Button>
             </DialogActions>
         </Dialog>

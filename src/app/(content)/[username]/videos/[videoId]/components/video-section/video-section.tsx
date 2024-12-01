@@ -9,6 +9,7 @@ import AuthorInfoComponent from "./author-info";
 import VideoPlayerComponent from "./video-player";
 
 interface VideoSectionProps {
+    videoLink: string;
     changeTheaterMode: () => void;
 }
 export default function VideoSection(props: VideoSectionProps) {
@@ -19,7 +20,10 @@ export default function VideoSection(props: VideoSectionProps) {
             width: '100%',
         }}>
             {/* Video component */}
-            <VideoPlayerComponent changeTheaterMode={props.changeTheaterMode} />
+            <VideoPlayerComponent
+                videoLink={props.videoLink}
+                changeTheaterMode={props.changeTheaterMode}
+            />
 
             <Stack sx={{
                 borderLeft: '1px solid lightgray',

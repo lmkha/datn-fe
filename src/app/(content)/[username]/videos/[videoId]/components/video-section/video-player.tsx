@@ -3,6 +3,7 @@ import Image from "next/legacy/image";
 import ReactPlayer from 'react-player';
 
 interface VideoPlayerProps {
+    videoLink: string;
     changeTheaterMode?: () => void;
 }
 export default function VideoPlayerComponent(props: VideoPlayerProps) {
@@ -17,7 +18,7 @@ export default function VideoPlayerComponent(props: VideoPlayerProps) {
                 {/* Video player */}
                 <ReactPlayer
                     forcedash="true"
-                    url="http://localhost:8080/6746cb0b695f97155597ee35/output.mpd"
+                    url={props.videoLink}
                     controls={true}
                     width="100%"
                     height="100%"

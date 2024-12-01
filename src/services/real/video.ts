@@ -4,12 +4,14 @@ export const postVideo = async (data: {
     title: string;
     isPrivate: boolean;
     file: File;
+    commentOff?: boolean;
     description?: string;
     tags?: string[];
 }) => {
     const response = await videoAPI.uploadVideoMetaData({
         title: data.title,
         isPrivate: data.isPrivate,
+        commentOff: data.commentOff || false,
         description: data.description,
         tags: data.tags,
     });
@@ -26,7 +28,7 @@ export const postVideo = async (data: {
     return finalResult;
 };
 
-export const getVideoStreamLink = async (videoId: string) => {
-    const response = await videoAPI.getVideoStreamLink({ videoId });
-    return response;
+export const getVideoStreamLink = (videoId: string) => {
+    const result = `http://localhost:8080/${videoId}/output.mpd`
+    return result;
 };

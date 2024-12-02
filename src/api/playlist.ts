@@ -4,7 +4,7 @@ class Playlist extends Base {
     async createAPlaylist(data: {
         name: string,
         description: string,
-        videoIdsList?: string[],
+        videoIdsList: string[],
     }) {
         try {
             const response = await this.post("/playlists", data);
@@ -91,12 +91,13 @@ class Playlist extends Base {
 
     async uploadThumbnailForPlaylist(data: {
         playlistId: string,
-        thumbnail: string,
+        thumbnailFile: File,
     }) {
         try {
-            const response = await this.patch(`/playlists/${data.playlistId}/thumbnail`, {
-                thumbnail: data.thumbnail,
-            });
+            const formData = new FormData();
+            formData.append("img", data.thumbnailFile);
+
+            const response = await this.post(`/playlists/${data.playlistId}/thumbnail`, formData);
             return {
                 success: response.success,
                 message: response.message,

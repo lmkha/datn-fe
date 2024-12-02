@@ -1,36 +1,30 @@
-import imageAPI from "@/api/image";
 import playlistAPI from "@/api/playlist";
 
 export const createPlaylist = async (data: {
     name: string;
-    thumbnailFile?: File;
+    description: string;
+    thumbnailFile?: File | null;
 }) => {
-    let thumbnailUrl = undefined;
-    if (data?.thumbnailFile) {
-        const response = await imageAPI.uploadImage({
-            file: data.thumbnailFile,
-        });
-        if (response.success) {
-            thumbnailUrl = response.data.url;
-        } else {
-            return {
-                success: false,
-                message: response.message,
-            }
-        }
-    }
-    return playlistAPI.createAPlaylist({
+    const createPlaylistResult = await playlistAPI.createAPlaylist({
         name: data.name,
-        thumbnail: thumbnailUrl,
+        description: data.description,
+        videoIdsList: [],
     });
-};
 
-export const getPlaylists = async () => {
-    return playlistAPI.getPlaylists();
+    if (data?.thumbnailFile && createPlaylistResult.success) {
+        await playlistAPI.uploadThumbnailForPlaylist({
+            playlistId: createPlaylistResult.data._id,
+            thumbnailFile: data.thumbnailFile,
+        });
+    }
+
+    return createPlaylistResult;
+}
+
+export const getAllPlaylistByUserId = async (userId: string) => {
+    return playlistAPI.getAllPlaylistsByUserId(userId);
 };
 
 export const getPlaylistById = async (playlistId: string) => {
     return playlistAPI.getPlaylistById(playlistId);
 };
-
-

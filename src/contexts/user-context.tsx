@@ -63,7 +63,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const user = get("user");
     const [state, dispatch] = useReducer(userReducer, {
         ...initialUserState,
-        userId: user?.userId || null,
+        userId: user?.id || null,
         username: user?.username || null,
         email: user?.email || null,
         fullName: user?.fullName || null,

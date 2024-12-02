@@ -39,7 +39,7 @@ class Video extends Base {
         }
     }
 
-    async uploadVideoThumbnail(data: {
+    async uploadThumbnail(data: {
         file: File,
         videoId: string,
     }) {

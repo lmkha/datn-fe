@@ -14,6 +14,7 @@ import { useUserContext } from "@/contexts/user-context";
 import Image from "next/legacy/image";
 import { getUserByUsername } from "@/services/real/user";
 import { getVideosByUserId } from "@/services/real/video";
+import { CldImage } from 'next-cloudinary';
 
 export default function Profile() {
     const [user, setUser] = useState<any>(null);
@@ -144,7 +145,6 @@ export default function Profile() {
                 <Grid2 container spacing={2}>
                     {
                         selectedTab === 'videos' ? (
-                            // [...Array(10)].map((_, index) => <VideoItem key={index} index={index} />)
                             videos.map((video, index) =>
                                 <VideoItem
                                     videoId={video.id}
@@ -153,6 +153,7 @@ export default function Profile() {
                                     index={index}
                                     title={video.title}
                                     description={video.description}
+                                    thumbnail={video.thumbnailUrl}
 
                                 />)
                         ) : selectedTab === 'playlists' ? (
@@ -174,6 +175,7 @@ interface VideoItemProps {
     index: number;
     title: string;
     description: string;
+    thumbnail?: string;
 }
 function VideoItem(props: VideoItemProps) {
     const router = useRouter();
@@ -211,11 +213,15 @@ function VideoItem(props: VideoItemProps) {
                     position: 'relative',
                 }}
             >
-                <Image
-                    src="/images/video-image.jpg"
+                <CldImage
+                    fill={true}
+                    style={{
+                        objectFit: 'cover',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                    src={props.thumbnail || ''}
                     alt="Image"
-                    layout="fill"
-                    objectFit="cover"
                 />
             </Box>
 

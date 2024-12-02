@@ -3,12 +3,14 @@ import videoAPI from "@/api/video";
 export const postVideo = async (data: {
     title: string;
     isPrivate: boolean;
-    file: File;
+    videoFile: File;
+    thumbnailFile?: File;
     commentOff?: boolean;
     description?: string;
     tags?: string[];
 }) => {
-    const response = await videoAPI.uploadVideoMetaData({
+    // Upload video meta data
+    const uploadVideoMetaDataResult = await videoAPI.uploadVideoMetaData({
         title: data.title,
         isPrivate: data.isPrivate,
         commentOff: data.commentOff || false,
@@ -16,16 +18,25 @@ export const postVideo = async (data: {
         tags: data.tags,
     });
 
-    if (!response.success) {
-        return response;
+    if (!uploadVideoMetaDataResult.success) {
+        return uploadVideoMetaDataResult;
     }
 
-    const finalResult = await videoAPI.uploadVideoFile({
-        videoId: response.data.id,
-        file: data.file,
+    // Upload thumbnail file
+    if (data.thumbnailFile) {
+        videoAPI.uploadThumbnail({
+            videoId: uploadVideoMetaDataResult.data.id,
+            file: data.thumbnailFile,
+        });
+    }
+
+    // Upload video file
+    const uploadVideoFileResult = await videoAPI.uploadVideoFile({
+        videoId: uploadVideoMetaDataResult.data.id,
+        file: data.videoFile,
     });
 
-    return finalResult;
+    return uploadVideoFileResult;
 };
 
 export const getVideoStreamLink = (videoId: string) => {

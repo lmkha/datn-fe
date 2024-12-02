@@ -23,6 +23,7 @@ export default function VideoSection(props: VideoSectionProps) {
             {/* Video component */}
             <VideoPlayerComponent
                 videoLink={props.videoLink}
+                thumbnail={props?.video?.thumbnailUrl}
                 changeTheaterMode={props.changeTheaterMode}
             />
 

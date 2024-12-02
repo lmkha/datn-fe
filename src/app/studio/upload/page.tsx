@@ -26,12 +26,12 @@ interface PageState {
     playlist?: string;
     thumbnailFile?: File;
     videoFile?: File;
+    videoFileMetaData?: VideoFileMetadata;
     success?: boolean;
 }
 
 export default function UploadVideoPage() {
     const [pageState, setPageState] = useState<PageState>();
-    const [videoMetadata, setVideoMetadata] = useState<VideoFileMetadata>();
 
     const videoURL = useMemo(() => {
         if (pageState?.videoFile) {
@@ -47,22 +47,6 @@ export default function UploadVideoPage() {
         return null;
     }, [pageState?.thumbnailFile]);
 
-    useEffect(() => {
-        return () => {
-            if (videoURL) {
-                URL.revokeObjectURL(videoURL);
-            }
-        };
-    }, [videoURL]);
-
-    useEffect(() => {
-        return () => {
-            if (thumbnailURL) {
-                URL.revokeObjectURL(thumbnailURL);
-            }
-        };
-    }, [thumbnailURL]);
-
     const setVideoFileMetadata = (file: File) => {
         const videoURL = URL.createObjectURL(file);
         const video = document.createElement('video');
@@ -72,9 +56,12 @@ export default function UploadVideoPage() {
             const formattedDuration = formatDuration(video.duration);
             const formattedSize = formatSize(file.size);
 
-            setVideoMetadata({
-                size: formattedSize,
-                duration: formattedDuration,
+            setPageState({
+                ...pageState,
+                videoFileMetaData: {
+                    size: formattedSize,
+                    duration: formattedDuration,
+                },
             });
 
             URL.revokeObjectURL(videoURL);
@@ -85,35 +72,23 @@ export default function UploadVideoPage() {
         };
     };
 
-    const setThumbnailFileMetadata = (file: File) => {
-        const thumbnailURL = URL.createObjectURL(file);
-        const image = document.createElement('img');
-        image.src = thumbnailURL;
-
-        image.onload = () => {
-            URL.revokeObjectURL(thumbnailURL);
-        };
-
-        image.onerror = () => {
-            console.error('Error loading thumbnail metadata');
-        }
-    }
-
     useEffect(() => {
         if (pageState?.videoFile) {
             setVideoFileMetadata(pageState.videoFile);
         }
-        if (pageState?.thumbnailFile) {
-            setThumbnailFileMetadata(pageState.thumbnailFile);
-        }
-    }, [pageState]);
+    }, [pageState?.videoFile]);
 
     const handleUpload = async () => {
         setPageState({ ...pageState, isUploading: true });
+        if (!pageState?.videoFile) {
+            setPageState({ ...pageState, isUploading: false });
+            return;
+        }
         postVideo({
             title: pageState?.title || '',
             isPrivate: pageState?.visibility === 'private',
-            file: pageState?.videoFile || new File([], ''),
+            videoFile: pageState?.videoFile,
+            thumbnailFile: pageState?.thumbnailFile,
             description: pageState?.description,
             tags: pageState?.hashtags,
         }).then((response) => {
@@ -158,12 +133,12 @@ export default function UploadVideoPage() {
                                     {/* Size */}
                                     <Stack direction={'row'} spacing={1}>
                                         <Typography>Size</Typography>
-                                        <Typography fontWeight={'bold'}>{videoMetadata?.size || ''}</Typography>
+                                        <Typography fontWeight={'bold'}>{pageState?.videoFileMetaData?.size || ''}</Typography>
                                     </Stack>
                                     {/* Duration */}
                                     <Stack direction={'row'} spacing={1}>
                                         <Typography>Duration</Typography>
-                                        <Typography fontWeight={'bold'}>{videoMetadata?.duration || ''}</Typography>
+                                        <Typography fontWeight={'bold'}>{pageState?.videoFileMetaData?.duration || ''}</Typography>
                                     </Stack>
                                 </Stack>
                                 <VideoUploadButton onChange={(file) => setPageState({ ...pageState, videoFile: file })} />
@@ -176,15 +151,15 @@ export default function UploadVideoPage() {
                         height: '100%',
                         backgroundColor: 'black',
                         borderRadius: '10px',
+                        position: 'relative',
+                        overflow: 'hidden',
                     }}>
                         {videoURL && (
                             <video
                                 src={videoURL}
                                 controls
-                                autoPlay={true}
-                                width="100%"
-                                height="100%"
-                                className="rounded-lg"
+                                autoPlay
+                                className="absolute top-0 left-0 w-full h-full object-cover"
                             />
                         )}
                     </Grid2>
@@ -279,19 +254,19 @@ export default function UploadVideoPage() {
                     <Grid2 size={4}>
                         <Stack spacing={2}>
                             {/* Thumbnail */}
-                            <Box sx={{
-                                width: '100%',
-                                height: '170px',
-                                backgroundColor: 'black',
-                                borderRadius: '10px',
-                                border: '1px solid lightgray',
-                                position: 'relative',
-                                overflow: 'hidden',
-                            }}>
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    height: '170px',
+                                    backgroundColor: 'black',
+                                    borderRadius: '10px',
+                                    border: '1px solid lightgray',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                }}
+                            >
                                 {thumbnailURL && (
                                     <Image
-                                        width={200}
-                                        height={200}
                                         src={thumbnailURL}
                                         alt="Thumbnail"
                                         layout="fill"
@@ -299,6 +274,7 @@ export default function UploadVideoPage() {
                                     />
                                 )}
                             </Box>
+
                             {/* Set thumbnail button */}
                             <ThumbnailUploadButton onChange={(file) => setPageState({ ...pageState, thumbnailFile: file })} />
                             {/* Who can view video */}
@@ -336,7 +312,6 @@ export default function UploadVideoPage() {
                                     </Typography>
                                 )}
                             </Button>
-
                         </Stack>
                     </Grid2>
                 </Grid2>

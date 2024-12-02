@@ -4,15 +4,44 @@ import { Box, Button, Grid2, MenuItem, Select, SelectChangeEvent, Typography } f
 import * as React from 'react';
 import FormControl from '@mui/material/FormControl';
 import CreateNewPlayListModal from "./create-playlist-modal";
+import { get } from "@/hooks/use-local-storage";
+import { getAllPlaylistByUserId } from "@/services/real/playlist";
+import { useUserContext } from "@/contexts/user-context";
 
+interface Playlist {
+    id: string;
+    name: string;
+}
+interface PlayListSelectState {
+    allPlaylists: Playlist[];
+    selectedPlaylist?: Playlist;
+    openCreateNewPlaylistModal?: boolean;
+}
+interface PlayListSelectProps {
+    onPlaylistSelected?: (playlist: string) => void;
+}
+export default function PlayListSelect(props: PlayListSelectProps) {
+    const { state: userState } = useUserContext();
+    const [state, setState] = React.useState<PlayListSelectState>({ allPlaylists: [] });
 
-export default function PlayListSelect() {
-    const [playlist, setPlaylist] = React.useState('');
-    const [openCreateNewPlaylistModal, setOpenCreateNewPlaylistModal] = React.useState(false);
-
-    const handleChange = (event: SelectChangeEvent) => {
-        setPlaylist(event.target.value);
+    const fetchPlaylists = async () => {
+        console.log('User stat id', userState.userId);
+        if (!userState.userId) return;
+        getAllPlaylistByUserId(userState.userId).then((response) => {
+            if (response.success && response.data) {
+                response.data.map((playlist: any) => {
+                    setState({
+                        ...state,
+                        allPlaylists: [...state.allPlaylists, { id: playlist.id, name: playlist.name }]
+                    });
+                });
+            }
+        });
     };
+
+    React.useEffect(() => {
+        fetchPlaylists();
+    }, []);
 
     return (
         <Box>
@@ -27,18 +56,23 @@ export default function PlayListSelect() {
                     <FormControl fullWidth>
                         <Select
                             size="small"
-                            value={playlist}
-                            onChange={handleChange}
+                            onChange={(event: SelectChangeEvent) => {
+
+                            }}
                             displayEmpty
                             inputProps={{ 'aria-label': 'Select a playlist' }}
                         >
                             <MenuItem value="" disabled>
                                 Choose a playlist
                             </MenuItem>
-                            <MenuItem value="1">My Favorites</MenuItem>
-                            <MenuItem value="2">Workout Mix</MenuItem>
-                            <MenuItem value="3">Relaxing Music</MenuItem>
-                            <MenuItem value="4">Top Hits</MenuItem>
+                            {state?.allPlaylists?.map((playlist, index) => (
+                                <MenuItem
+                                    key={index}
+                                    onClick={() => props.onPlaylistSelected && props.onPlaylistSelected(playlist.id)}
+                                >
+                                    {playlist.name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Grid2>
@@ -55,15 +89,18 @@ export default function PlayListSelect() {
                             width: 'auto',
                             height: '100%',
                         }}
-                        onClick={() => setOpenCreateNewPlaylistModal(true)}
+                        onClick={() => setState({ ...state, openCreateNewPlaylistModal: true })}
                     >
                         <Typography>Create</Typography>
                     </Button>
                 </Grid2>
             </Grid2>
             <CreateNewPlayListModal
-                open={openCreateNewPlaylistModal}
-                onClose={() => setOpenCreateNewPlaylistModal(false)}
+                open={state.openCreateNewPlaylistModal || false}
+                onClose={() => setState({ ...state, openCreateNewPlaylistModal: false })}
+                onCreated={() => {
+                    fetchPlaylists();
+                }}
             />
         </Box>
     );

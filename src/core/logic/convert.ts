@@ -10,6 +10,34 @@ export function formatNumberToShortText(number: number): string {
     return `${formattedNumber}${units[unitIndex]}`;
 }
 
+export function formatTimeToShortText(createdAt: string): string {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffInSeconds = Math.floor((now.getTime() - createdDate.getTime()) / 1000);
+
+    const units = [
+        { label: "year", seconds: 365 * 24 * 60 * 60 },
+        { label: "month", seconds: 30 * 24 * 60 * 60 },
+        { label: "week", seconds: 7 * 24 * 60 * 60 },
+        { label: "day", seconds: 24 * 60 * 60 },
+        { label: "hour", seconds: 60 * 60 },
+        { label: "minute", seconds: 60 },
+        { label: "second", seconds: 1 },
+    ];
+
+    for (const unit of units) {
+        const count = Math.floor(diffInSeconds / unit.seconds);
+        if (count >= 1) {
+            return count === 1
+                ? `1 ${unit.label} ago`
+                : `${count} ${unit.label}s ago`;
+        }
+    }
+
+    return "just now";
+}
+
+
 export const formatDuration = (durationInSeconds: number): string => {
     const hours = Math.floor(durationInSeconds / 3600);
     const minutes = Math.floor((durationInSeconds % 3600) / 60);

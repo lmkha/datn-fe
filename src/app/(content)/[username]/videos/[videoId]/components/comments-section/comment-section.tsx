@@ -1,11 +1,11 @@
 'use client';
 
 import { Stack } from "@mui/material";
-import CommentComponent from "./comment-component";
-import { Comment } from "../../types";
+import ParentCommentComponent from "./parent-comment";
+import { ParentComment } from "../../types";
 
 interface CommentSectionProps {
-    comments?: Comment[];
+    comments?: ParentComment[];
 }
 
 export default function CommentSection(props: CommentSectionProps) {
@@ -14,7 +14,10 @@ export default function CommentSection(props: CommentSectionProps) {
             borderBottom: '1px solid lightgray',
         }}>
             {props?.comments?.map((comment, index) => (
-                <CommentComponent key={index} comment={comment} />
+                <ParentCommentComponent
+                    key={index}
+                    comment={comment}
+                />
             ))}
         </Stack>
     );

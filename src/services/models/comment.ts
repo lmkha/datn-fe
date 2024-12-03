@@ -1,9 +1,25 @@
-export interface CommentModel {
-    id?: string;
-    videoId?: string;
-    content?: string;
-    username?: string;
-    createdAt?: string;
-    likes?: string;
-    dislikes?: string;
+export interface ParentCommentModel {
+    id: string;
+    content: string;
+    likes: number;
+    childrenIds: string[];
+    replyCount: number;
+    videoId: string;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+    isEdited: boolean;
+}
+
+export interface ChildCommentModel {
+    parentId: string;
+    id: string;
+    content: string;
+    likes: number;
+    replyCount: number;
+    videoId: string;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+    isEdited: boolean;
 }

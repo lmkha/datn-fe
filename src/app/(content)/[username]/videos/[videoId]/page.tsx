@@ -6,44 +6,31 @@ import CommentSection from "./components/comments-section/comment-section";
 import VideoSection from "./components/video-section/video-section";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getCommentByVideoId } from "@/services/mock/comment";
 import DescriptionComponent from "./components/video-section/description-component";
-import { useVideoContext } from "@/contexts/video-context";
-import { getRecommendedVideos, getVideoById } from "@/services/mock/video";
-import { RecommendedVideo } from "./types";
-import { getVideoByVideoId as realGetVideoById, getVideoStreamLink } from "@/services/real/video";
+import { getRecommendedVideos as _mock_getRecommendedVideos, getVideoById as _mock_getVideoById } from "@/services/mock/video";
+import { getVideoByVideoId } from "@/services/real/video";
+import { getUserByUsername } from "@/services/real/user";
+import { getAllParentCommentsOfVideo_Mock } from "@/services/mock/comment";
+import { ParentComment } from "./types";
 
 export default function VideoPage() {
     const { username, videoId } = useParams();
-    const { state, dispatch } = useVideoContext();
+    const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
+    const [user, setUser] = useState<any>(null);
     const [video, setVideo] = useState<any>(null);
-
-    useEffect(() => {
-        realGetVideoById(videoId as string).then((result) => {
-            if (result.success) {
-                setVideo(result.data);
-            }
-        });
-    }, []);
+    const [comments, setComments] = useState<ParentComment[]>();
 
     const fetchData = async () => {
-        if (username && videoId) {
-            // Fetch video data
-            getVideoById(videoId as string).then((result) => {
+        if (actualUsername && videoId) {
+            getVideoByVideoId(videoId as string).then((result) => {
                 if (result.success) {
+                    setVideo(result.data);
                 }
             });
-            // Fetch comments
-            getCommentByVideoId(videoId as string).then((result) => {
-                dispatch({ type: "SET_COMMENTS", payload: result?.comments || [] });
-            });
-            // Fetch recommended videos
-            getRecommendedVideos(videoId as string).then((result) => {
-                if (result.success) {
-                    const topRecommendVideos = result.recommendedVideos?.slice(0, 3) || [];
-                    const bottomRecommendVideos = result.recommendedVideos?.slice(3) || [];
-                    dispatch({ type: 'SET_TOP_RECOMMEND_VIDEOS', payload: topRecommendVideos as RecommendedVideo[] });
-                    dispatch({ type: 'SET_BOTTOM_RECOMMEND_VIDEOS', payload: bottomRecommendVideos as RecommendedVideo[] });
+
+            getUserByUsername({ username: actualUsername as string }).then((result) => {
+                if (result.success && result.user) {
+                    setUser(result.user);
                 }
             });
         }
@@ -51,50 +38,49 @@ export default function VideoPage() {
 
     useEffect(() => {
         fetchData();
-    }, [username, videoId]);
 
-    const toggleTheaterMode = () => {
-        dispatch({ type: "TOGGLE_THEATER_MODE" });
-    };
+
+        getAllParentCommentsOfVideo_Mock(videoId as string).then((result) => {
+            setComments(result);
+        });
+    }, []);
 
     return (
         <Stack sx={{
             height: '100%',
         }}>
+            {/* Video section */}
             <Grid2 container spacing={1} sx={{
-                border: state.theaterMode ? '1px solid lightgray' : 'none',
+                // border: state.theaterMode ? '1px solid lightgray' : 'none',
+                border: '1px solid lightgray',
                 borderRadius: '10px'
             }}>
-                <Grid2 size={state.theaterMode ? 12 : 9}>
+                <Grid2 size={12}>
                     <VideoSection
                         video={video}
-                        videoLink={getVideoStreamLink(videoId as string)}
-                        changeTheaterMode={toggleTheaterMode}
+                        user={user}
+                        changeTheaterMode={() => { }}
                     />
                 </Grid2>
-
-                {!state?.theaterMode && (
-                    <Grid2 size={3} >
-                        <RecommendedVideoSection recommendedVideos={state.topRecommendVideos} />
-                    </Grid2>
-                )}
             </Grid2>
 
+            {/* Description, comments, recommended videos */}
             <Grid2 container spacing={1}>
                 <Grid2 size={9}>
+                    {/* Description, comments */}
                     <Stack>
-                        <DescriptionComponent />
-                        <CommentSection comments={state.comments} />
+                        <DescriptionComponent description={video?.description} />
+                        <CommentSection comments={comments} />
                     </Stack>
                 </Grid2>
 
-                <Grid2 size={3} sx={{
-                    marginTop: state.theaterMode ? 0 : '4px'
-                }}>
-                    <RecommendedVideoSection recommendedVideos={state.bottomRecommendVideos} />
+                {/* Recommended videos */}
+                <Grid2 size={3}>
+                    <RecommendedVideoSection
+                    // recommendedVideos={}
+                    />
                 </Grid2>
             </Grid2>
         </Stack>
     );
 }
-

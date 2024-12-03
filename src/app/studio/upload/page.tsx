@@ -307,9 +307,14 @@ export default function UploadVideoPage() {
                                         }}
                                     />
                                 ) : (
-                                    <Typography variant="h6" fontWeight={'bold'}>
-                                        {pageState?.success ? 'Post successfully' : 'Post'}
-                                    </Typography>
+                                    pageState?.success ? (
+                                        <Stack>
+                                            <Typography variant="h6" fontWeight={'bold'}>Post successfully</Typography>
+                                            <Typography variant="h6" fontWeight={'bold'}>video is being processed</Typography>
+                                        </Stack>
+                                    ) : (
+                                        <Typography variant="h6" fontWeight={'bold'}>Post</Typography>
+                                    )
                                 )}
                             </Button>
                         </Stack>

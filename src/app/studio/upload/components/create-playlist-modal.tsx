@@ -104,6 +104,7 @@ export default function CreateNewPlayListModal(props: CreateNewPlayListModalProp
                         </Stack>
                         {/* Playlist name */}
                         <TextField
+                            onChange={(event) => setState({ ...state, title: event.target.value })}
                             size="small"
                             label="Playlist Name"
                             fullWidth

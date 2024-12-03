@@ -42,14 +42,33 @@ export default function Profile() {
             <Grid2 container direction={'row'} spacing={20}>
                 {/* Avatar */}
                 <Grid2 size={2}>
-                    <Avatar
-                        src="/images/avatar.jpg"
-                        alt="avatar"
-                        sx={{
+                    {user?.profilePic ?
+                        (<Box sx={{
                             width: 200,
                             height: 200,
-                        }}
-                    />
+                            borderRadius: '50%',
+                            overflow: 'hidden',
+                            position: 'relative',
+                        }}>
+                            <CldImage
+                                fill={true}
+                                style={{
+                                    objectFit: 'cover',
+                                    width: '100%',
+                                    height: '100%',
+                                }}
+                                src={user.profilePic}
+                                alt="Image"
+                            />
+                        </Box>) :
+                        (<Avatar
+                            src="/images/avatar.png"
+                            alt="avatar"
+                            sx={{
+                                width: 200,
+                                height: 200,
+                            }}
+                        />)}
                 </Grid2>
 
                 {/* Username, button, following, followers */}
@@ -71,7 +90,6 @@ export default function Profile() {
                                 fontWeight: 'bold',
                                 fontSize: '1.5rem',
                             }}>{actualUsername}</Typography>
-                            {/* <Typography>{userState.fullName || 'No name'}</Typography> */}
                             <Typography>{user?.fullName || 'No name'}</Typography>
                         </Stack>
 

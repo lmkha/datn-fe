@@ -2,7 +2,7 @@
 
 import Header from "@/core/components/header";
 import { Box } from "@mui/material";
-import Drawer from "./components/drawer";
+import Drawer, { SelectedRoute } from "./components/drawer";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ContentProvider } from "@/contexts/content-context";
@@ -27,14 +27,11 @@ function LayoutContent({
     const [openDrawer, setOpenDrawer] = useState<boolean>(true);
     const pathname = usePathname();
     const router = useRouter();
-    const [selectedRoute, setSelectedRoute] = useState<'FOR_YOU' | 'EXPLORE' | 'FOLLOWING' | 'PROFILE'>('FOR_YOU');
+    const [selectedRoute, setSelectedRoute] = useState<SelectedRoute>('FOR_YOU');
+
 
     useEffect(() => {
-        if (pathname.startsWith('/@') && pathname.includes('/videos/')) {
-            setOpenDrawer(false);
-        } else {
-            setOpenDrawer(true);
-        }
+        setOpenDrawer(true);
         if (pathname === '/') {
             setSelectedRoute('FOR_YOU');
         }
@@ -46,6 +43,10 @@ function LayoutContent({
         }
         if (pathname.startsWith('/@')) {
             setSelectedRoute('PROFILE');
+            if (pathname.includes('/videos/')) {
+                setOpenDrawer(false);
+                setSelectedRoute('NONE');
+            }
         }
     }, [pathname]);
 
@@ -68,6 +69,7 @@ function LayoutContent({
                     zIndex: 1000,
                     borderBottom: "1px solid lightgray",
                     height: "57px",
+                    backgroundColor: "white"
                 }}
             >
                 <Header
@@ -75,7 +77,6 @@ function LayoutContent({
                     logoClickRoute="/"
                     onOpenDrawerChange={() => setOpenDrawer(!openDrawer)}
                     onSearch={() => { }}
-                    onNotification={() => { }}
                     onUpload={() => router.push('/studio/upload')}
                 />
             </Box>

@@ -1,3 +1,4 @@
+import axiosInstance from "@/core/axios/instance";
 import Base from "./base";
 
 class Playlist extends Base {
@@ -7,11 +8,11 @@ class Playlist extends Base {
         videoIdsList: string[],
     }) {
         try {
-            const response = await this.post("/playlists", data);
+            const response = await axiosInstance.post("/playlists/", data);
             return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
+                success: response.data.success,
+                message: response.data.message,
+                data: response.data.data,
             }
         } catch (err: any) {
             return {

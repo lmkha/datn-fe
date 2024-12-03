@@ -16,6 +16,7 @@ import {
     Paper,
     List,
     ListItem,
+    Box,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useState, MouseEvent, useEffect } from 'react';
@@ -31,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { useUserContext } from "@/contexts/user-context";
 import { logout } from "@/services/real/auth";
 import { get, set } from "@/hooks/use-local-storage";
+import { CldImage } from "next-cloudinary";
 
 interface HeaderProps {
     title?: string;
@@ -43,13 +45,14 @@ interface HeaderProps {
 }
 
 export default function Header(props: HeaderProps) {
+    const accessToken = get("accessToken");
     return (
         <>
             <Grid2 container sx={{
                 width: '100%',
+                height: '100%',
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: 'white',
             }}>
                 {/* Toggle drawer, Logo, Title */}
                 <Grid2 size={2}>
@@ -82,9 +85,10 @@ export default function Header(props: HeaderProps) {
                         justifyContent: 'end',
                         alignItems: 'center',
                         width: '100%',
+                        paddingRight: 1,
                     }}>
                         {/* UploadButton */}
-                        {props?.onUpload && (
+                        {accessToken && props?.onUpload && (
                             <Button
                                 onClick={props.onUpload}
                                 variant="outlined"
@@ -118,6 +122,7 @@ export default function Header(props: HeaderProps) {
                                 <CircleNotificationsIcon fontSize="large" />
                             </IconButton>
                         )}
+
                         <Account />
                     </Stack>
                 </Grid2>
@@ -128,7 +133,8 @@ export default function Header(props: HeaderProps) {
 
 function Account() {
     const router = useRouter();
-    const { state: userState } = useUserContext();
+    const user = get("user");
+    const accessToken = get("accessToken");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -143,65 +149,109 @@ function Account() {
 
     return (
         <>
-            <IconButton onClick={handleClick}>
-                <Avatar alt="Avt" src="/images/avatar.jpg" />
-            </IconButton>
-            <Popover
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
-            >
-                <div>
-                    <MenuItem onClick={() => {
-                        userState?.username && router.push(`/@${userState.username}`);
-                        handleClose();
-                    }}>
-                        <ListItemIcon>
-                            <AccountCircleRoundedIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="inherit">Profile</Typography>
-                    </MenuItem>
+            {!accessToken ? (
+                <>
+                    <Button
+                        onClick={() => router.push('/login')}
+                        variant="outlined"
+                        startIcon={<AccountCircleRoundedIcon />}
+                        sx={{
+                            textTransform: 'none',
+                            height: 'auto',
+                            width: 'auto',
+                            color: 'black',
+                            border: '2px solid black',
+                        }}
+                    >
+                        Login in
+                    </Button>
+                </>
+            ) : (
+                <>
+                    <IconButton onClick={handleClick}>
+                        {user?.profilePic ?
+                            (<Box sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: '50%',
+                                overflow: 'hidden',
+                                position: 'relative',
+                            }}>
+                                <CldImage
+                                    fill={true}
+                                    style={{
+                                        objectFit: 'cover',
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                    src={user.profilePic}
+                                    alt="Image"
+                                />
+                            </Box>) :
+                            (<Avatar alt="Avt" src="/images/avatar.png" />)}
+                    </IconButton>
+                    <Popover
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={handleClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }}
+                    >
+                        <div>
+                            {/* Profile */}
+                            <MenuItem onClick={() => {
+                                user?.username && router.push(`/@${user.username}`);
+                                handleClose();
+                            }}>
+                                <ListItemIcon>
+                                    <AccountCircleRoundedIcon fontSize="small" />
+                                </ListItemIcon>
+                                <Typography variant="inherit">Profile</Typography>
+                            </MenuItem>
 
-                    <MenuItem onClick={() => {
-                        router.push('/studio');
-                        handleClose();
-                    }}>
-                        <ListItemIcon>
-                            <GamepadIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="inherit">Studio</Typography>
-                    </MenuItem>
+                            {/* Studio */}
+                            <MenuItem onClick={() => {
+                                router.push('/studio');
+                                handleClose();
+                            }}>
+                                <ListItemIcon>
+                                    <GamepadIcon fontSize="small" />
+                                </ListItemIcon>
+                                <Typography variant="inherit">Studio</Typography>
+                            </MenuItem>
 
-                    <MenuItem onClick={() => {
-                        userState?.username && router.push('/settings');
-                        handleClose();
-                    }}>
-                        <ListItemIcon>
-                            <SettingsIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="inherit">Settings</Typography>
-                    </MenuItem>
+                            {/* Settings */}
+                            <MenuItem onClick={() => {
+                                user?.username && router.push('/settings');
+                                handleClose();
+                            }}>
+                                <ListItemIcon>
+                                    <SettingsIcon fontSize="small" />
+                                </ListItemIcon>
+                                <Typography variant="inherit">Settings</Typography>
+                            </MenuItem>
 
-                    <MenuItem onClick={() => {
-                        router.replace('/login');
-                        logout();
-                        handleClose();
-                    }}>
-                        <ListItemIcon>
-                            <LogoutIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="inherit">Logout</Typography>
-                    </MenuItem>
-                </div>
-            </Popover>
+                            {/* Logout, login */}
+                            <MenuItem onClick={() => {
+                                router.replace('/login');
+                                logout();
+                                handleClose();
+                            }}>
+                                <ListItemIcon>
+                                    <LogoutIcon fontSize="small" />
+                                </ListItemIcon>
+                                <Typography variant="inherit">Logout</Typography>
+                            </MenuItem>
+                        </div>
+                    </Popover>
+                </>
+            )}
         </>
     )
 }

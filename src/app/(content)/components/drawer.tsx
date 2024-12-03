@@ -6,16 +6,19 @@ import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import { useRouter } from "next/navigation";
-import { useUserContext } from "@/contexts/user-context";
+import { get } from "@/hooks/use-local-storage";
+import { CldImage } from "next-cloudinary";
 
+export type SelectedRoute = 'FOR_YOU' | 'EXPLORE' | 'FOLLOWING' | 'PROFILE' | 'NONE';
 interface DrawerProps {
     openDrawer: boolean;
-    selectedRoute: 'FOR_YOU' | 'EXPLORE' | 'FOLLOWING' | 'PROFILE';
+    selectedRoute: SelectedRoute;
 }
 
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
-    const { state: userState } = useUserContext();
+    const accessToken = get("accessToken");
+    const user = get("user");
 
     return (
         < Box
@@ -46,28 +49,52 @@ export default function Drawer(props: DrawerProps) {
                     selected={props.selectedRoute === 'EXPLORE'}
                 />
 
-                <DrawerMenuItem
-                    onClick={() => { router.push('/following') }}
-                    icon={<PeopleAltIcon />}
-                    text={'Following'}
-                    sx={{ height: 50 }}
-                    selected={props.selectedRoute === 'FOLLOWING'}
-                />
+                {accessToken && user?.username && (
+                    <>
+                        <DrawerMenuItem
+                            onClick={() => { router.push('/following') }}
+                            icon={<PeopleAltIcon />}
+                            text={'Following'}
+                            sx={{ height: 50 }}
+                            selected={props.selectedRoute === 'FOLLOWING'}
+                        />
+                        <DrawerMenuItem
+                            onClick={() => { router.push(`/@${user?.username}`) }}
+                            icon={user?.profilePic ?
+                                (<Box sx={{
+                                    width: 25,
+                                    height: 25,
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    position: 'relative',
+                                }}>
+                                    <CldImage
+                                        fill={true}
+                                        style={{
+                                            objectFit: 'cover',
+                                            width: '100%',
+                                            height: '100%',
+                                        }}
+                                        src={user.profilePic}
+                                        alt="Image"
+                                    />
+                                </Box>) :
+                                (<Avatar
+                                    src="/images/avatar.png"
+                                    alt="avatar"
+                                    sx={{
+                                        width: 25,
+                                        height: 25,
+                                    }}
+                                />)}
+                            text={'Profile'}
+                            sx={{ height: 50 }}
+                            selected={props.selectedRoute === 'PROFILE'}
+                        />
+                    </>
 
-                <DrawerMenuItem
-                    onClick={() => { router.push(`/@${userState.username}`) }}
-                    icon={<Avatar
-                        src="/images/avatar.jpg"
-                        alt="avatar"
-                        sx={{
-                            width: 25,
-                            height: 25,
-                        }}
-                    />}
-                    text={'Profile'}
-                    sx={{ height: 50 }}
-                    selected={props.selectedRoute === 'PROFILE'}
-                />
+                )}
+
 
             </MenuList>
         </Box >

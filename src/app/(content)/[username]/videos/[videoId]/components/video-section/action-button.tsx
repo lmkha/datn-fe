@@ -4,9 +4,11 @@ import { IconButton, Stack, Typography } from "@mui/material";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import ShortcutIcon from '@mui/icons-material/Shortcut';
+import { formatNumberToShortText } from "@/core/logic/convert";
 
 interface ActionButtonProps {
+    likeCount: number;
+    commentCount: number;
     liked: boolean;
     setLiked: (liked: boolean) => void;
 }
@@ -25,7 +27,8 @@ export default function ActionButton(props: ActionButtonProps) {
                         }} />
                     }
                 </IconButton>
-                <Typography variant="body2">2.7M</Typography>
+
+                <Typography variant="body2">{formatNumberToShortText(props.likeCount)}</Typography>
             </Stack>
 
             {/* Comment button */}
@@ -37,19 +40,7 @@ export default function ActionButton(props: ActionButtonProps) {
                         }
                     }} />
                 </IconButton>
-                <Typography variant="body2">2K</Typography>
-            </Stack>
-
-            {/* Share button */}
-            <Stack justifyContent={'center'} alignItems={'center'}>
-                <IconButton>
-                    <ShortcutIcon sx={{
-                        ":hover": {
-                            color: 'black'
-                        }
-                    }} />
-                </IconButton>
-                <Typography variant="body2">270</Typography>
+                <Typography variant="body2">{formatNumberToShortText(props.commentCount)}</Typography>
             </Stack>
         </>
     );

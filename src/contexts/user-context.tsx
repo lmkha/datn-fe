@@ -12,6 +12,7 @@ interface UserState {
     dateOfBirth: string | null;
     followingCount: number | null;
     followersCount: number | null;
+    avatar: string | null;
 }
 
 // Define the types of actions
@@ -30,6 +31,7 @@ const initialUserState: UserState = {
     dateOfBirth: null,
     followingCount: null,
     followersCount: null,
+    avatar: null,
 };
 
 // Define the reducer function
@@ -72,6 +74,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         dateOfBirth: user?.dateOfBirth || null,
         followingCount: user?.followingCount || null,
         followersCount: user?.followersCount || null,
+        avatar: user?.profilePic || null,
     });
 
     return (

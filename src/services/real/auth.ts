@@ -13,7 +13,7 @@ export const login = async ({ username, password }: { username: string, password
         });
     }
     return {
-        success: false,
+        success: result.success,
         message: result.message
     }
 }

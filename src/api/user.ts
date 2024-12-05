@@ -67,7 +67,7 @@ class User extends Base {
 
     async getCurrentUser() {
         try {
-            const response = await this.get("/users");
+            const response = await this.get("/users/");
             return {
                 success: response.success,
                 message: response.message,

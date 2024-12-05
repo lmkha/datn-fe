@@ -9,7 +9,7 @@ import { useParams } from "next/navigation";
 import DescriptionComponent from "./components/video-section/description-component";
 import { getRecommendedVideos as _mock_getRecommendedVideos, getVideoById as _mock_getVideoById } from "@/services/mock/video";
 import { getVideoByVideoId } from "@/services/real/video";
-import { getUserByUsername } from "@/services/real/user";
+import { getPublicUserByUsername, getUserByUsername } from "@/services/real/user";
 import { getAllParentCommentsOfVideo_Mock } from "@/services/mock/comment";
 import { ParentComment } from "./types";
 
@@ -28,7 +28,7 @@ export default function VideoPage() {
                 }
             });
 
-            getUserByUsername({ username: actualUsername as string }).then((result) => {
+            getPublicUserByUsername({ username: actualUsername as string }).then((result) => {
                 if (result.success && result.user) {
                     setUser(result.user);
                 }
@@ -38,8 +38,6 @@ export default function VideoPage() {
 
     useEffect(() => {
         fetchData();
-
-
         getAllParentCommentsOfVideo_Mock(videoId as string).then((result) => {
             setComments(result);
         });

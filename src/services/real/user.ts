@@ -30,7 +30,7 @@ export const getAllFollowings = async () => {
     };
 };
 export const getPublicUserByUsername = async (params: { username: string }) => {
-    const result = await userAPI.getPublicUserByUsername(params);
+    const result = await userAPI.getPublicUserByUsername({ username: params.username });
     return {
         success: result.success,
         message: result.message,

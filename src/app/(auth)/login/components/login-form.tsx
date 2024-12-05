@@ -38,12 +38,12 @@ export default function LoginForm() {
         }
         await login({ username: state.username, password: state.password }).then((result) => {
             if (result.success) {
+                router.push('/');
                 setState({
                     ...state,
                     isProcessing: false,
                     errors: [],
                 });
-                router.push('/');
             } else {
                 if (result.message === 'Verifying you account, please check you email inbox!') {
                     setState({ ...state, isProcessing: false, openVerifyModal: true });

@@ -10,9 +10,7 @@ import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import MyTabs, { Tab } from "../components/tabs";
 import Filter from "../components/filter";
 import { useEffect, useState } from "react";
-import { useUserContext } from "@/contexts/user-context";
-import Image from "next/legacy/image";
-import { getUserByUsername } from "@/services/real/user";
+import { getCurrentUser, getPublicUserByUsername } from "@/services/real/user";
 import { getVideosByUserId } from "@/services/real/video";
 import { CldImage } from 'next-cloudinary';
 
@@ -24,16 +22,23 @@ export default function Profile() {
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
     const [selectedTab, setSelectedTab] = useState<Tab>('videos');
 
+    const fetchData = async () => {
+        if (actualUsername) {
+            getPublicUserByUsername({ username: actualUsername }).then((result) => {
+                if (result.success && result.user) {
+                    setUser(result.user);
+                    getVideosByUserId(result.user.id).then((videosResult) => {
+                        setVideos(videosResult.data);
+                    });
+                }
+            });
+        }
+    };
+
     useEffect(() => {
-        getUserByUsername({ username: actualUsername }).then((result) => {
-            if (result.success) {
-                setUser(result.user);
-                getVideosByUserId(result.user.id).then((videosResult) => {
-                    setVideos(videosResult.data);
-                });
-            }
-        });
+        fetchData();
     }, []);
+
 
 
     return (

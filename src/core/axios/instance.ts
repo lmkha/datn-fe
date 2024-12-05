@@ -7,14 +7,38 @@ const axiosInstance = axios.create({
     withCredentials: true,
 });
 
+type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+interface NoAuthRequiredApiEndpoint {
+    url: string;
+    method: Method;
+}
+
 const noAuthRequiredApiEndpoints = [
-    "/auth/signIn",
-    "/auth/register",
-    "/users/checkUsernameAvailability",
-    '/users/checkEmailAvailability',
-    '/auth/account-otp-verification',
-    "/videos/user"
+    { url: "/auth/signIn", method: "POST" },
+    { url: "/auth/register", method: "POST" },
+    { url: "/auth/account-otp-verification", method: "POST" },
+
+    { url: "/users/checkUsernameAvailability", method: "GET" },
+    { url: "/users/checkEmailAvailability", method: "GET" },
+
+    { url: "/videos/user", method: "GET" },
+    { url: "/videos", method: "GET" },
 ];
+
+const isNoAuthRequiredEndpoint = (url?: string, method?: string): boolean => {
+    return noAuthRequiredApiEndpoints.some((endpoint) => {
+        if (url?.startsWith(endpoint.url) && method?.toUpperCase() === endpoint.method) {
+            return true;
+        }
+
+        if (url?.startsWith("/users") && url?.endsWith("/public") && method?.toUpperCase() === "GET") {
+            return true;
+        }
+
+        return false;
+    });
+};
 
 axiosInstance.interceptors.request.use(
     (config) => {
@@ -22,10 +46,7 @@ axiosInstance.interceptors.request.use(
         const accessToken = get("accessToken");
         const language = localStorage.getItem("language") || "vi";
 
-        const isNoAuthRequired = noAuthRequiredApiEndpoints.some((endpoint) => {
-            return config.url?.startsWith(endpoint);
-        });
-        if (!isNoAuthRequired && accessToken) {
+        if (!isNoAuthRequiredEndpoint(config.url, config.method) && accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
 

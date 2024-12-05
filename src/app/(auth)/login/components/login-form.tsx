@@ -38,10 +38,27 @@ export default function LoginForm() {
         }
         await login({ username: state.username, password: state.password }).then((result) => {
             if (result.success) {
+                setState({
+                    ...state,
+                    isProcessing: false,
+                    errors: [],
+                });
                 router.push('/');
             } else {
                 if (result.message === 'Verifying you account, please check you email inbox!') {
                     setState({ ...state, isProcessing: false, openVerifyModal: true });
+                    return;
+                }
+
+                if (result.message === 'The username does not exist') {
+                    setState({ ...state, isProcessing: false, errors: [{ field: 'username', message: result.message }] });
+                    return;
+                }
+
+                if (result.message === 'Invalid password') {
+                    setState({ ...state, isProcessing: false, errors: [{ field: 'password', message: result.message }] });
+                    return;
+
                 }
             }
         });
@@ -76,16 +93,20 @@ export default function LoginForm() {
                     color: 'black',
                 },
             }}
+                error={state.errors?.find((error) => error.field === 'username') ? true : false}
+                helperText={state.errors?.find((error) => error.field === 'username')?.message}
                 onChange={(e) => setState({ ...state, username: e.target.value })}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             />
 
             <Password
                 showPassword={state.showPassword}
-                isError={false}
-                helperText=''
+                isError={state.errors?.find((error) => error.field === 'password') ? true : false}
+                helperText={state.errors?.find((error) => error.field === 'password')?.message}
                 onChange={(value) => setState({ ...state, password: value })}
                 validatePassword={() => { }}
                 onChangeShowPassword={() => setState({ ...state, showPassword: !state.showPassword })}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             />
 
             <FormControlLabel

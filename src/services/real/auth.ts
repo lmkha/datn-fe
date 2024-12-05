@@ -1,19 +1,16 @@
 import auth from "@/api/auth"
 import { set, remove } from "@/hooks/use-local-storage";
-import { getUserByUsername } from "./user";
+import { getCurrentUser } from "./user";
 
 export const login = async ({ username, password }: { username: string, password: string }) => {
     const result = await auth.login({ username, password });
     if (result.success) {
         set("accessToken", result.token);
-        getUserByUsername({ username }).then((data) => {
-            if (data.success && data.user) {
-                set("user", data.user);
+        await getCurrentUser().then((result) => {
+            if (result.success && result.data) {
+                set("user", result.data);
             }
         });
-        return {
-            success: true
-        }
     }
     return {
         success: false,

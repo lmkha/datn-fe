@@ -17,6 +17,7 @@ interface PasswordProps {
     onChange: (value: string) => void;
     validatePassword: (password: string) => void;
     onChangeShowPassword: () => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export default function Password(
@@ -28,6 +29,7 @@ export default function Password(
         onChange,
         validatePassword,
         onChangeShowPassword,
+        onKeyDown,
     }: PasswordProps
 ) {
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -64,6 +66,7 @@ export default function Password(
                         validatePassword(e.target.value);
                         onChange(e.target.value);
                     }}
+                    onKeyDown={(e) => onKeyDown && onKeyDown(e as React.KeyboardEvent<HTMLInputElement>)}
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton

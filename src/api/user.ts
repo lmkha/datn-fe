@@ -64,6 +64,54 @@ class User extends Base {
             }
         }
     }
+
+    async getCurrentUser() {
+        try {
+            const response = await this.get("/users");
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get current user failed",
+            }
+        }
+    };
+
+    async getPublicUserByUsername(params: { username: string }) {
+        try {
+            const response = await this.get(`/users/${params.username}/public`);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get public user by username failed",
+            }
+        }
+    }
+
+    async getAllFollowing() {
+        try {
+            const response = await this.get(`/users/followings`);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get all following failed",
+            }
+        }
+    }
 }
 
 const userAPI = new User();

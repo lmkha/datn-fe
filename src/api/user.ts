@@ -147,6 +147,27 @@ class User extends Base {
             }
         }
     }
+
+    async updateProfile(data: {
+        phone: string;
+        fullName: string;
+        isPrivate: boolean;
+        dateOfBirth: string;
+    }) {
+        try {
+            const response = await this.put('/users/', data);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Update profile failed",
+            }
+        }
+    }
 }
 
 const userAPI = new User();

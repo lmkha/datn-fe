@@ -1,13 +1,15 @@
 'use client';
 
-import { Avatar, Box, Button, Grid2, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid2, Stack, Switch, TextField, Typography } from "@mui/material";
 import * as React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { get } from "@/hooks/use-local-storage";
+import { get, set } from "@/hooks/use-local-storage";
+import AvatarComponent from "./components/avatar";
+import { getCurrentUser, updateProfile } from "@/services/real/user";
 
 // avatar, fullName, username, bio, date of birth,  phone, isPrivate
 interface PageState {
@@ -19,6 +21,9 @@ interface PageState {
     phone: string | null;
     isPrivate: boolean | null;
     newAvatarFile?: File;
+    isDiscard?: boolean;
+    success?: boolean;
+    updating?: boolean;
 }
 export default function EditProfilePage() {
     const user = get('user');
@@ -27,10 +32,47 @@ export default function EditProfilePage() {
         fullName: user?.fullName,
         username: user?.username,
         bio: user?.bio,
-        dateOfBirth: dayjs(user?.dateOfBirth),
+        dateOfBirth: user?.dateOfBirth ? dayjs(user.dateOfBirth) : null,
         phone: user?.phone,
         isPrivate: user?.isPrivate,
     });
+
+    const handleSave = () => {
+        const dateOfBirthToUnix = state.dateOfBirth?.unix() || 0;
+        updateProfile({
+            phone: state.phone || '',
+            fullName: state.fullName || '',
+            isPrivate: state.isPrivate || false,
+            dateOfBirth: dateOfBirthToUnix.toString(),
+            avatar: state.newAvatarFile || null,
+        }).then((result) => {
+            if (result.success) {
+                setState({ ...state, success: true, updating: false });
+                getCurrentUser().then((res) => {
+                    if (res.success) {
+                        set('user', res.data);
+                    }
+                });
+
+            } else {
+                setState({ ...state, success: false, updating: false });
+            }
+        });
+    };
+
+    const handleDiscard = () => {
+        setState({
+            avatar: user?.profilePic,
+            fullName: user?.fullName,
+            username: user?.username,
+            bio: user?.bio,
+            dateOfBirth: user?.dateOfBirth ? dayjs(user.dateOfBirth) : null,
+            phone: user?.phone,
+            isPrivate: user?.isPrivate,
+            newAvatarFile: undefined,
+            isDiscard: true,
+        });
+    };
 
     return (
         <Box sx={{
@@ -58,6 +100,9 @@ export default function EditProfilePage() {
                         {/* Avatar */}
                         <AvatarComponent
                             onAvatarFileChange={(file) => setState({ ...state, newAvatarFile: file })}
+                            oldAvatarSrc={user?.profilePic}
+                            refresh={state.isDiscard || false}
+                            onDoneRefresh={() => setState({ ...state, isDiscard: false })}
                         />
 
                         {/* Is private */}
@@ -111,40 +156,6 @@ export default function EditProfilePage() {
                     padding: 2,
                 }}>
                     <Stack spacing={4}>
-                        {/* username */}
-                        <Stack direction={'row'} spacing={2}>
-                            <TextField
-                                label="Username"
-                                value={state.username}
-                                onChange={(e) => setState({ ...state, username: e.target.value })}
-                                sx={{
-                                    width: '60%',
-                                }}
-                                slotProps={{
-                                    input: {
-                                        sx: {
-                                            backgroundColor: 'white',
-                                        }
-                                    },
-                                    inputLabel: {
-                                        shrink: Boolean(state.username),
-                                    }
-                                }}
-                            />
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    wordBreak: 'break-word',
-                                    whiteSpace: 'normal',
-                                    width: '40%',
-                                }}
-                            >
-                                Usernames must be between 3 and 30 characters long and can only include letters, numbers, underscores, and periods. They cannot begin or end with underscores or periods, and consecutive underscores or periods are not allowed. Changing your username will also update your profile link.
-                            </Typography>
-
-                        </Stack>
                         {/* FullName */}
                         <Stack direction={'row'} spacing={2}>
                             <TextField
@@ -222,93 +233,61 @@ export default function EditProfilePage() {
                             />
                             <Typography variant={'body2'}>Phone</Typography>
                         </Stack>
-                        {/* Save button */}
-                        <Box sx={{
-                            width: '100%',
+                        {/* Buttons */}
+                        <Stack direction={"row"} sx={{
+                            width: '50%',
                             display: 'flex',
-                            justifyContent: 'center',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
                         }}>
-                            <Button variant="contained" sx={{
-                                textTransform: 'none',
-                                backgroundColor: '#EA284E',
-                                color: 'white',
-                                width: '60%',
-                                height: 50,
+                            {/* Discard */}
+                            <Box sx={{
+                                width: '50%',
+                                display: 'flex',
+                                justifyContent: 'center',
                             }}>
-                                <Typography variant={'h6'}>Save</Typography>
-                            </Button>
-                        </Box>
+                                <Button
+                                    onClick={handleDiscard}
+                                    variant="contained"
+                                    sx={{
+                                        textTransform: 'none',
+                                        backgroundColor: 'gray',
+                                        color: 'white',
+                                        width: '60%',
+                                        height: 50,
+                                    }}>
+                                    <Typography variant={'h6'}>Discard</Typography>
+                                </Button>
+                            </Box>
+
+                            {/* Save */}
+                            <Box sx={{
+                                width: '50%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                            }}>
+                                <Button
+                                    disabled={state.success || state.updating || !state.fullName || !state.dateOfBirth || !state.phone}
+                                    onClick={handleSave}
+                                    variant="contained"
+                                    sx={{
+                                        textTransform: 'none',
+                                        backgroundColor: '#EA284E',
+                                        color: 'white',
+                                        width: '60%',
+                                        height: 50,
+                                    }}>
+                                    {state.updating ? <CircularProgress size={24} color="inherit" /> :
+                                        <Typography variant={'h6'}>
+                                            {state.success ? 'Saved' : 'Save'}
+                                        </Typography>
+                                    }
+                                </Button>
+                            </Box>
+                        </Stack>
                     </Stack>
                 </Grid2>
             </Grid2>
-        </Box>
-    );
-}
-
-interface AvatarComponentProps {
-    onAvatarFileChange: (file: File) => void;
-}
-function AvatarComponent(props: AvatarComponentProps) {
-    const [avatarSrc, setAvatarSrc] = React.useState("/images/avatar.jpg");
-
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            const file = event.target.files[0];
-            const imageURL = URL.createObjectURL(file);
-            setAvatarSrc(imageURL);
-            props.onAvatarFileChange(file);
-        }
-    };
-
-    return (
-        <Box
-            position="relative"
-            width={300}
-            height={300}
-            onClick={() => document.getElementById("avatarInput")?.click()}
-            sx={{ cursor: "pointer" }}
-        >
-            {/* Avatar */}
-            <Avatar
-                src={avatarSrc}
-                alt="avatar"
-                sx={{
-                    width: 300,
-                    height: 300,
-                }}
-            />
-
-            {/* Overlay */}
-            <Box
-                borderRadius={50}
-                position="absolute"
-                top={0}
-                left={0}
-                width="100%"
-                height="100%"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                bgcolor="rgba(0, 0, 0, 0.6)"
-                color="white"
-                sx={{
-                    opacity: 0,
-                    transition: "opacity 0.3s",
-                    ":hover": {
-                        opacity: 1,
-                    },
-                }}
-            >
-                <Typography variant="h6">Change Avatar</Typography>
-            </Box>
-
-            <input
-                hidden
-                id="avatarInput"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-            />
         </Box>
     );
 }

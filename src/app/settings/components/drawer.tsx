@@ -48,7 +48,7 @@ export default function Drawer(props: DrawerProps) {
                 <DrawerMenuItem
                     onClick={() => { router.push(`/@${userState.username}`) }}
                     icon={<Avatar
-                        src="/images/avatar.jpg"
+                        src="/images/avatar.png"
                         alt="avatar"
                         sx={{
                             width: 25,

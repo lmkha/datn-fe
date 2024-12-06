@@ -55,14 +55,46 @@ export const getVideoByVideoId = async (videoId: string) => {
     return response;
 };
 
-export const getVideosForHomePage = async (data: { count: number } = { count: 20 }): Promise<
-    {
-        success: boolean;
-        message?: string;
-        videos?: any[];
-    }
-> => {
+export const getVideosForHomePage = async (data: { count: number } = { count: 20 }): Promise<{
+    success: boolean;
+    message?: string;
+    videos?: any[];
+}> => {
     const response = await videoAPI.getVideosForHomePage(data);
+    if (!response.success || !response.data) {
+        return response;
+    }
+
+    const videos = response.data;
+    const users = await Promise.all(
+        videos.map(async (video: any) => {
+            const { user } = await getPublicUserId({ userId: video.userId });
+            return user;
+        })
+    );
+
+    return {
+        success: true,
+        message: response.message,
+        videos: videos.map((video: any, index: number) => {
+            return {
+                ...video,
+                user: users[index],
+            };
+        }) as any[],
+    };
+};
+
+export const searchVideos = async (data: {
+    type: 'tag' | 'video',
+    pattern: string,
+    count: number
+} = { type: 'tag', pattern: '', count: 20 }): Promise<{
+    success: boolean;
+    message?: string;
+    videos?: any[];
+}> => {
+    const response = await videoAPI.searchVideos(data);
     if (!response.success || !response.data) {
         return response;
     }

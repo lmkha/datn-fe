@@ -23,7 +23,6 @@ export default function Page() {
         getVideosForHomePage().then((response) => {
             if (response.success) {
                 setVideos(response.videos);
-                console.log(response.videos);
             }
             setIsLoading(false);
         });

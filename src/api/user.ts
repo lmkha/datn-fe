@@ -128,6 +128,25 @@ class User extends Base {
             }
         }
     }
+
+    async searchUserByUsername(params: { username: string }) {
+        const requestParams = {
+            pattern: params.username,
+        }
+        try {
+            const response = await this.get('/users/search', requestParams);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Search by username failed",
+            }
+        }
+    }
 }
 
 const userAPI = new User();

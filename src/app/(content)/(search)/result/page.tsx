@@ -3,9 +3,17 @@
 import { Avatar, Box, Button, Grid2, Skeleton, Stack, Typography } from "@mui/material";
 import Image from "next/legacy/image";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs, Tab } from '@mui/material';
 import { Suspense } from "react";
+import { searchVideos } from "@/services/real/video";
+import { searchUserByUsername } from "@/services/real/user";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import ShortcutIcon from '@mui/icons-material/Shortcut';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import { CldImage } from "next-cloudinary";
 
 export default function SearchResultPage() {
     return (
@@ -15,10 +23,81 @@ export default function SearchResultPage() {
     );
 }
 
+interface PageState {
+    videos: any[];
+    users: any[];
+    tag: string;
+    query: string;
+    count: number;
+    selectedTab: Tab;
+}
+
 function PageContent() {
     const searchParams = useSearchParams();
-    const query = searchParams.get('q');
-    const [tab, setTab] = useState<Tab>('Videos');
+    const [state, setState] = useState<PageState>({
+        videos: [],
+        users: [],
+        selectedTab: 'Videos',
+        tag: '',
+        query: '',
+        count: 50,
+    });
+
+    useEffect(() => {
+        const query = searchParams.get('q');
+        const tag = searchParams.get('tag');
+        if (query) {
+            setState((prevState) => ({
+                ...prevState,
+                query: query,
+            }));
+        }
+        if (tag) {
+            setState((prevState) => ({
+                ...prevState,
+                tag: tag,
+            }));
+        }
+    }, [searchParams]);
+
+    const fetchVideos = async () => {
+        if (state.tag || state.query) {
+            searchVideos({
+                type: state.tag ? 'tag' : 'video',
+                pattern: state.tag || state.query,
+                count: state.count,
+            }).then((res) => {
+                if (res.success && res?.videos) {
+                    setState({
+                        ...state,
+                        videos: res.videos,
+                    })
+                }
+            });
+        }
+    };
+
+    const fetchUsers = async () => {
+        if (state.query) {
+            searchUserByUsername({ username: state.query }).then((res) => {
+                if (res.success && res.data) {
+                    setState((prevState) => ({
+                        ...prevState,
+                        users: res.data,
+                    }));
+                    console.log(res.data);
+                }
+            });
+        }
+    };
+
+    useEffect(() => {
+        if (state.selectedTab === 'Videos') {
+            fetchVideos();
+        } else {
+            fetchUsers();
+        }
+    }, [state.selectedTab, state.query, state.tag]);
 
     return (
         <Stack spacing={2} sx={{
@@ -37,9 +116,26 @@ function PageContent() {
                 borderRadius: '10px',
             }}>
                 <MyTabs
-                    onTabChange={(selectedTab) => setTab(selectedTab)}
+                    onTabChange={(selectedTab) => { setState((prevState) => ({ ...prevState, selectedTab: selectedTab })) }}
                 />
             </Box>
+
+            {state.tag && (<Box sx={{
+                width: '90%',
+                height: '50px',
+                backgroundColor: 'white',
+                borderRadius: '10px',
+                justifyContent: 'start',
+                alignItems: 'center',
+                display: 'flex',
+            }}>
+                <Typography variant="h5" fontWeight={'bold'} sx={{
+                    color: 'black',
+                    padding: 2,
+                }}>
+                    #{state.tag}
+                </Typography>
+            </Box>)}
 
             <Stack spacing={2} sx={{
                 padding: 1,
@@ -48,10 +144,10 @@ function PageContent() {
                 backgroundColor: 'white',
             }}>
                 {
-                    tab === 'Videos' ? (
-                        [...Array(11)].map((_, index) => <VideoItem key={index} index={index} />)
+                    state.selectedTab === 'Videos' ? (
+                        state?.videos?.map((video, index) => <VideoItem key={index} video={video} />)
                     ) : (
-                        [...Array(1)].map((_, index) => <FollowingItem key={index} />)
+                        state?.users?.map((user, index) => <UserItem key={index} />)
                     )
                 }
             </Stack>
@@ -97,12 +193,13 @@ function PageContentSkeleton() {
 }
 
 interface VideoItemProps {
-    index: number;
+    video: any;
 }
 function VideoItem(props: VideoItemProps) {
+    const router = useRouter();
     return (
         <Box
-            key={props.index}
+            key={props?.video?.id}
             sx={{
                 backgroundColor: '#F8F8F8',
                 display: 'flex',
@@ -122,71 +219,188 @@ function VideoItem(props: VideoItemProps) {
                 <Grid2 size={4} sx={{
                     height: '100%',
                 }}>
+                    {/* Thumbnail & Overlay */}
                     <Box
                         sx={{
-                            cursor: 'pointer',
                             width: '100%',
                             height: '100%',
                             borderRadius: '10px',
                             overflow: 'hidden',
                             position: 'relative',
-                        }}
-                        onClick={() => {
-                            console.log("Go to video");
+                            '&:hover .video-title': {
+                                opacity: 1,
+                                visibility: 'visible',
+                            },
                         }}
                     >
-                        <Image
-                            src="/images/video-image.jpg"
-                            alt="Image"
-                            layout="fill"
-                            objectFit="cover"
-                        />
+                        {props?.video?.thumbnailUrl ? (
+                            <CldImage
+                                fill={true}
+                                style={{
+                                    objectFit: 'cover',
+                                    width: '100%',
+                                    height: '100%',
+                                }}
+                                src={props.video.thumbnailUrl}
+                                alt="Image"
+                            />
+                        ) : (
+                            <Image
+                                src="/images/video-image.png"
+                                alt="Image"
+                                layout="fill"
+                                objectFit="revert"
+                            />
+                        )}
+
+                        {/* Video overlay */}
+                        <Box
+                            onClick={() => {
+                                props.video?.user?.username &&
+                                    props?.video?.id &&
+                                    router.push(`/@${props.video.user.username}/videos/${props.video.id}`);
+                            }}
+                            className="video-title"
+                            sx={{
+                                cursor: 'pointer',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8))',
+                                display: 'flex',
+                                color: 'white',
+                                fontSize: '1.5rem',
+                                fontWeight: 'bold',
+                                textAlign: 'center',
+                                borderRadius: '10px',
+                                opacity: 0,
+                                visibility: 'hidden',
+                                transition: 'opacity 0.3s ease, visibility 0.3s ease',
+                                justifyContent: 'flex-start',
+                                alignItems: 'flex-end',
+                            }}
+                        >
+                            <Stack padding={2}>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        display: '-webkit-box',
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        WebkitLineClamp: 2,
+                                        lineHeight: 1.5,
+                                    }}
+                                >
+                                    {props?.video?.title}
+                                </Typography>
+
+                                <Stack>
+                                    <Stack direction={'row'} spacing={2}>
+                                        <Stack direction={'row'}>
+                                            <PlayArrowOutlinedIcon />
+                                            <Typography>125K</Typography>
+                                        </Stack>
+                                        <Stack direction={'row'}>
+                                            <FavoriteBorderOutlinedIcon />
+                                            <Typography>125K</Typography>
+                                        </Stack>
+                                        <Stack direction={'row'}>
+                                            <ChatBubbleOutlineOutlinedIcon />
+                                            <Typography>125K</Typography>
+                                        </Stack>
+                                        <Stack direction={'row'}>
+                                            <ShortcutIcon />
+                                            <Typography>125K</Typography>
+                                        </Stack>
+                                    </Stack>
+                                    <Stack direction={'row'} spacing={2}>
+                                        <Typography>Everyone</Typography>
+                                        <Typography>Nov 17, 2024</Typography>
+                                    </Stack>
+                                </Stack>
+                            </Stack>
+                        </Box>
                     </Box>
                 </Grid2>
 
                 {/* Video Info */}
                 <Grid2 size={8} height={'100%'} padding={1}>
                     <Stack
-                        spacing={1} sx={{
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => {
-                            console.log("Go to video");
-                        }}
-                    >
-                        <Typography variant="h6" fontWeight={'bold'}>Andres Iniesta - The last of his kind - HD</Typography>
+                        spacing={1}>
+                        <Typography
+                            variant="h6"
+                            fontWeight={'bold'}
+                            onClick={() => {
+                                props.video?.user?.username &&
+                                    props?.video?.id &&
+                                    router.push(`/@${props.video.user.username}/videos/${props.video.id}`);
+                            }}
+                            sx={{
+                                cursor: 'pointer',
+                            }}
+                        >
+                            {props?.video?.title}
+                        </Typography>
                         <Stack direction={'row'} width={'100%'} spacing={2}>
-                            <Typography variant="body2">1.2k views</Typography>
-                            <Typography variant="body2">1 day ago</Typography>
+                            <Typography variant="body2">{formatNumberToShortText(props?.video?.viewsCount)} views</Typography>
+                            <Typography variant="body2">{formatTimeToShortText(props?.video?.createdAt)}</Typography>
                         </Stack>
                         {/* Account info */}
                         <Stack direction={'row'} spacing={2} sx={{ alignItems: 'center' }}>
-                            <Avatar
-                                alt="Avt"
-                                src="/images/avatar.jpg"
-                                sx={{
-                                    width: 'auto',
-                                    aspectRatio: 1,
+                            {props?.video?.user?.profilePic ?
+                                (<Box sx={{
+                                    width: 50,
+                                    height: 50,
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    position: 'relative',
                                     cursor: 'pointer',
                                 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    console.log("Go to account");
-                                }}
-                            />
+                                    onClick={(e) => {
+                                        props.video?.user?.username && router.push(`/@${props.video.user.username}`);
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <CldImage
+                                        fill={true}
+                                        style={{
+                                            objectFit: 'cover',
+                                            width: '100%',
+                                            height: '100%',
+                                        }}
+                                        src={props.video.user.profilePic}
+                                        alt="Image"
+                                    />
+                                </Box>) :
+                                (<Avatar
+                                    src="/images/avatar.png"
+                                    alt="avatar"
+                                    sx={{
+                                        width: 50,
+                                        height: 50,
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={(e) => {
+                                        props.video?.user?.username && router.push(`/@${props.video.user.username}`);
+                                        e.stopPropagation();
+                                    }}
+                                />)}
                             <Typography variant="body1" fontWeight={'bold'}
                                 sx={{
                                     cursor: 'pointer',
                                 }}
                                 onClick={(e) => {
+                                    props.video?.user?.username && router.push(`/@${props.video.user.username}`);
                                     e.stopPropagation();
-                                    console.log("Go to account");
                                 }}
                             >
-                                @lmkha
+                                @{props?.video?.user?.username}
                             </Typography>
                         </Stack>
-                        <Typography variant="body2">This is a tribute to one of the greatest midfielder ever. Andres Iniesta was a big part of FC Barcelona's success in the last decade. He is famous for his passing, vision, dribbles and important goals - this video includes all of them!</Typography>
+                        <Typography variant="body2">{props?.video?.description}</Typography>
                     </Stack>
 
                 </Grid2>
@@ -311,7 +525,7 @@ function MyTabs({ onTabChange }: TabsProps) {
     );
 }
 
-function FollowingItem() {
+function UserItem() {
     const router = useRouter();
     const [followed, setFollowed] = useState<boolean>(false);
 
@@ -329,7 +543,7 @@ function FollowingItem() {
                 <Grid2 size={2} height={'100%'}>
                     <Avatar
                         alt="Avt"
-                        src="/images/avatar.jpg"
+                        src="/images/avatar.png"
                         sx={{
                             height: '100%',
                             width: 'auto',

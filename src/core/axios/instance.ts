@@ -14,13 +14,14 @@ interface NoAuthRequiredApiEndpoint {
     method: Method;
 }
 
-const noAuthRequiredApiEndpoints = [
+const noAuthRequiredApiEndpoints: NoAuthRequiredApiEndpoint[] = [
     { url: "/auth/signIn", method: "POST" },
     { url: "/auth/register", method: "POST" },
     { url: "/auth/account-otp-verification", method: "POST" },
 
     { url: "/users/checkUsernameAvailability", method: "GET" },
     { url: "/users/checkEmailAvailability", method: "GET" },
+    { url: "/users/search", method: "GET" },
 
     { url: "/videos/user", method: "GET" },
     { url: "/videos", method: "GET" },

@@ -178,6 +178,27 @@ class Video extends Base {
             }
         }
     }
+
+    // Search video
+    async searchVideos(params: {
+        type: 'tag' | 'video',
+        pattern: string,
+        count: number,
+    }) {
+        try {
+            const response = await this.get("videos/search", params);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            };
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Search videos failed",
+            }
+        }
+    }
 }
 
 const videoAPI = new Video();

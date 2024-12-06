@@ -55,3 +55,7 @@ export const followUser = async (params: { username: string }) => {
 export const unFollowUser = async (params: { username: string }) => {
     return await userAPI.unFollowUser(params);
 };
+
+export const searchUserByUsername = async (params: { username: string }) => {
+    return await userAPI.searchUserByUsername(params);
+}

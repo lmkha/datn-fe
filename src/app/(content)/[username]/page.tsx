@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser, getPublicUserByUsername } from "@/services/real/user";
 import { getVideosByUserId } from "@/services/real/video";
 import { CldImage } from 'next-cloudinary';
+import Image from "next/legacy/image";
 
 export default function Profile() {
     const [user, setUser] = useState<any>(null);
@@ -236,16 +237,25 @@ function VideoItem(props: VideoItemProps) {
                     position: 'relative',
                 }}
             >
-                <CldImage
-                    fill={true}
-                    style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                    }}
-                    src={props.thumbnail || ''}
-                    alt="Image"
-                />
+                {props.thumbnail ?
+                    (<CldImage
+                        fill={true}
+                        style={{
+                            objectFit: 'cover',
+                            width: '100%',
+                            height: '100%',
+                        }}
+                        src={props.thumbnail || ''}
+                        alt="Image"
+
+                    />) :
+                    (<Image
+                        src="/images/video-image.png"
+                        alt="Image"
+                        layout="fill"
+                        objectFit="revert"
+                    />)
+                }
             </Box>
 
             {/* Video overlay */}
@@ -274,8 +284,14 @@ function VideoItem(props: VideoItemProps) {
                 }}
             >
                 <Stack padding={2}>
-                    {/* <Typography variant="h6">The best attacking trio in football history</Typography> */}
-                    <Typography variant="h6">{props.title}</Typography>
+                    <Typography variant="h6" sx={{
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        WebkitLineClamp: 2,
+                        lineHeight: 1.5,
+                    }}>{props.title}</Typography>
                     <Stack>
                         <Stack direction={'row'} spacing={2}>
                             <Stack direction={'row'}>

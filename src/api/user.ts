@@ -83,7 +83,7 @@ class User extends Base {
 
     async getPublicUserByUsername(params: { username: string }) {
         try {
-            const response = await this.get(`/users/${params.username}/public`);
+            const response = await this.get(`/users/${params.username}/public-username`);
             return {
                 success: response.success,
                 message: response.message,
@@ -93,6 +93,22 @@ class User extends Base {
             return {
                 success: false,
                 message: err?.response?.data?.message || "Get public user by username failed",
+            }
+        }
+    }
+
+    async getPublicUserId(params: { userId: string }) {
+        try {
+            const response = await this.get(`/users/${params.userId}/public-id`);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get public user by userId failed",
             }
         }
     }

@@ -1,4 +1,5 @@
 import videoAPI from "@/api/video";
+import { getPublicUserByUsername, getPublicUserId } from "./user";
 
 export const postVideo = async (data: {
     title: string;
@@ -52,4 +53,36 @@ export const getVideosByUserId = async (userId: string) => {
 export const getVideoByVideoId = async (videoId: string) => {
     const response = await videoAPI.getVideoByVideoId({ videoId });
     return response;
+};
+
+export const getVideosForHomePage = async (data: { count: number } = { count: 20 }): Promise<
+    {
+        success: boolean;
+        message?: string;
+        videos?: any[];
+    }
+> => {
+    const response = await videoAPI.getVideosForHomePage(data);
+    if (!response.success || !response.data) {
+        return response;
+    }
+
+    const videos = response.data;
+    const users = await Promise.all(
+        videos.map(async (video: any) => {
+            const { user } = await getPublicUserId({ userId: video.userId });
+            return user;
+        })
+    );
+
+    return {
+        success: true,
+        message: response.message,
+        videos: videos.map((video: any, index: number) => {
+            return {
+                ...video,
+                user: users[index],
+            };
+        }) as any[],
+    };
 };

@@ -161,6 +161,23 @@ class Video extends Base {
             }
         }
     }
+
+    // Get video for home page
+    async getVideosForHomePage(params: { count: number }) {
+        try {
+            const response = await this.get("videos/random", params);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            };
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get videos for home page failed",
+            }
+        }
+    }
 }
 
 const videoAPI = new Video();

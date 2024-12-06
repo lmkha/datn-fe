@@ -32,7 +32,11 @@ const isNoAuthRequiredEndpoint = (url?: string, method?: string): boolean => {
             return true;
         }
 
-        if (url?.startsWith("/users") && url?.endsWith("/public") && method?.toUpperCase() === "GET") {
+        if (url?.startsWith("/users") && url?.endsWith("/public-username") && method?.toUpperCase() === "GET") {
+            return true;
+        }
+
+        if (url?.startsWith("/users") && url?.endsWith("/public-id") && method?.toUpperCase() === "GET") {
             return true;
         }
 

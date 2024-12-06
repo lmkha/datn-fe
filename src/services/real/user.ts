@@ -29,8 +29,18 @@ export const getAllFollowings = async () => {
         followingUsers: followingUsers,
     };
 };
+
 export const getPublicUserByUsername = async (params: { username: string }) => {
     const result = await userAPI.getPublicUserByUsername({ username: params.username });
+    return {
+        success: result.success,
+        message: result.message,
+        user: result.data,
+    }
+};
+
+export const getPublicUserId = async (params: { userId: string }) => {
+    const result = await userAPI.getPublicUserId(params);
     return {
         success: result.success,
         message: result.message,

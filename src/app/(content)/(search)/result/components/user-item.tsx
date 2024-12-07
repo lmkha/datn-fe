@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { formatNumberToShortText } from "@/core/logic/convert";
 import { CldImage } from "next-cloudinary";
+import { followUser, unFollowUser } from "@/services/real/user";
 
 interface UserItemProps {
     user: any;
@@ -14,6 +15,29 @@ export default function UserItem(props: UserItemProps) {
     const [followed, setFollowed] = useState<boolean>(false);
     const followingCount = parseInt(props?.user?.followingCount) || 0;
     const followersCount = parseInt(props?.user?.followerCount) || 0;
+
+    const handleFollow = async () => {
+        followUser(props?.user?.username).then((res) => {
+            if (res.success) {
+                setFollowed(true);
+            }
+        });
+    };
+    const handleUnFollow = async () => {
+        unFollowUser(props?.user?.username).then((res) => {
+            if (res.success) {
+                setFollowed(false);
+            }
+        });
+    };
+
+    const handleFollowClick = () => {
+        if (followed) {
+            handleUnFollow();
+        } else {
+            handleFollow();
+        }
+    };
 
     return (
         <>
@@ -107,9 +131,7 @@ export default function UserItem(props: UserItemProps) {
                         color: followed ? 'black' : 'white',
                         textTransform: 'none',
                     }}
-                        onClick={() => {
-                            setFollowed(!followed);
-                        }}
+                        onClick={handleFollowClick}
                     >
                         <Typography variant="body1" fontWeight={'bold'}>
                             {followed ? 'Unfollow' : 'Follow'}

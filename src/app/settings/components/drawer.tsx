@@ -6,6 +6,7 @@ import ContactPageIcon from '@mui/icons-material/ContactPage';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/contexts/user-context";
+import { get } from "@/hooks/use-local-storage";
 
 interface DrawerProps {
     openDrawer: boolean;
@@ -14,7 +15,8 @@ interface DrawerProps {
 
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
-    const { state: userState } = useUserContext();
+    // const { state: userState } = useUserContext();
+    const userState = get('user');
 
     return (
         < Box

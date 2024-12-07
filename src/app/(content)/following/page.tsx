@@ -1,7 +1,7 @@
 'use client';
 
 import { get } from "@/hooks/use-local-storage";
-import { getAllFollowings } from "@/services/real/user";
+import { getAllFollowings, unFollowUser } from "@/services/real/user";
 import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid2, Stack, Typography } from "@mui/material";
 import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,6 @@ export default function FollowingPage() {
     const fetchData = async () => {
         getAllFollowings().then((result) => {
             if (result.success && result.followingUsers) {
-                console.log(result.followingUsers);
                 setState({
                     ...state,
                     followingUsers: result.followingUsers,
@@ -67,6 +66,7 @@ interface FollowingItemProps {
 function FollowingItem(props: FollowingItemProps) {
     const router = useRouter();
     const [openUnFollowConfirmDialog, setOpenUnFollowConfirmDialog] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(true);
 
     return (
         <>
@@ -143,13 +143,15 @@ function FollowingItem(props: FollowingItemProps) {
                     <Button sx={{
                         width: '100%',
                         height: '50px',
-                        backgroundColor: 'lightgray',
-                        color: 'black',
+                        background: isFollowing ? 'lightgray' : '#EA284E',
+                        color: isFollowing ? 'black' : 'white',
                         textTransform: 'none',
                     }}
                         onClick={() => setOpenUnFollowConfirmDialog(true)}
                     >
-                        <Typography variant="body1" fontWeight={'bold'}>Unfollow</Typography>
+                        <Typography variant="body1" fontWeight={'bold'}>
+                            {isFollowing ? 'Unfollow' : 'Follow'}
+                        </Typography>
                     </Button>
                 </Grid2>
             </Grid2>
@@ -159,6 +161,9 @@ function FollowingItem(props: FollowingItemProps) {
                 username={props?.followingUser?.username}
                 fullName={props?.followingUser?.fullName}
                 profilePic={props?.followingUser?.profilePic}
+                onConfirm={() => {
+                    setIsFollowing(!isFollowing);
+                }}
             />
         </>
     );
@@ -170,8 +175,18 @@ interface UnFollowConfirmDialogProps {
     username: string;
     fullName: string;
     profilePic: string;
+    onConfirm: () => void;
 }
 function UnFollowConfirmDialog(props: UnFollowConfirmDialogProps) {
+    const handleUnFollow = async () => {
+        unFollowUser({ username: props.username }).then((result) => {
+            if (result.success) {
+                props.onConfirm();
+                props.onClose();
+            }
+        });
+    };
+
     return (
         <Dialog
             open={props.open}
@@ -250,7 +265,7 @@ function UnFollowConfirmDialog(props: UnFollowConfirmDialogProps) {
                     <Typography variant="body1" fontWeight={'bold'}>Cancel</Typography>
                 </Button>
                 <Button
-                    onClick={props.onClose}
+                    onClick={handleUnFollow}
                     autoFocus
                     variant="contained"
                     sx={{

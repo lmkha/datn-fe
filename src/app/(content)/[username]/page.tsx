@@ -1,35 +1,59 @@
 'use client';
 
 import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import ShortcutIcon from '@mui/icons-material/Shortcut';
-import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import MyTabs, { Tab } from "../components/tabs";
 import Filter from "../components/filter";
 import { useEffect, useState } from "react";
-import { getCurrentUser, getPublicUserByUsername } from "@/services/real/user";
+import { getPublicUserByUsername } from "@/services/real/user";
 import { getVideosByUserId } from "@/services/real/video";
 import { CldImage } from 'next-cloudinary';
-import Image from "next/legacy/image";
+import PlaylistItem from "./components/playlist-item";
+import LikedVideo from "./components/liked-video-item";
+import VideoItem from "./components/video-item";
 
+interface PageState {
+    user: any;
+    videos: any[];
+    username: string;
+    actualUsername: string;
+    selectedTab: Tab;
+}
 export default function Profile() {
-    const [user, setUser] = useState<any>(null);
-    const [videos, setVideos] = useState<any[]>([]);
     const params = useParams();
-    const { username } = params;
-    const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
-    const [selectedTab, setSelectedTab] = useState<Tab>('videos');
+    const [state, setState] = useState<PageState>({
+        user: null,
+        videos: [],
+        username: '',
+        actualUsername: '',
+        selectedTab: 'videos',
+    });
+
+    useEffect(() => {
+        const { username } = params;
+        const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
+        setState((prevState) => ({
+            ...prevState,
+            username: username as string,
+            actualUsername,
+        }));
+    }, [params]);
 
     const fetchData = async () => {
-        if (actualUsername) {
-            getPublicUserByUsername({ username: actualUsername }).then((result) => {
+        if (state.actualUsername) {
+            getPublicUserByUsername({ username: state.actualUsername }).then((result) => {
                 if (result.success && result.user) {
-                    setUser(result.user);
+                    setState((prevState) => ({
+                        ...prevState,
+                        user: result.user,
+                    }));
                     getVideosByUserId(result.user.id).then((videosResult) => {
-                        setVideos(videosResult.data);
+                        setState((prevState) => ({
+                            ...prevState,
+                            user: result.user,
+                            videos: videosResult.data,
+                        }));
                     });
                 }
             });
@@ -38,9 +62,7 @@ export default function Profile() {
 
     useEffect(() => {
         fetchData();
-    }, []);
-
-
+    }, [state.actualUsername]);
 
     return (
         (<Stack direction={'column'} spacing={2}>
@@ -48,7 +70,7 @@ export default function Profile() {
             <Grid2 container direction={'row'} spacing={20}>
                 {/* Avatar */}
                 <Grid2 size={2}>
-                    {user?.profilePic ?
+                    {state?.user?.profilePic ?
                         (<Box sx={{
                             width: 200,
                             height: 200,
@@ -63,7 +85,7 @@ export default function Profile() {
                                     width: '100%',
                                     height: '100%',
                                 }}
-                                src={user.profilePic}
+                                src={state?.user.profilePic}
                                 alt="Image"
                             />
                         </Box>) :
@@ -95,8 +117,8 @@ export default function Profile() {
                             <Typography sx={{
                                 fontWeight: 'bold',
                                 fontSize: '1.5rem',
-                            }}>{actualUsername}</Typography>
-                            <Typography>{user?.fullName || 'No name'}</Typography>
+                            }}>{state.actualUsername}</Typography>
+                            <Typography>{state.user?.fullName || 'No name'}</Typography>
                         </Stack>
 
                         {/* Buttons */}
@@ -106,8 +128,7 @@ export default function Profile() {
                                 textTransform: 'none',
                                 fontWeight: 'bold',
                             }}>
-                                {/* {actualUsername === userState.username ? 'Edit Profile' : 'Follow'} */}
-                                {actualUsername === user?.username ? 'Edit Profile' : 'Follow'}
+                                {state.actualUsername === state.user?.username ? 'Edit Profile' : 'Follow'}
                             </Button>
                             <Button variant="contained" sx={{
                                 minWidth: 'auto',
@@ -123,27 +144,23 @@ export default function Profile() {
                         {/* Following, followers, likes */}
                         <Stack direction={'row'} spacing={4}>
                             <Stack direction={'row'} spacing={1}>
-                                {/* <Typography sx={{ fontWeight: 'bold' }}>27</Typography> */}
-                                <Typography sx={{ fontWeight: 'bold' }}>{user?.followingCount || 0}</Typography>
+                                <Typography sx={{ fontWeight: 'bold' }}>{state.user?.followingCount || 0}</Typography>
                                 <Typography sx={{ color: 'gray' }}>Following</Typography>
                             </Stack>
 
                             <Stack direction={'row'} spacing={1}>
-                                {/* <Typography sx={{ fontWeight: 'bold' }}>120K</Typography> */}
-                                <Typography sx={{ fontWeight: 'bold' }}>{user?.followerCount || 0}</Typography>
+                                <Typography sx={{ fontWeight: 'bold' }}>{state.user?.followerCount || 0}</Typography>
                                 <Typography sx={{ color: 'gray' }}>Followers</Typography>
                             </Stack>
 
                             <Stack direction={'row'} spacing={1}>
-                                {/* <Typography sx={{ fontWeight: 'bold' }}>2M</Typography> */}
-                                <Typography sx={{ fontWeight: 'bold' }}>{user?.likes || 0}</Typography>
+                                <Typography sx={{ fontWeight: 'bold' }}>{state.user?.likes || 0}</Typography>
                                 <Typography sx={{ color: 'gray' }}>Likes</Typography>
                             </Stack>
                         </Stack>
 
                         {/* Bio */}
-                        {/* <Typography>I'm a the best developer!</Typography> */}
-                        <Typography>{user?.bio || 'No bio yet'}</Typography>
+                        <Typography>{state.user?.bio || 'No bio yet'}</Typography>
                     </Box>
                 </Grid2>
             </Grid2>
@@ -153,7 +170,7 @@ export default function Profile() {
             }}>
                 <Grid2 size={6}>
                     <MyTabs
-                        onTabChange={(tab: Tab) => setSelectedTab(tab)}
+                        onTabChange={(tab: Tab) => setState((prevState) => ({ ...prevState, selectedTab: tab }))}
                     />
                 </Grid2>
                 <Grid2 size={6} sx={{
@@ -168,11 +185,11 @@ export default function Profile() {
             <Box >
                 <Grid2 container spacing={2}>
                     {
-                        selectedTab === 'videos' ? (
-                            videos.map((video, index) =>
+                        state.selectedTab === 'videos' ? (
+                            state.videos.map((video, index) =>
                                 <VideoItem
                                     videoId={video.id}
-                                    username={user?.username || ''}
+                                    username={state.user?.username || ''}
                                     key={index}
                                     index={index}
                                     title={video.title}
@@ -180,7 +197,7 @@ export default function Profile() {
                                     thumbnail={video.thumbnailUrl}
 
                                 />)
-                        ) : selectedTab === 'playlists' ? (
+                        ) : state.selectedTab === 'playlists' ? (
                             [...Array(5)].map((_, index) => <PlaylistItem key={index} index={index} />)
                         ) : (
                             // Liked videos
@@ -190,192 +207,5 @@ export default function Profile() {
                 </Grid2>
             </Box>
         </Stack>)
-    );
-}
-
-interface VideoItemProps {
-    videoId: string;
-    username: string;
-    index: number;
-    title: string;
-    description: string;
-    thumbnail?: string;
-}
-function VideoItem(props: VideoItemProps) {
-    const router = useRouter();
-
-    return (
-        <Grid2
-            key={props.index}
-            minHeight={250}
-            size={{
-                xs: 12,
-                sm: 6,
-                md: 4,
-                lg: 4,
-            }}
-            sx={{
-                position: 'relative',
-                backgroundColor: 'lightgray',
-                display: 'flex',
-                justifyContent: 'center',
-                borderRadius: 2,
-                overflow: 'hidden',
-                '&:hover .video-title': {
-                    opacity: 1,
-                    visibility: 'visible',
-                },
-            }}
-        >
-            {/* Content */}
-            <Box
-                sx={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    position: 'relative',
-                }}
-            >
-                {props.thumbnail ?
-                    (<CldImage
-                        fill={true}
-                        style={{
-                            objectFit: 'cover',
-                            width: '100%',
-                            height: '100%',
-                        }}
-                        src={props.thumbnail || ''}
-                        alt="Image"
-
-                    />) :
-                    (<Image
-                        src="/images/video-image.png"
-                        alt="Image"
-                        layout="fill"
-                        objectFit="revert"
-                    />)
-                }
-            </Box>
-
-            {/* Video overlay */}
-            <Box
-                onClick={() => router.push(`/@${props.username}/videos/${props.videoId}`)}
-                className="video-title"
-                sx={{
-                    cursor: 'pointer',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8))',
-                    display: 'flex',
-                    color: 'white',
-                    fontSize: '1.5rem',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    borderRadius: '10px',
-                    opacity: 0,
-                    visibility: 'hidden',
-                    transition: 'opacity 0.3s ease, visibility 0.3s ease',
-                    justifyContent: 'start',
-                    alignItems: 'end',
-                }}
-            >
-                <Stack padding={2}>
-                    <Typography variant="h6" sx={{
-                        display: '-webkit-box',
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        WebkitLineClamp: 2,
-                        lineHeight: 1.5,
-                    }}>{props.title}</Typography>
-                    <Stack>
-                        <Stack direction={'row'} spacing={2}>
-                            <Stack direction={'row'}>
-                                <PlayArrowOutlinedIcon />
-                                <Typography>125K</Typography>
-                            </Stack>
-                            <Stack direction={'row'}>
-                                <FavoriteBorderOutlinedIcon />
-                                <Typography>125K</Typography>
-                            </Stack>
-                            <Stack direction={'row'}>
-                                <ChatBubbleOutlineOutlinedIcon />
-                                <Typography>125K</Typography>
-                            </Stack>
-                            <Stack direction={'row'}>
-                                <ShortcutIcon />
-                                <Typography>125K</Typography>
-                            </Stack>
-                        </Stack>
-                        <Stack direction={'row'} spacing={2}>
-                            <Typography>Every one</Typography>
-                            <Typography>Nov 17, 2024</Typography>
-                        </Stack>
-                    </Stack>
-                </Stack>
-            </Box>
-        </Grid2>
-    );
-}
-
-interface PlaylistItemProps {
-    index: number;
-}
-function PlaylistItem(props: PlaylistItemProps) {
-    return (
-        <Grid2
-            key={props.index}
-            minHeight={100}
-            size={{
-                xs: 12,
-                sm: 6,
-                md: 4,
-                lg: 6,
-            }}
-            sx={{
-                backgroundColor: 'lightgray',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 2,
-            }}
-        >
-            <Typography variant="h6" gutterBottom>
-                Playlist {props.index + 1}
-            </Typography>
-        </Grid2>
-    );
-}
-
-interface LikedVideoProps {
-    index: number;
-}
-function LikedVideo(props: LikedVideoProps) {
-    return (
-        <Grid2
-            key={props.index}
-            minHeight={170}
-            size={{
-                xs: 12,
-                sm: 6,
-                md: 4,
-                lg: 3,
-            }}
-            sx={{
-                backgroundColor: 'lightgray',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 2,
-            }}
-        >
-            <Typography variant="h6" gutterBottom>
-                Liked video {props.index + 1}
-            </Typography>
-        </Grid2>
     );
 }

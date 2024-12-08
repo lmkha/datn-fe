@@ -1,7 +1,6 @@
 'use client';
 
 import { Grid2, Stack, Typography } from "@mui/material";
-import { useState } from "react";
 import HashtagComponent from "./hashtag-component";
 import ActionButton from "./action-button";
 import AuthorInfoComponent from "./author-info";
@@ -52,8 +51,8 @@ export default function VideoSection(props: VideoSectionProps) {
                         }}>
                             <ActionButton
                                 videoId={props?.video?.id}
-                                likeCount={props?.video?.likesCount || 0}
-                                commentCount={props?.video?.commentsCount || 0}
+                                likeCount={props?.video?.likesCount}
+                                commentCount={props?.video?.commentsCount}
                             />
                         </Stack>
                     </Grid2>

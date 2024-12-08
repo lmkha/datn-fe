@@ -28,9 +28,6 @@ export default function Filter() {
                 <ToggleButton value="latest" aria-label="left aligned" sx={{ textTransform: 'none' }}>
                     Latest
                 </ToggleButton>
-                <ToggleButton value="popular" aria-label="centered" sx={{ textTransform: 'none' }}>
-                    Popular
-                </ToggleButton>
                 <ToggleButton value="oldest" aria-label="right aligned" sx={{ textTransform: 'none' }}>
                     Oldest
                 </ToggleButton>

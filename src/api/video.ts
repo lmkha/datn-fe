@@ -9,7 +9,8 @@ class Video extends Base {
         tags?: string[],
     }) {
         try {
-            const response = await this.post("/videos/new/", data);
+            // const response = await this.post("/videos/new/", data);
+            const response = await this.post({ url: "/videos/new/", data });
             return {
                 success: response.success,
                 message: response.message,
@@ -25,7 +26,11 @@ class Video extends Base {
 
     async getVideoMetaData(params: { videoId: string }) {
         try {
-            const response = await this.get(`/videos/metaData/${params.videoId}`);
+            // const response = await this.get(`/videos/metaData/${params.videoId}`);
+            const response = await this.get({
+                url: `/videos/metaData/${params.videoId}`,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -46,7 +51,11 @@ class Video extends Base {
         try {
             const formData = new FormData();
             formData.append("file", data.file);
-            const response = await this.post(`/videos/${data.videoId}/thumbnail`, formData);
+            // const response = await this.post(`/videos/${data.videoId}/thumbnail`, formData);
+            const response = await this.post({
+                url: `/videos/${data.videoId}/thumbnail`,
+                data: formData,
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -67,7 +76,11 @@ class Video extends Base {
         try {
             const formData = new FormData();
             formData.append("file", data.file);
-            const response = await this.post(`/file/video/${data.videoId}`, formData);
+            // const response = await this.post(`/file/video/${data.videoId}`, formData);
+            const response = await this.post({
+                url: `/file/video/${data.videoId}`,
+                data: formData,
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -83,7 +96,11 @@ class Video extends Base {
 
     async getVideosByUserId(params: { userId: string }) {
         try {
-            const response = await this.get(`/videos/user/${params.userId}`);
+            // const response = await this.get(`/videos/user/${params.userId}`);
+            const response = await this.get({
+                url: `/videos/user/${params.userId}`,
+                authRequired: false,
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -99,7 +116,11 @@ class Video extends Base {
 
     async getVideoByVideoId(params: { videoId: string }) {
         try {
-            const response = await this.get(`/videos/${params.videoId}`);
+            // const response = await this.get(`/videos/${params.videoId}`);
+            const response = await this.get({
+                url: `/videos/${params.videoId}`,
+                authRequired: false,
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -116,7 +137,8 @@ class Video extends Base {
     // Like video
     async likeAVideo(params: { videoId: string }) {
         try {
-            const response = await this.post(`/videos/likes/${params.videoId}`, {});
+            // const response = await this.post(`/videos/likes/${params.videoId}`, {});
+            const response = await this.post({ url: `/videos/likes/${params.videoId}` });
             return {
                 success: response.success,
                 message: response.message,
@@ -132,7 +154,8 @@ class Video extends Base {
 
     async unLikeAVideo(params: { videoId: string }) {
         try {
-            const response = await this.delete(`/videos/likes/${params.videoId}`);
+            // const response = await this.delete(`/videos/likes/${params.videoId}`);
+            const response = await this.delete({ url: `/videos/likes/${params.videoId}` });
             return {
                 success: response.success,
                 message: response.message,
@@ -148,7 +171,8 @@ class Video extends Base {
 
     async isLikedAVideo(params: { videoId: string }) {
         try {
-            const response = await this.get(`/videos/likes/${params.videoId}`);
+            // const response = await this.get(`/videos/likes/${params.videoId}`);
+            const response = await this.get({ url: `/videos/likes/${params.videoId}` });
             return {
                 success: response.success,
                 message: response.message,
@@ -165,7 +189,12 @@ class Video extends Base {
     // Get video for home page
     async getVideosForHomePage(params: { count: number }) {
         try {
-            const response = await this.get("videos/random", params);
+            // const response = await this.get("videos/random", params);
+            const response = await this.get({
+                url: "videos/random",
+                params: params,
+                authRequired: false,
+            })
             return {
                 success: response.success,
                 message: response.message,
@@ -186,7 +215,12 @@ class Video extends Base {
         count: number,
     }) {
         try {
-            const response = await this.get("videos/search", params);
+            // const response = await this.get("videos/search", params);
+            const response = await this.get({
+                url: "videos/search",
+                params: params,
+                authRequired: false,
+            });
             return {
                 success: response.success,
                 message: response.message,

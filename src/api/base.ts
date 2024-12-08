@@ -1,41 +1,69 @@
 import axiosInstance from "@/core/axios/instance";
 
-type HttpMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
+type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
+
+interface RequestOptions {
+    url: string;
+    method?: HttpMethod;
+    data?: any;
+    params?: any;
+    config?: any;
+    authRequired?: boolean;
+}
 
 class Base {
-    async execute(options: { method: HttpMethod; url: string; data?: any; params?: any; config?: any }) {
+    private async execute(options: RequestOptions) {
+        const { method = "get", url, data, params, config = {}, authRequired = true } = options;
+
+        if (!url || url.trim() === "") {
+            return null;
+        }
+
         try {
+            const updatedConfig = { ...config };
+            if (authRequired) {
+                const accessToken = localStorage.getItem("accessToken");
+                if (accessToken) {
+                    const sanitizedToken = accessToken.replace(/^"+|"+$/g, "");
+                    updatedConfig.headers = {
+                        ...updatedConfig.headers,
+                        Authorization: `Bearer ${sanitizedToken}`,
+                    };
+                }
+            }
+
             const response = await axiosInstance({
-                method: options.method,
-                url: options.url,
-                data: options.data,
-                params: options.params,
-                ...options.config,
+                method,
+                url,
+                data,
+                params,
+                ...updatedConfig,
             });
+
             return response.data;
         } catch (err) {
             throw err;
         }
     }
 
-    async get(url: string, params?: any, config?: any) {
-        return this.execute({ method: 'get', url, params, config });
+    async put(options: Omit<RequestOptions, "method">) {
+        return this.execute({ ...options, method: "put" });
     }
 
-    async post(url: string, data: any, config?: any) {
-        return this.execute({ method: 'post', url, data, config });
+    async get(options: Omit<RequestOptions, "method" | "data">) {
+        return this.execute({ ...options, method: "get" });
     }
 
-    async put(url: string, data: any, config?: any) {
-        return this.execute({ method: 'put', url, data, config });
+    async post(options: Omit<RequestOptions, "method">) {
+        return this.execute({ ...options, method: "post" });
     }
 
-    async delete(url: string, data?: any, config?: any) {
-        return this.execute({ method: 'delete', url, data, config });
+    async delete(options: Omit<RequestOptions, "method">) {
+        return this.execute({ ...options, method: "delete" });
     }
 
-    async patch(url: string, data: any, config?: any) {
-        return this.execute({ method: 'patch', url, data, config });
+    async patch(options: Omit<RequestOptions, "method">) {
+        return this.execute({ ...options, method: "patch" });
     }
 }
 

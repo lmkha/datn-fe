@@ -7,7 +7,11 @@ class Image extends Base {
         try {
             const formData = new FormData();
             formData.append("file", data.file);
-            const response = await this.post("/file/image", formData);
+            // const response = await this.post("/file/image", formData);
+            const response = await this.post({
+                url: "/file/image",
+                data: formData
+            })
             return {
                 success: response.success,
                 message: response.message,

@@ -3,7 +3,11 @@ import Base from "./base";
 class Comment extends Base {
     async addComment(data: { videoId: string, content: string }) {
         try {
-            const response = await this.post('/comments', data);
+            // const response = await this.post('/comments', data);
+            const response = await this.post({
+                url: '/comments',
+                data: data
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -18,7 +22,10 @@ class Comment extends Base {
 
     async deleteComment(params: { commentId: string }) {
         try {
-            const response = await this.delete(`/comments?commentId=${params.commentId}`);
+            // const response = await this.delete(`/comments?commentId=${params.commentId}`);
+            const response = await this.delete({
+                url: `/comments?commentId=${params.commentId}`
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -33,7 +40,11 @@ class Comment extends Base {
 
     async updateComment(data: { id: string, content: string }) {
         try {
-            const response = await this.patch('/comments', data);
+            // const response = await this.patch('/comments', data);
+            const response = await this.patch({
+                url: '/comments',
+                data: data
+            });
             return {
                 success: response.success,
                 message: response.message,

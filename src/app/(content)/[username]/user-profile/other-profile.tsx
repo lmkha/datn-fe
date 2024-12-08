@@ -3,7 +3,7 @@
 import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useEffect, useState } from "react";
-import { getPublicUserByUsername } from "@/services/real/user";
+import { followUser, getPublicUserByUsername, isFollowing, unFollowUser } from "@/services/real/user";
 import { getVideosByUserId } from "@/services/real/video";
 import { CldImage } from 'next-cloudinary';
 import MyTabs, { Tab } from "../../components/tabs";
@@ -11,12 +11,14 @@ import Filter from "../../components/filter";
 import VideoItem from "../components/video-item";
 import PlaylistItem from "../components/playlist-item";
 import LikedVideo from "../components/liked-video-item";
+import { get } from "@/hooks/use-local-storage";
 
 interface State {
     user?: any;
     videos?: any[];
     username?: string;
     selectedTab?: Tab;
+    isFollowing?: boolean;
 }
 interface OtherProfileProps {
     username: string;
@@ -43,6 +45,53 @@ export default function OtherProfile({ username }: OtherProfileProps) {
                     });
                 }
             });
+            isFollowing({ username: username }).then((result) => {
+                setState((prevState) => ({
+                    ...prevState,
+                    isFollowing: result.success ? result.isFollowing : false,
+                }));
+            });
+        }
+    };
+
+    const handleFollow = async () => {
+        const fetchUserDataRelateToFollow = async () => {
+            username && getPublicUserByUsername({ username: username }).then((result) => {
+                if (result.success && result.user) {
+                    setState((prevState) => ({
+                        ...prevState,
+                        user: result.user,
+                    }));
+                }
+            });
+        };
+
+        if (state?.isFollowing) {
+            const token = get('accessToken');
+            if (token) {
+                unFollowUser({ username: username }).then((result) => {
+                    if (result.success) {
+                        setState((prevState) => ({
+                            ...prevState,
+                            isFollowing: false,
+                        }));
+                        fetchUserDataRelateToFollow();
+                    }
+                });
+            }
+        } else {
+            const token = get('accessToken');
+            if (token) {
+                followUser({ username: username }).then((result) => {
+                    if (result.success) {
+                        setState((prevState) => ({
+                            ...prevState,
+                            isFollowing: true,
+                        }));
+                        fetchUserDataRelateToFollow();
+                    }
+                });
+            }
         }
     };
 
@@ -109,22 +158,18 @@ export default function OtherProfile({ username }: OtherProfileProps) {
 
                         {/* Buttons */}
                         <Stack direction={'row'} spacing={2}>
-                            <Button variant={'contained'} sx={{
-                                backgroundColor: '#EA284E',
-                                textTransform: 'none',
-                                fontWeight: 'bold',
-                            }}>
-                                Follow
+                            <Button
+                                onClick={handleFollow}
+                                variant={'contained'}
+                                sx={{
+                                    backgroundColor: state?.isFollowing ? 'lightgrey' : '#EA284E',
+                                    color: state?.isFollowing ? 'black' : 'white',
+                                    textTransform: 'none',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                {state?.isFollowing ? 'UnFollow' : 'Follow'}
                             </Button>
-                            <Button variant="contained" sx={{
-                                minWidth: 'auto',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                fontSize: 'large',
-                                color: 'black',
-                                backgroundColor: 'lightgrey',
-                            }}><SettingsIcon /></Button>
                         </Stack>
 
                         {/* Following, followers, likes */}
@@ -171,8 +216,8 @@ export default function OtherProfile({ username }: OtherProfileProps) {
             <Box >
                 <Grid2 container spacing={2}>
                     {
-                        state?.selectedTab === 'videos' ? (
-                            state?.videos && state?.videos.map((video, index) =>
+                        state?.selectedTab === 'videos' ?
+                            (state?.videos && state?.videos.map((video, index) =>
                                 <VideoItem
                                     videoId={video.id}
                                     username={state.user?.username || ''}
@@ -183,12 +228,8 @@ export default function OtherProfile({ username }: OtherProfileProps) {
                                     thumbnail={video.thumbnailUrl}
 
                                 />)
-                        ) : state?.selectedTab === 'playlists' ? (
-                            [...Array(5)].map((_, index) => <PlaylistItem key={index} index={index} />)
-                        ) : (
-                            // Liked videos
-                            ([...Array(10)].map((_, index) => <LikedVideo key={index} index={index} />))
-                        )
+                            ) :
+                            ([...Array(5)].map((_, index) => <PlaylistItem key={index} index={index} />))
                     }
                 </Grid2>
             </Box>

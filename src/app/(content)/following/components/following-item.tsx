@@ -1,6 +1,5 @@
 'use client';
 
-import { get } from "@/hooks/use-local-storage";
 import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/navigation";
@@ -57,20 +56,37 @@ export default function FollowingItem(props: FollowingItemProps) {
                                 aspectRatio: '1',
                                 cursor: 'pointer',
                             }}
-                            onClick={() => router.push(`/@${get('user').username}`)}
+                            onClick={() => {
+                                props.followingUser?.username && router.push(`/@${props.followingUser?.username}`);
+                            }}
                         />)}
                 </Grid2>
                 {/* Info */}
                 <Grid2 size={8}>
                     <Stack>
                         {/* FullName */}
-                        <Typography variant="h6" fontWeight={'bold'} onClick={() => router.push('/@lmkha')} sx={{
-                            cursor: 'pointer',
-                        }}>{props.followingUser?.fullName || 'Full Name'}</Typography>
+                        <Typography
+                            variant="h6"
+                            fontWeight={'bold'}
+                            onClick={() => {
+                                props.followingUser?.username && router.push(`/@${props.followingUser?.username}`);
+                            }}
+                            sx={{
+                                cursor: 'pointer',
+                            }}
+                        >
+                            {props.followingUser?.fullName || 'Full Name'}
+                        </Typography>
                         {/* Username */}
-                        <Typography variant="h6" onClick={() => router.push(`/@${props.followingUser?.username}`)} sx={{
-                            cursor: 'pointer',
-                        }}>@{props.followingUser?.username || 'username'}</Typography>
+                        <Typography
+                            variant="h6"
+                            onClick={() => router.push(`/@${props.followingUser?.username}`)}
+                            sx={{
+                                cursor: 'pointer',
+                            }}
+                        >
+                            @{props.followingUser?.username || 'username'}
+                        </Typography>
                         {/* Bio */}
                         <Typography variant="body1">I'm a the best developer!</Typography>
                         {/* Metrics */}

@@ -3,7 +3,12 @@ import Base from "./base";
 class Auth extends Base {
     async login(data: { username: string, password: string }) {
         try {
-            const response = await this.post("/auth/signIn", data);
+            // const response = await this.post("/auth/signIn", data, {}, false);
+            const response = await this.post({
+                url: "/auth/signIn",
+                data: data,
+                authRequired: false
+            });
             return {
                 success: true,
                 token: response.token,
@@ -26,7 +31,12 @@ class Auth extends Base {
         isPrivate: boolean,
     }) {
         try {
-            const response = await this.post("/auth/register", data);
+            // const response = await this.post("/auth/register", data);
+            const response = await this.post({
+                url: "/auth/register",
+                data: data,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -42,7 +52,12 @@ class Auth extends Base {
 
     async checkUsernameExist(params: { username: string }) {
         try {
-            const response = await this.get('/users/checkUsernameAvailability', params);
+            // const response = await this.get('/users/checkUsernameAvailability', params);
+            const response = await this.get({
+                url: '/users/checkUsernameAvailability',
+                params: params,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -58,7 +73,12 @@ class Auth extends Base {
 
     async checkEmailExist(params: { email: string }) {
         try {
-            const response = await this.get('/users/checkEmailAvailability', params);
+            // const response = await this.get('/users/checkEmailAvailability', params);
+            const response = await this.get({
+                url: '/users/checkEmailAvailability',
+                params: params,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -74,7 +94,11 @@ class Auth extends Base {
 
     async resetPassword(data: { email: string }) {
         try {
-            const response = await this.post(`/auth/reset-password/?email=${data.email}`, {});
+            // const response = await this.post(`/auth/reset-password/?email=${data.email}`, {});
+            const response = await this.post({
+                url: `/auth/reset-password/?email=${data.email}`,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -96,7 +120,12 @@ class Auth extends Base {
         otpCode: string,
     }) {
         try {
-            const response = await this.post('/auth/reset-password-verification', data);
+            // const response = await this.post('/auth/reset-password-verification', data);
+            const response = await this.post({
+                url: '/auth/reset-password-verification',
+                data: data,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,
@@ -117,7 +146,12 @@ class Auth extends Base {
                 },
                 otpCode: data.otpCode,
             }
-            const response = await this.post('auth/account-otp-verification', requestData);
+            // const response = await this.post('auth/account-otp-verification', requestData);
+            const response = await this.post({
+                url: 'auth/account-otp-verification',
+                data: requestData,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,

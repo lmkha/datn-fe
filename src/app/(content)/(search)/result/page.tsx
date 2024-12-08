@@ -81,7 +81,6 @@ function PageContent() {
                         ...prevState,
                         users: res.data,
                     }));
-                    console.log(res.data);
                 }
             });
         }

@@ -145,6 +145,26 @@ export default function LoginForm() {
             }}>
                 Sign In with Google
             </Button>
+            <Box sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'end',
+                alignItems: 'center',
+            }}>
+                <Typography variant="body2" align="center">
+                    <Box display="flex" justifyContent="center" alignItems="center">
+                        <Link href="/signup">
+                            <Typography variant="body2" sx={{
+                                color: '#EA284E',
+                                cursor: 'pointer',
+                                '&:hover': { textDecoration: 'underline' }
+                            }}>
+                                Forgot password?
+                            </Typography>
+                        </Link>
+                    </Box>
+                </Typography>
+            </Box>
 
             <Typography variant="body2" align="center" sx={{ mt: 2 }}>
                 <Box display="flex" justifyContent="center" alignItems="center">
@@ -161,6 +181,8 @@ export default function LoginForm() {
                     </Link>
                 </Box>
             </Typography>
+
+
 
             <VerifyAccountModal
                 open={state.openVerifyModal}

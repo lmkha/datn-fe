@@ -51,8 +51,8 @@ export default function VideoPlayerComponent(props: VideoPlayerProps) {
                         </Box>
                     }
                     playing={true}
-                    onStart={() => console.log('Video started')}
-                    onEnded={() => console.log('Video ended')}
+                    onStart={() => { }}
+                    onEnded={() => { }}
                 />
             </Box>
         </>

@@ -68,7 +68,6 @@ export default function UploadVideoPage() {
         };
 
         video.onerror = () => {
-            console.error('Error loading video metadata');
         };
     };
 

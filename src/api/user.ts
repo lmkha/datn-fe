@@ -3,7 +3,6 @@ import Base from "./base";
 class User extends Base {
     async getUserByUsername(params: { username: string }) {
         try {
-            // const response = await this.get(`/users/${params.username}`);
             const response = await this.get({ url: `/users/${params.username}` });
             return {
                 success: response.success,
@@ -20,7 +19,6 @@ class User extends Base {
 
     async followUser(params: { username: string }) {
         try {
-            // const response = await this.post(`/users/${params.username}/follow`, {});
             const response = await this.post({ url: `/users/${params.username}/follow` });
             return {
                 success: response.success,
@@ -36,7 +34,6 @@ class User extends Base {
 
     async unFollowUser(params: { username: string }) {
         try {
-            // const response = await this.post(`/users/${params.username}/unfollow`, {});
             const response = await this.post({ url: `/users/${params.username}/unfollow` });
             return {
                 success: response.success,
@@ -54,7 +51,6 @@ class User extends Base {
         try {
             const formData = new FormData();
             formData.append("img", data.img);
-            // const response = await this.post("/users/profilePic", formData);
             const response = await this.post({
                 url: "/users/profilePic",
                 data: formData
@@ -74,7 +70,6 @@ class User extends Base {
 
     async getCurrentUser() {
         try {
-            // const response = await this.get("/users/");
             const response = await this.get({ url: "/users/" });
             return {
                 success: response.success,
@@ -91,7 +86,6 @@ class User extends Base {
 
     async getPublicUserByUsername(params: { username: string }) {
         try {
-            // const response = await this.get(`/users/${params.username}/public-username`);
             const response = await this.get({
                 url: `/users/${params.username}/public-username`,
                 authRequired: false
@@ -111,7 +105,6 @@ class User extends Base {
 
     async getPublicUserId(params: { userId: string }) {
         try {
-            // const response = await this.get(`/users/${params.userId}/public-id`);
             const response = await this.get({
                 url: `/users/${params.userId}/public-id`,
                 authRequired: false
@@ -131,7 +124,6 @@ class User extends Base {
 
     async getAllFollowing() {
         try {
-            // const response = await this.get(`/users/followings`);
             const response = await this.get({ url: `/users/followings` });
             return {
                 success: response.success,
@@ -151,7 +143,6 @@ class User extends Base {
             pattern: params.username,
         }
         try {
-            // const response = await this.get('/users/search', requestParams);
             const response = await this.get({
                 url: '/users/search',
                 params: requestParams,
@@ -177,7 +168,6 @@ class User extends Base {
         dateOfBirth: string;
     }) {
         try {
-            // const response = await this.put('/users/', data);
             const response = await this.put({
                 url: '/users/',
                 data: data
@@ -197,7 +187,6 @@ class User extends Base {
 
     async isFollowing(params: { username: string }) {
         try {
-            // const response = await this.get(`/users/${params.username}/checkFollow`);
             const response = await this.get({ url: `/users/${params.username}/checkFollow` });
             return {
                 success: response.success,

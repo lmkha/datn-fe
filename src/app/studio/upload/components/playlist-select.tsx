@@ -25,7 +25,6 @@ export default function PlayListSelect(props: PlayListSelectProps) {
     const [state, setState] = React.useState<PlayListSelectState>({ allPlaylists: [] });
 
     const fetchPlaylists = async () => {
-        console.log('User stat id', userState.userId);
         if (!userState.userId) return;
         getAllPlaylistByUserId(userState.userId).then((response) => {
             if (response.success && response.data) {

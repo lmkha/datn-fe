@@ -10,7 +10,6 @@ export default function TestPage() {
     const observerRef = useRef<HTMLDivElement | null>(null);
 
     const fetchData = async (page: number) => {
-        console.log("Fetching data from page:", page);
         setIsFetching(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
 

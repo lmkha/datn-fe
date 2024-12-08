@@ -16,7 +16,6 @@ const initialAuthState: AuthState = {
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
     switch (action.type) {
         case 'LOGIN':
-            console.log('LOGIN');
             return { isLogged: true };
         case 'LOGOUT':
             return { isLogged: false };

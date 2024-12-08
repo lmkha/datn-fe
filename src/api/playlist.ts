@@ -8,7 +8,6 @@ class Playlist extends Base {
         videoIdsList: string[],
     }) {
         try {
-            // const response = await axiosInstance.post("/playlists/", data);
             const response = await this.post({
                 url: "/playlists/",
                 data: data
@@ -28,7 +27,6 @@ class Playlist extends Base {
 
     async getAllPlaylistsByUserId(userId: string) {
         try {
-            // const response = await this.get(`/playlists/user/${userId}`);
             const response = await this.get({
                 url: `/playlists/user/${userId}`,
                 authRequired: false
@@ -48,7 +46,6 @@ class Playlist extends Base {
 
     async getPlaylistById(playlistId: string) {
         try {
-            // const response = await this.get(`/playlists/${playlistId}`);
             const response = await this.get({
                 url: `/playlists/${playlistId}`,
                 authRequired: false
@@ -71,7 +68,6 @@ class Playlist extends Base {
         videoId: string,
     }) {
         try {
-            // const response = await this.patch(`/playlists/${data.playlistId}/?videoId=${data.videoId}`, {});
             const response = await this.patch({ url: `/playlists/${data.playlistId}/?videoId=${data.videoId}` });
             return {
                 success: response.success,
@@ -90,7 +86,6 @@ class Playlist extends Base {
         videoId: string,
     }) {
         try {
-            // const response = await this.patch(`/playlists/${data.playlistId}/remove?videoId=${data.videoId}`, {});
             const response = await this.patch({ url: `/playlists/${data.playlistId}/remove?videoId=${data.videoId}` });
             return {
                 success: response.success,
@@ -112,7 +107,6 @@ class Playlist extends Base {
             const formData = new FormData();
             formData.append("img", data.thumbnailFile);
 
-            // const response = await this.post(`/playlists/${data.playlistId}/thumbnail`, formData);
             const response = await this.post({
                 url: `/playlists/${data.playlistId}/thumbnail`,
                 data: formData

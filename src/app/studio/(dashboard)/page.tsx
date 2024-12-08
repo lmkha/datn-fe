@@ -281,7 +281,7 @@ function AccountInfo() {
             <Stack direction={'row'} spacing={2}>
                 <Avatar
                     alt="Avt"
-                    src="/images/avatar.jpg"
+                    src="/images/avatar.png"
                     sx={{
                         width: 100,
                         height: 100,
@@ -328,7 +328,7 @@ function RecentComment() {
                     <Grid2 size={2}>
                         <Avatar
                             alt="Avt"
-                            src="/images/avatar.jpg"
+                            src="/images/avatar.png"
                             sx={{
                                 width: '100%',
                                 height: 'auto',

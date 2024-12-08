@@ -24,7 +24,7 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
         }}>
             <Box padding={1}>
                 <Avatar
-                    src="/images/avatar.jpg"
+                    src="/images/avatar.png"
                     alt="avatar"
                     sx={{
                         width: 35,

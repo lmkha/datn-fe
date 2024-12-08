@@ -42,7 +42,7 @@ export default function ParentCommentComponent(props: CommentProps) {
             }}>
                 <Box padding={1}>
                     <Avatar
-                        src="/images/avatar.jpg"
+                        src="/images/avatar.png"
                         alt="avatar"
                         sx={{
                             width: 40,

@@ -100,3 +100,12 @@ export const updateProfile = async (data: {
         message: "Update profile successfully",
     }
 }
+
+export const isFollowing = async (params: { username: string }) => {
+    const result = await userAPI.isFollowing(params);
+    return {
+        success: result.success,
+        message: result.message,
+        isFollowing: result.message === "Followed",
+    }
+};

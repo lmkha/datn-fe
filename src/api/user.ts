@@ -168,6 +168,22 @@ class User extends Base {
             }
         }
     }
+
+    async isFollowing(params: { username: string }) {
+        try {
+            const response = await this.get(`/users/${params.username}/checkFollow`);
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Check is following failed",
+            }
+        }
+    }
 }
 
 const userAPI = new User();

@@ -256,7 +256,7 @@ function CommentItem() {
                         <Grid2 size={1}>
                             <Avatar
                                 alt="Avt"
-                                src="/images/avatar.jpg"
+                                src="/images/avatar.png"
                                 sx={{
                                     width: 'auto',
                                     aspectRatio: '1',

@@ -3,17 +3,49 @@
 import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import UnFollowConfirmDialog from "./unfollow-dialog";
+import { useEffect, useState } from "react";
+import UnFollowConfirmDialog from "../../components/unfollow-dialog";
+import { followUser, isFollowing } from "@/services/real/user";
+import { get } from "@/hooks/use-local-storage";
 
-
+interface State {
+    isFollowing?: boolean;
+    openUnFollowConfirmDialog: boolean;
+}
 interface FollowingItemProps {
     followingUser: any;
 }
 export default function FollowingItem(props: FollowingItemProps) {
     const router = useRouter();
-    const [openUnFollowConfirmDialog, setOpenUnFollowConfirmDialog] = useState(false);
-    const [isFollowing, setIsFollowing] = useState(true);
+    const currentUser = get('user');
+    const [state, setState] = useState<State>({ openUnFollowConfirmDialog: false });
+
+    const fetchData = async () => {
+        props?.followingUser?.username && isFollowing({ username: props?.followingUser?.username }).then((result) => {
+            if (result.success) {
+                setState((prev) => ({ ...prev, isFollowing: result.isFollowing }));
+            } else {
+                setState((prev) => ({ ...prev, isFollowing: false }));
+            }
+        });
+    };
+
+    const handleFollow = async () => {
+        if (!props.followingUser?.username) return;
+        if (state.isFollowing) {
+            setState({ ...state, openUnFollowConfirmDialog: true });
+        } else {
+            followUser({ username: props.followingUser?.username }).then((result) => {
+                if (result.success) {
+                    setState({ ...state, isFollowing: true });
+                }
+            });
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
         <>
@@ -104,29 +136,38 @@ export default function FollowingItem(props: FollowingItemProps) {
                 </Grid2>
                 {/* UnFollow button */}
                 <Grid2 size={2}>
-                    <Button sx={{
-                        width: '100%',
-                        height: '50px',
-                        background: isFollowing ? 'lightgray' : '#EA284E',
-                        color: isFollowing ? 'black' : 'white',
-                        textTransform: 'none',
-                    }}
-                        onClick={() => setOpenUnFollowConfirmDialog(true)}
-                    >
-                        <Typography variant="body1" fontWeight={'bold'}>
-                            {isFollowing ? 'Unfollow' : 'Follow'}
-                        </Typography>
-                    </Button>
+                    {props.followingUser?.username !== currentUser?.username && (
+                        <Button sx={{
+                            width: '100%',
+                            height: '50px',
+                            background: state?.isFollowing ? 'lightgray' : '#EA284E',
+                            color: state?.isFollowing ? 'black' : 'white',
+                            textTransform: 'none',
+                        }}
+                            onClick={handleFollow}
+                        >
+                            <Typography variant="body1" fontWeight={'bold'}>
+                                {state?.isFollowing ? 'Unfollow' : 'Follow'}
+                            </Typography>
+                        </Button>
+                    )}
+
                 </Grid2>
             </Grid2>
             <UnFollowConfirmDialog
-                open={openUnFollowConfirmDialog}
-                onClose={() => setOpenUnFollowConfirmDialog(false)}
+                open={state.openUnFollowConfirmDialog}
+                onClose={() => setState({ ...state, openUnFollowConfirmDialog: false })}
                 username={props?.followingUser?.username}
                 fullName={props?.followingUser?.fullName}
                 profilePic={props?.followingUser?.profilePic}
-                onConfirm={() => {
-                    setIsFollowing(!isFollowing);
+                onConfirm={(success) => {
+                    if (success) {
+                        setState({
+                            ...state,
+                            isFollowing: false,
+                            openUnFollowConfirmDialog: false
+                        });
+                    }
                 }}
             />
         </>

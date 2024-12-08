@@ -10,14 +10,13 @@ interface UnFollowConfirmDialogProps {
     username: string;
     fullName: string;
     profilePic: string;
-    onConfirm: () => void;
+    onConfirm: (success: boolean) => void;
 }
 export default function UnFollowConfirmDialog(props: UnFollowConfirmDialogProps) {
     const handleUnFollow = async () => {
         unFollowUser({ username: props.username }).then((result) => {
             if (result.success) {
-                props.onConfirm();
-                props.onClose();
+                props.onConfirm(true);
             }
         });
     };

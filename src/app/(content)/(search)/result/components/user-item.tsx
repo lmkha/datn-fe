@@ -2,42 +2,59 @@
 
 import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatNumberToShortText } from "@/core/logic/convert";
 import { CldImage } from "next-cloudinary";
-import { followUser, unFollowUser } from "@/services/real/user";
+import { followUser, isFollowing } from "@/services/real/user";
+import UnFollowConfirmDialog from "@/app/(content)/components/unfollow-dialog";
+import { get } from "@/hooks/use-local-storage";
 
+interface State {
+    openUnFollowConfirmDialog: boolean;
+    isFollowing?: boolean;
+    followingCount?: number;
+    followersCount?: number;
+}
 interface UserItemProps {
     user: any;
 }
 export default function UserItem(props: UserItemProps) {
+    const currentUser = get('user');
     const router = useRouter();
-    const [followed, setFollowed] = useState<boolean>(false);
-    const followingCount = parseInt(props?.user?.followingCount) || 0;
-    const followersCount = parseInt(props?.user?.followerCount) || 0;
+    const [state, setState] = useState<State>({ openUnFollowConfirmDialog: false });
+
+    const fetchData = async () => {
+        props?.user?.username && isFollowing({ username: props?.user?.username }).then((result) => {
+            if (result.success) {
+                setState((prev) => ({ ...prev, isFollowing: result.isFollowing }));
+            } else {
+                setState((prev) => ({ ...prev, isFollowing: false }));
+            }
+        });
+    };
 
     const handleFollow = async () => {
-        followUser(props?.user?.username).then((res) => {
-            if (res.success) {
-                setFollowed(true);
-            }
-        });
-    };
-    const handleUnFollow = async () => {
-        unFollowUser(props?.user?.username).then((res) => {
-            if (res.success) {
-                setFollowed(false);
-            }
-        });
-    };
-
-    const handleFollowClick = () => {
-        if (followed) {
-            handleUnFollow();
+        if (!props.user?.username) return;
+        if (state.isFollowing) {
+            setState({ ...state, openUnFollowConfirmDialog: true });
         } else {
-            handleFollow();
+            followUser({ username: props.user.username }).then((result) => {
+                if (result.success) {
+                    setState({ ...state, isFollowing: true });
+                }
+            });
         }
     };
+
+    useEffect(() => {
+        setState({
+            ...state,
+            followingCount: parseInt(props?.user?.followingCount) || 0,
+            followersCount: parseInt(props?.user?.followerCount) || 0,
+        });
+        fetchData();
+    }, []);
+
 
     return (
         <>
@@ -112,11 +129,11 @@ export default function UserItem(props: UserItemProps) {
                         {/* Metrics */}
                         <Stack direction={'row'} spacing={2}>
                             <Stack direction={'row'} spacing={1}>
-                                <Typography variant="body1">{formatNumberToShortText(followersCount)} </Typography>
+                                <Typography variant="body1">{formatNumberToShortText(state?.followersCount || 0)} </Typography>
                                 <Typography variant="body1" color="textSecondary">Followers</Typography>
                             </Stack>
                             <Stack direction={'row'} spacing={1}>
-                                <Typography variant="body1">{formatNumberToShortText(followingCount)} </Typography>
+                                <Typography variant="body1">{formatNumberToShortText(state?.followingCount || 0)} </Typography>
                                 <Typography variant="body1" color="textSecondary">Following</Typography>
                             </Stack>
                         </Stack>
@@ -124,21 +141,40 @@ export default function UserItem(props: UserItemProps) {
                 </Grid2>
                 {/* UnFollow button */}
                 <Grid2 size={2}>
-                    <Button sx={{
-                        width: '100%',
-                        height: '50px',
-                        backgroundColor: followed ? 'lightgray' : '#EA284E',
-                        color: followed ? 'black' : 'white',
-                        textTransform: 'none',
-                    }}
-                        onClick={handleFollowClick}
-                    >
-                        <Typography variant="body1" fontWeight={'bold'}>
-                            {followed ? 'Unfollow' : 'Follow'}
-                        </Typography>
-                    </Button>
+                    {props?.user?.username !== currentUser?.username && (
+                        <Button sx={{
+                            width: '100%',
+                            height: '50px',
+                            backgroundColor: state?.isFollowing ? 'lightgray' : '#EA284E',
+                            color: state?.isFollowing ? 'black' : 'white',
+                            textTransform: 'none',
+                        }}
+                            onClick={handleFollow}
+                        >
+                            <Typography variant="body1" fontWeight={'bold'}>
+                                {state?.isFollowing ? 'Unfollow' : 'Follow'}
+                            </Typography>
+                        </Button>
+                    )}
                 </Grid2>
             </Grid2>
+
+            <UnFollowConfirmDialog
+                open={state.openUnFollowConfirmDialog}
+                onClose={() => setState({ ...state, openUnFollowConfirmDialog: false })}
+                username={props?.user?.username}
+                fullName={props?.user?.fullName}
+                profilePic={props?.user?.profilePic}
+                onConfirm={(success) => {
+                    if (success) {
+                        setState({
+                            ...state,
+                            isFollowing: false,
+                            openUnFollowConfirmDialog: false
+                        });
+                    }
+                }}
+            />
         </>
     );
 }

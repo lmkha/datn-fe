@@ -1,5 +1,6 @@
 import videoAPI from "@/api/video";
 import { getPublicUserByUsername, getPublicUserId } from "./user";
+import { get } from "@/hooks/use-local-storage";
 
 export const postVideo = async (data: {
     title: string;
@@ -117,4 +118,35 @@ export const searchVideos = async (data: {
             };
         }) as any[],
     };
+};
+
+export const isLikedVideo = async (videoId: string) => {
+    const result = await videoAPI.isLikedAVideo({ videoId });
+    return {
+        success: result.success,
+        message: result.message,
+        liked: result.message === 'Liked' ? true : false
+    };
+};
+
+export const likeVideo = async (videoId: string) => {
+    const accessToken = get('accessToken');
+    if (!accessToken) {
+        return {
+            success: false,
+            message: 'Please login to like a video'
+        };
+    }
+    return await videoAPI.likeAVideo({ videoId });
+};
+
+export const unlikeVideo = async (videoId: string) => {
+    const accessToken = get('accessToken');
+    if (!accessToken) {
+        return {
+            success: false,
+            message: 'Please login to unlike a video'
+        };
+    }
+    return await videoAPI.unLikeAVideo({ videoId });
 };

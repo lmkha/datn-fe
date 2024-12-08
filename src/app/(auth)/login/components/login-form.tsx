@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, TextField, Typography, Checkbox, FormControlLabel, Box } from '@mui/material';
+import { Button, TextField, Typography, Checkbox, FormControlLabel, Box, Stack } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import Link from 'next/link';
 import Password from './password';
@@ -74,7 +74,23 @@ export default function LoginForm() {
         }}>
             {/* Add Icon Here */}
 
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>Welcome to MeTube</Typography>
+            <Stack direction={'row'} spacing={1}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>Welcome to</Typography>
+                <Typography
+                    onClick={() => router.push('/')}
+                    variant="h4"
+                    sx={{
+                        fontWeight: 'bold',
+                        mb: 1,
+                        ":hover": {
+                            color: '#EA284E',
+                            cursor: 'pointer',
+                        }
+                    }}
+                >
+                    MeTube
+                </Typography>
+            </Stack>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
                 Enter your email and password to access your account
             </Typography>

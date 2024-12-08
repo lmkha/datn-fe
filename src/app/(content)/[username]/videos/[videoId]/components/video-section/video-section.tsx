@@ -15,8 +15,6 @@ interface VideoSectionProps {
     changeTheaterMode: () => void;
 }
 export default function VideoSection(props: VideoSectionProps) {
-    const [liked, setLiked] = useState(false);
-
     return (
         <Stack sx={{
             width: '100%',
@@ -53,8 +51,7 @@ export default function VideoSection(props: VideoSectionProps) {
                             border: '1px solid lightgray',
                         }}>
                             <ActionButton
-                                liked={liked}
-                                setLiked={setLiked}
+                                videoId={props?.video?.id}
                                 likeCount={props?.video?.likesCount || 0}
                                 commentCount={props?.video?.commentsCount || 0}
                             />

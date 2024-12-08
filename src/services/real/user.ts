@@ -1,4 +1,5 @@
 import userAPI from "@/api/user";
+import { get } from "@/hooks/use-local-storage";
 
 export const getUserByUsername = async (params: { username: string }) => {
     const result = await userAPI.getUserByUsername(params);
@@ -49,10 +50,25 @@ export const getPublicUserId = async (params: { userId: string }) => {
 };
 
 export const followUser = async (params: { username: string }) => {
+    const accessToken = get('accessToken');
+    if (!accessToken) {
+        return {
+            success: false,
+            message: "You need to login to follow user",
+        }
+    }
+
     return await userAPI.followUser(params);
 };
 
 export const unFollowUser = async (params: { username: string }) => {
+    const accessToken = get('accessToken');
+    if (!accessToken) {
+        return {
+            success: false,
+            message: "You need to login to unfollow user",
+        }
+    }
     return await userAPI.unFollowUser(params);
 };
 

@@ -67,31 +67,25 @@ export default function OtherProfile({ username }: OtherProfileProps) {
         };
 
         if (state?.isFollowing) {
-            const token = get('accessToken');
-            if (token) {
-                unFollowUser({ username: username }).then((result) => {
-                    if (result.success) {
-                        setState((prevState) => ({
-                            ...prevState,
-                            isFollowing: false,
-                        }));
-                        fetchUserDataRelateToFollow();
-                    }
-                });
-            }
+            unFollowUser({ username: username }).then((result) => {
+                if (result.success) {
+                    setState((prevState) => ({
+                        ...prevState,
+                        isFollowing: false,
+                    }));
+                    fetchUserDataRelateToFollow();
+                }
+            });
         } else {
-            const token = get('accessToken');
-            if (token) {
-                followUser({ username: username }).then((result) => {
-                    if (result.success) {
-                        setState((prevState) => ({
-                            ...prevState,
-                            isFollowing: true,
-                        }));
-                        fetchUserDataRelateToFollow();
-                    }
-                });
-            }
+            followUser({ username: username }).then((result) => {
+                if (result.success) {
+                    setState((prevState) => ({
+                        ...prevState,
+                        isFollowing: true,
+                    }));
+                    fetchUserDataRelateToFollow();
+                }
+            });
         }
     };
 

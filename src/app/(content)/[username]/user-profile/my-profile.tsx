@@ -1,7 +1,7 @@
 'use client';
 
 import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useEffect, useState } from "react";
 import { getPublicUserByUsername } from "@/services/real/user";
@@ -12,10 +12,12 @@ import Filter from "../../components/filter";
 import VideoItem from "../components/video-item";
 import PlaylistItem from "../components/playlist-item";
 import LikedVideo from "../components/liked-video-item";
+import { getAllPlaylistByUserId } from "@/services/real/playlist";
 
 interface PageState {
     user?: any;
     videos?: any[];
+    playlists?: any[];
     username?: string;
     selectedTab?: Tab;
 }
@@ -23,6 +25,7 @@ interface MyProfileProps {
     username: string;
 }
 export default function MyProfile({ username }: MyProfileProps) {
+    const router = useRouter();
     const [state, setState] = useState<PageState>({
         username: username,
         selectedTab: 'videos',
@@ -41,6 +44,12 @@ export default function MyProfile({ username }: MyProfileProps) {
                             ...prevState,
                             user: result.user,
                             videos: videosResult.data,
+                        }));
+                    });
+                    getAllPlaylistByUserId(result.user.id).then((playlistsResult) => {
+                        setState((prevState) => ({
+                            ...prevState,
+                            playlists: playlistsResult.data,
                         }));
                     });
                 }
@@ -110,23 +119,36 @@ export default function MyProfile({ username }: MyProfileProps) {
                         </Stack>
 
                         {/* Buttons */}
-                        <Stack direction={'row'} spacing={2}>
-                            <Button variant={'contained'} sx={{
-                                backgroundColor: '#EA284E',
-                                textTransform: 'none',
-                                fontWeight: 'bold',
-                            }}>
-                                {state.username === state.user?.username ? 'Edit Profile' : 'Follow'}
+                        <Stack
+                            direction={'row'}
+                            spacing={2}
+                        >
+                            <Button
+                                onClick={() => { router.push('/settings'); }}
+                                variant={'contained'}
+                                sx={{
+                                    backgroundColor: '#EA284E',
+                                    textTransform: 'none',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                Edit Profile
                             </Button>
-                            <Button variant="contained" sx={{
-                                minWidth: 'auto',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                fontSize: 'large',
-                                color: 'black',
-                                backgroundColor: 'lightgrey',
-                            }}><SettingsIcon /></Button>
+                            <Button
+                                onClick={() => { router.push('/settings'); }}
+                                variant="contained"
+                                sx={{
+                                    minWidth: 'auto',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    fontSize: 'large',
+                                    color: 'black',
+                                    backgroundColor: 'lightgrey',
+                                }}
+                            >
+                                <SettingsIcon />
+                            </Button>
                         </Stack>
 
                         {/* Following, followers, likes */}
@@ -187,7 +209,11 @@ export default function MyProfile({ username }: MyProfileProps) {
 
                                 />)
                         ) : state.selectedTab === 'playlists' ? (
-                            [...Array(5)].map((_, index) => <PlaylistItem key={index} index={index} />)
+                            state?.playlists && state.playlists.map((playlist, index) =>
+                                <PlaylistItem
+                                    index={index}
+                                    playlist={playlist}
+                                />)
                         ) : (
                             // Liked videos
                             ([...Array(10)].map((_, index) => <LikedVideo key={index} index={index} />))

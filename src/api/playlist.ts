@@ -49,7 +49,10 @@ class Playlist extends Base {
     async getPlaylistById(playlistId: string) {
         try {
             // const response = await this.get(`/playlists/${playlistId}`);
-            const response = await this.get({ url: `/playlists/${playlistId}` });
+            const response = await this.get({
+                url: `/playlists/${playlistId}`,
+                authRequired: false
+            });
             return {
                 success: response.success,
                 message: response.message,

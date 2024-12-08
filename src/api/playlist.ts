@@ -1,4 +1,3 @@
-import axiosInstance from "@/core/axios/instance";
 import Base from "./base";
 
 class Playlist extends Base {

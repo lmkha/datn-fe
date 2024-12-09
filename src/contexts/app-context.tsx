@@ -1,57 +1,66 @@
 'use client';
 
-import React, { createContext, useReducer, ReactNode, useContext } from "react";
+import React, { createContext, useState, ReactNode, useContext } from "react";
 
-// Define the shape of the App state
+interface AlertState {
+    text: string;
+    severity: 'error' | 'info' | 'success' | 'warning';
+    isOpen: boolean;
+}
+
 interface AppState {
     theme: "light" | "dark";
     language: "en" | "vi";
 }
 
-// Define the types of actions
-type AppAction =
-    | { type: "SET_THEME"; payload: "light" | "dark" }
-    | { type: "SET_LANGUAGE"; payload: "en" | "vi" };
-
-// Define the initial state
-const initialAppState: AppState = {
-    theme: "light",
-    language: "en",
-};
-
-// Define the reducer function
-const appReducer = (state: AppState, action: AppAction): AppState => {
-    switch (action.type) {
-        case "SET_THEME":
-            return { ...state, theme: action.payload };
-        case "SET_LANGUAGE":
-            return { ...state, language: action.payload };
-        default:
-            return state;
-    }
-};
-
-// Define the context type
 interface AppContextProps {
     state: AppState;
-    dispatch: React.Dispatch<AppAction>;
+    alertState: AlertState;
+    setTheme: (theme: "light" | "dark") => void;
+    setLanguage: (language: "en" | "vi") => void;
+    showAlert: (text: string, severity: 'error' | 'info' | 'success' | 'warning') => void;
+    hideAlert: () => void;
 }
 
-// Create the context
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
-// Create the provider component
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [state, dispatch] = useReducer(appReducer, initialAppState);
+    const [state, setState] = useState<AppState>({
+        theme: "light",
+        language: "en",
+    });
+
+    const [alertState, setAlertState] = useState<AlertState>({
+        text: '',
+        severity: 'info',
+        isOpen: false,
+    });
+
+    // Functions to update app state
+    const setTheme = (theme: "light" | "dark") => {
+        setState((prev) => ({ ...prev, theme }));
+    };
+
+    const setLanguage = (language: "en" | "vi") => {
+        setState((prev) => ({ ...prev, language }));
+    };
+
+    // Functions to manage Alert
+    const showAlert = (text: string, severity: 'error' | 'info' | 'success' | 'warning') => {
+        setAlertState({ text, severity, isOpen: true });
+    };
+
+    const hideAlert = () => {
+        setAlertState((prev) => ({ ...prev, isOpen: false }));
+    };
 
     return (
-        <AppContext.Provider value={{ state, dispatch }}>
+        <AppContext.Provider value={{ state, alertState, setTheme, setLanguage, showAlert, hideAlert }}>
             {children}
         </AppContext.Provider>
     );
 };
 
-// Create a custom hook for accessing the context
 export const useAppContext = (): AppContextProps => {
     const context = useContext(AppContext);
     if (!context) {

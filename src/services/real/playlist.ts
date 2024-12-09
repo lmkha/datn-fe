@@ -5,26 +5,20 @@ export const createPlaylist = async (data: {
     description: string;
     thumbnailFile?: File | null;
 }) => {
-    const result = await playlistAPI.createAPlaylist({
+    const createPlaylistResult = await playlistAPI.createAPlaylist({
         name: data.name,
         description: data.description,
         videoIdsList: [],
-    }).then((response) => {
-        if (response.success && data?.thumbnailFile) {
-            playlistAPI.uploadThumbnailForPlaylist({
-                playlistId: response.data.id,
-                thumbnailFile: data.thumbnailFile,
-            });
-        }
-        return response;
     });
 
-    return {
-        success: result.success,
-        message: result.message,
-        data: result.data,
+    if (data?.thumbnailFile) {
+        await playlistAPI.uploadThumbnailForPlaylist({
+            playlistId: createPlaylistResult.data.id,
+            thumbnailFile: data.thumbnailFile,
+        });
     }
-}
+    return createPlaylistResult;
+};
 
 export const getAllPlaylistByUserId = async (userId: string) => {
     return playlistAPI.getAllPlaylistsByUserId(userId);
@@ -32,4 +26,11 @@ export const getAllPlaylistByUserId = async (userId: string) => {
 
 export const getPlaylistById = async (playlistId: string) => {
     return playlistAPI.getPlaylistById(playlistId);
+};
+
+export const addVideoToPlayList = async (data: {
+    playlistId: string;
+    videoId: string;
+}) => {
+    return playlistAPI.addVideoToPlaylist(data);
 };

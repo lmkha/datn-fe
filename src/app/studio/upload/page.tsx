@@ -11,6 +11,7 @@ import VideoUploadButton from "./components/video-upload-button";
 import HashtagInput from "./components/hashtag-input";
 import WhoCanWatchViewSelect from "./components/who-can-see-select";
 import ThumbnailUploadButton from "./components/thumbnail-upload-button";
+import { useAppContext } from "@/contexts/app-context";
 
 interface VideoFileMetadata {
     size?: string;
@@ -31,6 +32,7 @@ interface PageState {
 }
 
 export default function UploadVideoPage() {
+    const { showAlert } = useAppContext();
     const [pageState, setPageState] = useState<PageState>();
 
     const videoURL = useMemo(() => {
@@ -279,7 +281,10 @@ export default function UploadVideoPage() {
                             {/* Who can view video */}
                             <WhoCanWatchViewSelect />
                             {/* Playlist */}
-                            <PlayListSelect />
+                            <PlayListSelect onSelected={(playlistId) => {
+                                console.log('playlistId', playlistId);
+                                setPageState({ ...pageState, playlist: playlistId });
+                            }} />
                             {/* Submit button */}
                             <Button
                                 onClick={handleUpload}

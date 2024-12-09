@@ -21,6 +21,7 @@ interface CreateNewPlayListModalProps {
     onCreated?: () => void;
 }
 export default function CreateNewPlayListModal(props: CreateNewPlayListModalProps) {
+    const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
     const [state, setState] = React.useState<CreateNewPlayListModalState>();
     const playlistImageFile = React.useRef<File | null>(null);
 
@@ -54,13 +55,25 @@ export default function CreateNewPlayListModal(props: CreateNewPlayListModalProp
         }).then((response) => {
             if (response.success) {
                 setState({ ...state, isUploading: false, created: true });
-                props.onCreated?.();
+
+                timeoutRef.current = setTimeout(() => {
+                    handleClose();
+                    props?.onCreated && props.onCreated?.();
+                }, 1000);
             } else {
-                setState({ ...state, isUploading: false });
+                setState({ ...state, isUploading: false, created: false });
             }
         });
-
     };
+
+    React.useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
 
     return (
         <>
@@ -190,6 +203,7 @@ export default function CreateNewPlayListModal(props: CreateNewPlayListModalProp
 
                         {/* Create Button */}
                         <Button
+                            disabled={state?.isUploading || state?.created}
                             onClick={handleCreatePlaylist}
                             variant="contained"
                             sx={{

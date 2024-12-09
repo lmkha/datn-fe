@@ -56,9 +56,10 @@ function LayoutContent({
                     top: 0,
                     left: 0,
                     width: "100%",
-                    zIndex: 1000,
+                    zIndex: 999,
                     borderBottom: "1px solid lightgray",
                     height: "57px",
+                    backgroundColor: "white",
                 }}
             >
                 <Header

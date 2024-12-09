@@ -1,45 +1,38 @@
 'use client';
 
-import { Box, Button, Grid2, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+import { Box, Button, Grid2, Typography } from "@mui/material";
 import * as React from 'react';
-import FormControl from '@mui/material/FormControl';
 import CreateNewPlayListModal from "./create-playlist-modal";
 import { get } from "@/hooks/use-local-storage";
 import { getAllPlaylistByUserId } from "@/services/real/playlist";
-import { useUserContext } from "@/contexts/user-context";
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
-interface Playlist {
-    id: string;
-    name: string;
-}
-interface PlayListSelectState {
-    allPlaylists: Playlist[];
-    selectedPlaylist?: Playlist;
+
+interface State {
+    allPlaylists?: any[];
+    selectedPlaylist?: any;
     openCreateNewPlaylistModal?: boolean;
+    searchValue?: string;
 }
 interface PlayListSelectProps {
-    onPlaylistSelected?: (playlist: string) => void;
+    onSelected?: (playlistId: string) => void;
 }
 export default function PlayListSelect(props: PlayListSelectProps) {
-    const { state: userState } = useUserContext();
-    const [state, setState] = React.useState<PlayListSelectState>({ allPlaylists: [] });
+    const user = get('user');
+    const [state, setState] = React.useState<State>();
 
-    const fetchPlaylists = async () => {
-        if (!userState.userId) return;
-        getAllPlaylistByUserId(userState.userId).then((response) => {
+    const fetchData = async () => {
+        if (!user?.id) return;
+        getAllPlaylistByUserId(user.id).then((response) => {
             if (response.success && response.data) {
-                response.data.map((playlist: any) => {
-                    setState({
-                        ...state,
-                        allPlaylists: [...state.allPlaylists, { id: playlist.id, name: playlist.name }]
-                    });
-                });
+                setState({ ...state, allPlaylists: response.data });
             }
         });
     };
 
     React.useEffect(() => {
-        fetchPlaylists();
+        fetchData();
     }, []);
 
     return (
@@ -52,28 +45,36 @@ export default function PlayListSelect(props: PlayListSelectProps) {
                 alignItems: 'center',
             }}>
                 <Grid2 size={9}>
-                    <FormControl fullWidth>
-                        <Select
-                            size="small"
-                            onChange={(event: SelectChangeEvent) => {
+                    <Autocomplete
+                        size="small"
+                        options={
+                            state?.allPlaylists
+                                ?.filter((playlist) =>
+                                    playlist.name.toLowerCase().includes(state?.searchValue?.toLowerCase() || '')
+                                )
+                                .map((playlist) => ({ id: playlist.id, name: playlist.name })) || []
+                        }
+                        onChange={(event, newValue) => {
+                            setState({ ...state, selectedPlaylist: newValue });
+                            props.onSelected && props.onSelected(newValue?.id || '');
+                        }}
+                        inputValue={state?.searchValue || ''}
+                        onInputChange={(event, newInputValue) => {
+                            setState({ ...state, searchValue: newInputValue });
+                        }}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        noOptionsText="No playlists available"
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                placeholder="Select or search a playlist"
+                                aria-label="Select a playlist"
+                            />
+                        )}
+                        sx={{ width: '100%' }}
+                    />
 
-                            }}
-                            displayEmpty
-                            inputProps={{ 'aria-label': 'Select a playlist' }}
-                        >
-                            <MenuItem value="" disabled>
-                                Choose a playlist
-                            </MenuItem>
-                            {state?.allPlaylists?.map((playlist, index) => (
-                                <MenuItem
-                                    key={index}
-                                    onClick={() => props.onPlaylistSelected && props.onPlaylistSelected(playlist.id)}
-                                >
-                                    {playlist.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
                 </Grid2>
                 <Grid2 size={3} height={'100%'} sx={{
                     display: 'flex',
@@ -95,10 +96,11 @@ export default function PlayListSelect(props: PlayListSelectProps) {
                 </Grid2>
             </Grid2>
             <CreateNewPlayListModal
-                open={state.openCreateNewPlaylistModal || false}
+                open={state?.openCreateNewPlaylistModal || false}
                 onClose={() => setState({ ...state, openCreateNewPlaylistModal: false })}
                 onCreated={() => {
-                    fetchPlaylists();
+                    console.log('created');
+                    fetchData();
                 }}
             />
         </Box>

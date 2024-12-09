@@ -12,9 +12,9 @@ class Playlist extends Base {
                 data: data
             });
             return {
-                success: response.data.success,
-                message: response.data.message,
-                data: response.data.data,
+                success: response.success,
+                message: response.message,
+                data: response.data,
             }
         } catch (err: any) {
             return {

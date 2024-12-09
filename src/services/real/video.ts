@@ -1,6 +1,7 @@
 import videoAPI from "@/api/video";
-import { getPublicUserByUsername, getPublicUserId } from "./user";
+import { getPublicUserId } from "./user";
 import { get } from "@/hooks/use-local-storage";
+import { addVideoToPlayList } from "./playlist";
 
 export const postVideo = async (data: {
     title: string;
@@ -10,6 +11,7 @@ export const postVideo = async (data: {
     commentOff?: boolean;
     description?: string;
     tags?: string[];
+    playlistId?: string;
 }) => {
     // Upload video meta data
     const uploadVideoMetaDataResult = await videoAPI.uploadVideoMetaData({
@@ -24,8 +26,16 @@ export const postVideo = async (data: {
         return uploadVideoMetaDataResult;
     }
 
+    // Add video to playlist
+    if (data?.playlistId) {
+        addVideoToPlayList({
+            playlistId: data.playlistId,
+            videoId: uploadVideoMetaDataResult.data.id,
+        });
+    }
+
     // Upload thumbnail file
-    if (data.thumbnailFile) {
+    if (data?.thumbnailFile) {
         videoAPI.uploadThumbnail({
             videoId: uploadVideoMetaDataResult.data.id,
             file: data.thumbnailFile,

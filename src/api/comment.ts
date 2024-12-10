@@ -55,6 +55,27 @@ class Comment extends Base {
         }
     }
 
+    // Get a comment by id
+    async getCommentById(params: { commentId: string }) {
+        try {
+            const response = await this.get({
+                url: `/comments/${params.commentId}`,
+                authRequired: false
+            });
+            return {
+                success: response.success,
+                message: response.message,
+                comment: response.data
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get comment by id failed",
+                comment: null
+            }
+        }
+    }
+
     // Get parent comments of a video
     async getParentCommentsOfVideo(params: { videoId: string, order?: 'oldest' | 'newest' }) {
         try {
@@ -80,10 +101,10 @@ class Comment extends Base {
     }
 
     // Get children comments of a parent comment
-    async getChildrenComment(params: { commentId: string }) {
+    async getChildrenComments(params: { commentId: string }) {
         try {
             const response = await this.get({
-                url: `/comments/${params.commentId}`,
+                url: `/comments/${params.commentId}/children`,
                 authRequired: false
             });
             return {

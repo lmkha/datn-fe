@@ -36,7 +36,6 @@ export default function CommentSection(props: CommentSectionProps) {
                 key={-1}
                 videoId={props.videoId}
                 onCommented={() => {
-                    console.log('commented');
                     fetchData();
                 }}
             />

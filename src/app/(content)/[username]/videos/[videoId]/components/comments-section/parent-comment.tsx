@@ -5,18 +5,18 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { useEffect, useState } from "react";
 import { ChildComment, ParentComment } from "../../types";
-import { getAllChildCommentsOfParentComment_Mock } from "@/services/mock/comment";
 import ChildCommentComponent from "./child-comment";
 import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { formatTimeToShortText } from "@/core/logic/convert";
-import { getChildrenComments, replyComment } from "@/services/real/comment";
+import { getChildrenComments, getCommentById, replyComment } from "@/services/real/comment";
 
 interface State {
     liked?: boolean;
     expanded?: boolean;
     openReply?: boolean;
     replyContent?: string;
+    comment?: ParentComment;
     childrenComments?: ChildComment[];
 }
 interface CommentProps {
@@ -29,26 +29,60 @@ export default function ParentCommentComponent(props: CommentProps) {
     const router = useRouter();
     const [state, setState] = useState<State>();
 
-    const fetchChildrenComments = async () => {
-        if (props.comment?.id && state?.expanded) {
-            getChildrenComments(props.comment?.id).then((result) => {
-                if (result.success) {
-                    setState({ ...state, childrenComments: result.comments });
-                }
-            });
+    useEffect(() => {
+        setState({ ...state, comment: props.comment });
+    }, [props.comment]);
+
+    const renewComment = async () => {
+        if (!state?.comment?.videoId) return;
+
+        const result = await getCommentById(state.comment.id as string);
+        if (!result.success) return;
+
+        const updatedState = {
+            ...state,
+            comment: result.comment as ParentComment,
+            openReply: false,
+            replyContent: '',
+        };
+
+        if (state?.expanded && state?.comment?.id) {
+            const result2 = await getChildrenComments(state.comment.id);
+            if (result2.success) {
+                updatedState.childrenComments = result2.comments;
+            }
         }
+
+        setState(updatedState);
+    };
+
+
+    const fetchChildrenComments = async () => {
+        if (!state?.comment?.id || !state?.expanded) return;
+        getChildrenComments(state?.comment?.id).then((result) => {
+            if (result.success) {
+                setState({
+                    ...state,
+                    childrenComments: result.comments
+                });
+            }
+        });
     };
 
     const handleReply = async () => {
-        if (props.videoId && props?.comment?.id && state?.replyContent && state?.replyContent.length > 0) {
-            // Call API to reply
-            const result = await replyComment({ videoId: props.videoId, replyTo: props.comment.id, content: state.replyContent });
-            if (result.success) {
-                // Update UI
+        if (state?.comment?.videoId && state?.comment?.id && state?.replyContent && state?.replyContent?.length > 0) {
+            const result = await replyComment({
+                videoId: state.comment.videoId,
+                replyTo: state.comment.id,
+                content: state.replyContent
+            });
 
+            if (result.success) {
+                await renewComment();
             }
         }
     };
+
 
     useEffect(() => {
         fetchChildrenComments();
@@ -62,7 +96,7 @@ export default function ParentCommentComponent(props: CommentProps) {
             margin: 1
         }}>
             {/* Avatar */}
-            {props?.comment?.userAvatar ? (<Box sx={{
+            {state?.comment?.userAvatar ? (<Box sx={{
                 width: 40,
                 height: 40,
                 borderRadius: '50%',
@@ -71,8 +105,8 @@ export default function ParentCommentComponent(props: CommentProps) {
                 cursor: 'pointer',
             }}
                 onClick={() => {
-                    props?.comment?.username &&
-                        router.push(`/@${props.comment.username}`);
+                    state?.comment?.username &&
+                        router.push(`/@${state?.comment.username}`);
                 }}
             >
                 <CldImage
@@ -82,7 +116,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                         width: '100%',
                         height: '100%',
                     }}
-                    src={props.comment.userAvatar}
+                    src={state?.comment.userAvatar}
                     alt="Image"
                 />
             </Box>) :
@@ -95,8 +129,8 @@ export default function ParentCommentComponent(props: CommentProps) {
                         cursor: 'pointer',
                     }}
                     onClick={() => {
-                        props?.comment?.username &&
-                            router.push(`/@${props.comment.username}`);
+                        state?.comment?.username &&
+                            router.push(`/@${state?.comment.username}`);
                     }}
                 />)
             }
@@ -112,7 +146,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                     </Typography>
                     {/* created at */}
                     <Typography variant="body2">
-                        {formatTimeToShortText(props.comment?.createdAt || '')}
+                        {formatTimeToShortText(state?.comment?.createdAt || '')}
                     </Typography>
                 </Stack>
                 {/* Content */}
@@ -126,7 +160,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                         WebkitLineClamp: state?.expanded ? 'none' : 2,
                     }}
                 >
-                    {props.comment?.content}
+                    {state?.comment?.content}
                 </Typography>
                 {/* Like, Open Reply button */}
                 <Stack direction={'row'} spacing={4}>
@@ -140,7 +174,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                         }}>
                             {state?.liked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
                         </IconButton>
-                        <Typography variant="body2">{props.comment?.likes}</Typography>
+                        <Typography variant="body2">{state?.comment?.likes}</Typography>
                     </Stack>
                     {/* Open Reply TextField */}
                     <Button
@@ -238,7 +272,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                 />}
 
                 {/* Show Children comments button*/}
-                {props.comment?.replyCount !== 0 && (
+                {state?.comment?.replyCount !== 0 && (
                     <Button
                         onClick={() => setState({ ...state, expanded: !state?.expanded })}
                         sx={{
@@ -253,8 +287,9 @@ export default function ParentCommentComponent(props: CommentProps) {
                             fontWeight={'bold'}
                             sx={{ color: 'black' }}
                         >
-                            {props?.comment?.replyCount === 1 ? `View ${props.comment?.replyCount} reply` :
-                                `View ${props.comment?.replyCount} replies`}
+                            {state?.expanded ? `Hide ${state.comment?.replyCount === 1 ? 'reply' : 'replies'}` :
+                                (state?.comment?.replyCount === 1 ? `View ${state?.comment?.replyCount} reply` :
+                                    `View ${state?.comment?.replyCount} replies`)}
                         </Typography>
                     </Button>
                 )}
@@ -266,7 +301,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                         state.childrenComments.map((child) =>
                             <ChildCommentComponent
                                 comment={child}
-                                onReplied={() => fetchChildrenComments()}
+                                onReplied={renewComment}
                             />
                         )
                     }

@@ -10,6 +10,45 @@ export const replyComment = async (data: { videoId: string, replyTo: string, con
     return commentAPI.addComment(data);
 };
 
+export const getCommentById = async (commentId: string): Promise<{
+    success: boolean;
+    message: string;
+    comment: ParentCommentModel | ChildCommentModel | null;
+}> => {
+    const result = await commentAPI.getCommentById({ commentId });
+
+    if (!result.success) {
+        return {
+            success: false,
+            message: result.message,
+            comment: null,
+        };
+    }
+
+    const comment = result.comment;
+    const { user } = await getPublicUserId({ userId: comment.userId });
+
+    return {
+        success: true,
+        message: result.message,
+        comment: {
+            parentId: comment.replyTo || null,
+            id: comment.id,
+            content: comment.content,
+            likes: comment.likeCount,
+            childrenIds: comment.replies || [],
+            replyCount: comment.replyCount,
+            videoId: comment.videoId,
+            userId: comment.userId,
+            username: user?.username || "Anonymous",
+            userAvatar: user?.profilePic || null,
+            createdAt: comment.createdAt,
+            updatedAt: comment.updatedAt,
+            isEdited: comment.isEdited,
+        }
+    };
+};
+
 export const getAllParentComments = async (videoId: string): Promise<{
     success: boolean;
     message: string;
@@ -49,7 +88,7 @@ export const getChildrenComments = async (parentCommentId: string): Promise<{
     message: string;
     comments: ChildCommentModel[];
 }> => {
-    const result = await commentAPI.getChildrenComment({ commentId: parentCommentId });
+    const result = await commentAPI.getChildrenComments({ commentId: parentCommentId });
 
     const comments = await Promise.all(
         (result?.comments || []).map(async (comment: any) => {

@@ -7,32 +7,38 @@ import { useEffect, useState } from "react";
 import { ChildComment, ParentComment } from "../../types";
 import { getAllChildCommentsOfParentComment_Mock } from "@/services/mock/comment";
 import ChildCommentComponent from "./child-comment";
+import { CldImage } from "next-cloudinary";
+import { useRouter } from "next/navigation";
+import { formatTimeToShortText } from "@/core/logic/convert";
 
+interface State {
+    liked?: boolean;
+    expanded?: boolean;
+    openReply?: boolean;
+    replyContent?: string;
+    childrenComments?: ChildComment[];
+}
 interface CommentProps {
     comment?: ParentComment;
     onLike?: () => void;
     onUnLike?: () => void;
 }
 export default function ParentCommentComponent(props: CommentProps) {
-    const [liked, setLiked] = useState(false);
-    const [expanded, setExpanded] = useState(false);
-    const [openReply, setOpenReply] = useState(false);
-    const [replyContent, setReplyContent] = useState('');
-    const [childrenComments, setChildrenComments] = useState<ChildComment[]>([]);
+    const router = useRouter();
+    const [state, setState] = useState<State>();
 
     useEffect(() => {
-        if (props.comment?.id && expanded) {
+        if (props.comment?.id && state?.expanded) {
             getAllChildCommentsOfParentComment_Mock(props.comment?.id).then((children) => {
-                setChildrenComments(children);
+                setState({ ...state, childrenComments: children });
             });
         }
-    }, [expanded]);
-
+    }, [state?.expanded]);
 
     return (
         <Stack>
             {/* Parent */}
-            <Stack direction={'row'} sx={{
+            <Stack direction={'row'} spacing={2} sx={{
                 width: '100%',
                 minHeight: '50px',
                 borderTop: '1px solid lightgray',
@@ -40,29 +46,57 @@ export default function ParentCommentComponent(props: CommentProps) {
                 borderRight: '1px solid lightgray',
                 cursor: 'pointer',
             }}>
-                <Box padding={1}>
-                    <Avatar
+                {props?.comment?.userAvatar ? (<Box sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    cursor: 'pointer',
+                }}
+                    onClick={() => {
+                        props?.comment?.username &&
+                            router.push(`/@${props.comment.username}`);
+                    }}
+                >
+                    <CldImage
+                        fill={true}
+                        style={{
+                            objectFit: 'cover',
+                            width: '100%',
+                            height: '100%',
+                        }}
+                        src={props.comment.userAvatar}
+                        alt="Image"
+                    />
+                </Box>) :
+                    (<Avatar
                         src="/images/avatar.png"
                         alt="avatar"
                         sx={{
                             width: 40,
                             height: 40,
+                            cursor: 'pointer',
                         }}
-                    />
-                </Box>
+                        onClick={() => {
+                            props?.comment?.username &&
+                                router.push(`/@${props.comment.username}`);
+                        }}
+                    />)
+                }
                 <Stack sx={{
                     overflowY: 'auto',
                     width: '100%',
                 }}>
                     {/* Username, updated time */}
                     <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                        {/* Username */}
                         <Typography variant="body1" fontWeight={'bold'}>
-                            {/* {props?.comment?.username} */}
-                            Username
+                            {props?.comment?.username}
                         </Typography>
+                        {/* created at */}
                         <Typography variant="body2">
-                            {/* {props?.comment?.createdAt} */}
-                            created at
+                            {formatTimeToShortText(props.comment?.createdAt || '')}
                         </Typography>
                     </Stack>
                     {/* Content */}
@@ -73,7 +107,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             textOverflow: 'revert',
-                            WebkitLineClamp: expanded ? 'none' : 2,
+                            WebkitLineClamp: state?.expanded ? 'none' : 2,
                         }}
                     >
                         {props.comment?.content}
@@ -86,19 +120,15 @@ export default function ParentCommentComponent(props: CommentProps) {
                         }}>
                             <IconButton onClick={(event) => {
                                 event.stopPropagation();
-                                setLiked(!liked);
-                                // props.onLike && props.onLike();
-                                // if (disliked) {
-                                //     setDisliked(false);
-                                // }
+                                setState({ ...state, liked: !state?.liked });
                             }}>
-                                {liked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
+                                {state?.liked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
                             </IconButton>
                             <Typography variant="body2">{props.comment?.likes}</Typography>
                         </Stack>
                         {/* Open Reply TextField */}
                         <Button
-                            onClick={() => setOpenReply(!openReply)}
+                            onClick={() => setState({ ...state, openReply: !state?.openReply })}
                             size="small"
                             sx={{
                                 textTransform: 'none',
@@ -119,9 +149,9 @@ export default function ParentCommentComponent(props: CommentProps) {
                         </Button>
                     </Stack>
                     {/* Reply TextField */}
-                    {openReply && <TextField
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
+                    {state?.openReply && <TextField
+                        value={state?.replyContent}
+                        onChange={(e) => setState({ ...state, replyContent: e.target.value })}
                         size="small"
                         placeholder="Add a reply..."
                         sx={{
@@ -136,7 +166,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                                         <Divider orientation="vertical" flexItem />
                                         {/* Cancel reply button */}
                                         <Button
-                                            onClick={() => setOpenReply(false)}
+                                            onClick={() => setState({ ...state, openReply: false })}
                                             sx={{
                                                 textTransform: 'none',
                                                 borderRadius: '10px',
@@ -157,7 +187,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                                         {/* Send Reply button */}
                                         <Button
                                             variant="contained"
-                                            disabled={replyContent.length === 0}
+                                            disabled={!state?.replyContent || state?.replyContent.length === 0}
                                             sx={{
                                                 textTransform: 'none',
                                                 borderRadius: '10px',
@@ -169,7 +199,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                                                 fontSize={'14px'}
                                                 fontWeight={'bold'}
                                                 sx={{
-                                                    color: replyContent.length === 0 ? 'black' : 'white',
+                                                    color: state?.replyContent && state?.replyContent.length === 0 ? 'black' : 'white',
                                                 }}>
                                                 Reply
                                             </Typography>
@@ -185,7 +215,7 @@ export default function ParentCommentComponent(props: CommentProps) {
 
                     {/* Show Children comments button*/}
                     <Button
-                        onClick={() => setExpanded(!expanded)}
+                        onClick={() => setState({ ...state, expanded: !state?.expanded })}
                         sx={{
                             width: '100px',
                             textTransform: 'none',
@@ -205,7 +235,9 @@ export default function ParentCommentComponent(props: CommentProps) {
 
                     {/* Children comments */}
                     <Stack>
-                        {expanded && childrenComments.map((child) => <ChildCommentComponent comment={child} />)}
+                        {state?.expanded &&
+                            state?.childrenComments &&
+                            state.childrenComments.map((child) => <ChildCommentComponent comment={child} />)}
                     </Stack>
                 </Stack>
             </Stack >

@@ -17,6 +17,7 @@ export default function VideoSection(props: VideoSectionProps) {
     return (
         <Stack sx={{
             width: '100%',
+            padding: 2,
         }}>
             {/* Video component */}
             <VideoPlayerComponent
@@ -25,10 +26,7 @@ export default function VideoSection(props: VideoSectionProps) {
                 changeTheaterMode={props.changeTheaterMode}
             />
 
-            <Stack sx={{
-                borderLeft: '1px solid lightgray',
-                borderRight: '1px solid lightgray',
-            }}>
+            <Stack>
                 {/* Title, author info, heart, comment, share */}
                 <Grid2 container alignItems={'center'} sx={{ width: '100%' }}>
                     {/* Title, author info */}

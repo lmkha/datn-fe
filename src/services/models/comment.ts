@@ -1,25 +1,27 @@
 export interface ParentCommentModel {
-    id: string;
-    content: string;
-    likes: number;
-    childrenIds: string[];
-    replyCount: number;
-    videoId: string;
-    userId: string;
-    createdAt: string;
-    updatedAt: string;
-    isEdited: boolean;
+    id?: string | null;
+    content?: string | null;
+    likes?: number | null;
+    childrenIds?: string[] | null;
+    replyCount?: number | null;
+    videoId?: string | null;
+    userId?: string | null;
+    username?: string | null;
+    userAvatar?: string | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
+    isEdited?: boolean | null;
 }
 
 export interface ChildCommentModel {
-    parentId: string;
-    id: string;
-    content: string;
-    likes: number;
-    replyCount: number;
-    videoId: string;
-    userId: string;
-    createdAt: string;
-    updatedAt: string;
-    isEdited: boolean;
+    parentId?: string | null;
+    id?: string | null;
+    content?: string | null;
+    likes?: number | null;
+    replyCount?: number | null;
+    videoId?: string | null;
+    userId?: string | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
+    isEdited?: boolean | null;
 }

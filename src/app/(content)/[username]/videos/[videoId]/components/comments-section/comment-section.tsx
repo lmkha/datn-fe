@@ -4,8 +4,8 @@ import { Stack } from "@mui/material";
 import ParentCommentComponent from "./parent-comment";
 import { ParentComment } from "../../types";
 import YourCommentComponent from "./your-comment";
-import { useState } from "react";
-import { getAllParentCommentsOfVideo_Mock } from "@/services/mock/comment";
+import { useEffect, useState } from "react";
+import { getAllParentComments } from "@/services/real/comment";
 
 interface CommentSectionProps {
     videoId: string;
@@ -15,18 +15,30 @@ export default function CommentSection(props: CommentSectionProps) {
     const [comments, setComments] = useState<ParentComment[]>();
 
     const fetchData = async () => {
-        getAllParentCommentsOfVideo_Mock(props.videoId).then((result) => {
-            setComments(result);
+        if (!props.videoId) return;
+        getAllParentComments(props.videoId).then((result) => {
+            console.log('Check result', result);
+            if (result.success) {
+                setComments(result.comments);
+            }
         });
     };
+
+    useEffect(() => {
+        fetchData();
+    }, [props.videoId]);
 
     return (
         <Stack sx={{
             borderBottom: '1px solid lightgray',
+            paddingTop: '10px',
         }}>
             <YourCommentComponent
                 key={-1}
                 videoId={props.videoId}
+                onCommented={() => {
+                    fetchData();
+                }}
             />
             {comments?.map((comment, index) => (
                 <ParentCommentComponent

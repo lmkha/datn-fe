@@ -29,6 +29,7 @@ export default function LoginForm() {
         isProcessing: false,
     });
 
+
     const handleSubmit = async () => {
         setState({ ...state, isProcessing: true })
         const validateResult = await validateLoginForm(state);
@@ -60,6 +61,20 @@ export default function LoginForm() {
                     return;
 
                 }
+            }
+        });
+    };
+
+    // ReLogin to get access token and user data after verify account
+    const handleReLoginAfterVerify = async () => {
+        login({ username: state.username, password: state.password }).then((result) => {
+            if (result.success) {
+                router.push('/');
+                setState({
+                    ...state,
+                    isProcessing: false,
+                    errors: [],
+                });
             }
         });
     };
@@ -187,6 +202,10 @@ export default function LoginForm() {
             <VerifyAccountModal
                 open={state.openVerifyModal}
                 username={state.username || ''}
+                onSuccess={() => {
+                    setState({ ...state, openVerifyModal: false });
+                    handleReLoginAfterVerify();
+                }}
             />
         </Box>
     );

@@ -61,14 +61,14 @@ class Comment extends Base {
             const response = await this.get({
                 url: `/comments/video/parent/${params.videoId}`,
                 params: {
-                    order: params?.order ? params.order : "oldest"
+                    order: params?.order ? params.order : "newest"
                 },
                 authRequired: false
             });
             return {
                 success: response.success,
                 message: response.message,
-                comments: response.comments
+                comments: response.data
             }
         } catch (err: any) {
             return {
@@ -159,7 +159,7 @@ class Comment extends Base {
             const response = await this.get({
                 url: `/comments/video/${params.videoId}`,
                 params: {
-                    order: params?.order ? params.order : "oldest"
+                    order: params?.order ? params.order : "newest"
                 },
                 authRequired: false
             });

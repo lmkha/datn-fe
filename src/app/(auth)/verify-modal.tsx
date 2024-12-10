@@ -7,11 +7,11 @@ import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import { Button, CircularProgress, Grid2 } from '@mui/material';
 import { verifyAccount } from '@/services/real/auth';
-import { useRouter } from 'next/navigation';
 
 interface ModalProps {
     open: boolean;
     username: string;
+    onSuccess?: () => void;
 }
 
 interface VerifyAccountModalState {
@@ -22,7 +22,6 @@ interface VerifyAccountModalState {
 }
 
 export default function VerifyAccountModal(props: ModalProps) {
-    const router = useRouter();
     const [state, setState] = useState<VerifyAccountModalState>({ code: Array(6).fill('') });
 
     const handleChange = (index: number, value: string) => {
@@ -84,7 +83,7 @@ export default function VerifyAccountModal(props: ModalProps) {
             if (data.success) {
                 setState({ ...state, isSubmitting: false, success: true, message: 'Verification successful!' });
                 setTimeout(() => {
-                    router.push('/login');
+                    props.onSuccess?.();
                 }, 1000);
             } else {
                 setState({ ...state, isSubmitting: false, success: false, message: data.message });

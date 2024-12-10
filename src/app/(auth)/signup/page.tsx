@@ -6,6 +6,7 @@ import { SignUpPageErrorField, validateSignUpForm } from '@/validators/signup-va
 import { createAccount } from '@/services/real/auth';
 import Password from '../login/components/password';
 import VerifyAccountModal from '../verify-modal';
+import { useRouter } from 'next/navigation';
 
 export interface SignUpPageState {
     fullName: string;
@@ -23,6 +24,7 @@ export interface SignUpPageState {
 }
 
 export default function SignUpPage() {
+    const router = useRouter();
     const [state, setState] = useState<SignUpPageState>({
         fullName: '',
         email: '',
@@ -265,6 +267,10 @@ export default function SignUpPage() {
             <VerifyAccountModal
                 open={state?.openVerifyModal || false}
                 username={state.username}
+                onSuccess={() => {
+                    setState({ ...state, openVerifyModal: false });
+                    router.push('/login');
+                }}
             />
         </Box>
     );

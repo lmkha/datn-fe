@@ -17,7 +17,6 @@ export default function DescriptionComponent(props: DescriptionComponentProps) {
                 overflow: "hidden",
                 position: "relative",
                 cursor: "pointer",
-                border: "1px solid lightgray",
                 borderTop: "none",
                 transition: "max-height 0.3s ease",
                 borderBottomLeftRadius: "10px",

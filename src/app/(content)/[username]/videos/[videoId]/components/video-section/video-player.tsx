@@ -32,12 +32,6 @@ export default function VideoPlayerComponent(props: VideoPlayerProps) {
                             overflow: 'hidden',
                             position: 'relative',
                         }}>
-                            {/* <Image
-                                src="/images/video-image.jpg"
-                                alt="Image"
-                                layout="fill"
-                                objectFit="cover"
-                            /> */}
                             <CldImage
                                 fill={true}
                                 style={{

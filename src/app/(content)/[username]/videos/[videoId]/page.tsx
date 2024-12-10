@@ -10,15 +10,12 @@ import DescriptionComponent from "./components/video-section/description-compone
 import { getRecommendedVideos as _mock_getRecommendedVideos, getVideoById as _mock_getVideoById } from "@/services/mock/video";
 import { getVideoByVideoId } from "@/services/real/video";
 import { getPublicUserByUsername, getUserByUsername } from "@/services/real/user";
-import { getAllParentCommentsOfVideo_Mock } from "@/services/mock/comment";
-import { ParentComment } from "./types";
 
 export default function VideoPage() {
     const { username, videoId } = useParams();
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
     const [user, setUser] = useState<any>(null);
     const [video, setVideo] = useState<any>(null);
-    const [comments, setComments] = useState<ParentComment[]>();
 
     const fetchData = async () => {
         if (actualUsername && videoId) {
@@ -38,9 +35,6 @@ export default function VideoPage() {
 
     useEffect(() => {
         fetchData();
-        getAllParentCommentsOfVideo_Mock(videoId as string).then((result) => {
-            setComments(result);
-        });
     }, []);
 
     return (
@@ -49,7 +43,6 @@ export default function VideoPage() {
         }}>
             {/* Video section */}
             <Grid2 container spacing={1} sx={{
-                // border: state.theaterMode ? '1px solid lightgray' : 'none',
                 border: '1px solid lightgray',
                 borderRadius: '10px'
             }}>
@@ -68,7 +61,7 @@ export default function VideoPage() {
                     {/* Description, comments */}
                     <Stack>
                         <DescriptionComponent description={video?.description} />
-                        <CommentSection comments={comments} />
+                        <CommentSection videoId={videoId as string} />
                     </Stack>
                 </Grid2>
 

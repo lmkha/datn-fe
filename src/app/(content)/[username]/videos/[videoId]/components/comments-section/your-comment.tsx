@@ -1,40 +1,42 @@
 'use client';
 
 import { Avatar, Box, Button, Divider, Stack, TextField, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { ChildComment, ParentComment } from "../../types";
-import { getAllChildCommentsOfParentComment_Mock } from "@/services/mock/comment";
-import ChildCommentComponent from "./child-comment";
+import { useState } from "react";
 import { get } from "@/hooks/use-local-storage";
 import { CldImage } from "next-cloudinary";
+import { addComment } from "@/services/real/comment";
 
 interface State {
     expanded?: boolean;
     isFocused?: boolean;
-    replyContent?: string;
-    childrenComments?: ChildComment[];
+    content?: string;
 }
 
 interface CommentProps {
-    comment?: ParentComment;
-    onLike?: () => void;
-    onUnLike?: () => void;
+    videoId: string;
+    onCommented?: () => void;
 }
 export default function YourCommentComponent(props: CommentProps) {
     const [state, setState] = useState<State>();
     const currentUser = get('user');
 
-    useEffect(() => {
-        if (props.comment?.id && state?.expanded) {
-            getAllChildCommentsOfParentComment_Mock(props.comment?.id).then((children) => {
-
+    const handleAddComment = async () => {
+        if (state?.content && state?.content.length > 0) {
+            addComment({ videoId: props.videoId, content: state.content }).then((result) => {
+                if (result.success) {
+                    setState({
+                        expanded: false,
+                        isFocused: false,
+                        content: '',
+                    });
+                    console.log(result.message);
+                }
             });
         }
-    }, [state?.expanded]);
+    };
 
     return (
         <Stack>
-            {/* Parent */}
             <Stack direction={'row'} spacing={2} sx={{
                 width: '100%',
                 minHeight: '50px',
@@ -43,6 +45,7 @@ export default function YourCommentComponent(props: CommentProps) {
                 borderRight: '1px solid lightgray',
                 cursor: 'pointer',
             }}>
+                {/* Avatar */}
                 {currentUser?.profilePic ?
                     (<Box sx={{
                         width: 40,
@@ -80,23 +83,15 @@ export default function YourCommentComponent(props: CommentProps) {
                             {currentUser?.username || 'Anonymous'}
                         </Typography>
                     </Stack>
-                    {/* Content */}
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            display: '-webkit-box',
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            textOverflow: 'revert',
-                            WebkitLineClamp: state?.expanded ? 'none' : 2,
-                        }}
-                    >
-                        {props.comment?.content}
-                    </Typography>
-                    {/* Reply TextField */}
+                    {/* Content TextField */}
                     {<TextField
-                        value={state?.replyContent}
-                        onChange={(e) => setState({ ...state, replyContent: e.target.value })}
+                        value={state?.content}
+                        onChange={(e) => setState({ ...state, content: e.target.value })}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleAddComment();
+                            }
+                        }}
                         size="small"
                         placeholder="Add a comment..."
                         sx={{
@@ -113,6 +108,7 @@ export default function YourCommentComponent(props: CommentProps) {
                                         <Divider orientation="vertical" flexItem />
                                         {/* Cancel reply button */}
                                         <Button
+                                            onMouseDown={(e) => e.preventDefault()}
                                             sx={{
                                                 textTransform: 'none',
                                                 borderRadius: '10px',
@@ -132,8 +128,10 @@ export default function YourCommentComponent(props: CommentProps) {
                                         </Button>
                                         {/* Send Reply button */}
                                         <Button
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={handleAddComment}
+                                            disabled={!state?.content || state?.content.length === 0}
                                             variant="contained"
-                                            disabled={!state?.replyContent || state?.replyContent.length === 0}
                                             sx={{
                                                 textTransform: 'none',
                                                 borderRadius: '10px',
@@ -145,9 +143,10 @@ export default function YourCommentComponent(props: CommentProps) {
                                                 fontSize={'14px'}
                                                 fontWeight={'bold'}
                                                 sx={{
-                                                    color: state?.replyContent && state.replyContent.length === 0 ? 'black' : 'white',
-                                                }}>
-                                                Reply
+                                                    color: state?.content && state.content.length === 0 ? 'black' : 'white',
+                                                }}
+                                            >
+                                                Comment
                                             </Typography>
                                         </Button>
                                     </Stack>,
@@ -158,30 +157,6 @@ export default function YourCommentComponent(props: CommentProps) {
                             }
                         }}
                     />}
-                    {/* Show Children comments button*/}
-                    <Button
-                        onClick={() => setState({ ...state, expanded: !state?.expanded })}
-                        sx={{
-                            width: '100px',
-                            textTransform: 'none',
-                        }}
-                    >
-                        <Typography
-                            variant="body2"
-                            fontSize={'12px'}
-                            fontWeight={'bold'}
-                            sx={{ color: 'black' }}>
-                            {
-                                props.comment?.replyCount && props.comment?.replyCount > 0 ? props.comment?.replyCount > 1 ? `View ${props.comment?.replyCount} replies` : `View ${props.comment?.replyCount} reply`
-                                    : ""
-                            }
-                        </Typography>
-                    </Button>
-
-                    {/* Children comments */}
-                    <Stack>
-                        {state?.expanded && state?.childrenComments?.map((child) => <ChildCommentComponent comment={child} />)}
-                    </Stack>
                 </Stack>
             </Stack >
         </Stack >

@@ -89,7 +89,7 @@ class Comment extends Base {
             return {
                 success: response.success,
                 message: response.message,
-                replies: response.replies
+                comments: response.data
             }
         } catch (err: any) {
             return {

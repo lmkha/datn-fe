@@ -21,6 +21,8 @@ export interface ChildCommentModel {
     replyCount?: number | null;
     videoId?: string | null;
     userId?: string | null;
+    username?: string | null;
+    userAvatar?: string | null;
     createdAt?: string | null;
     updatedAt?: string | null;
     isEdited?: boolean | null;

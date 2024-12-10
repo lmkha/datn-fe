@@ -17,7 +17,7 @@ export const postVideo = async (data: {
     const uploadVideoMetaDataResult = await videoAPI.uploadVideoMetaData({
         title: data.title,
         isPrivate: data.isPrivate,
-        commentOff: data.commentOff || false,
+        isCommentOff: data.commentOff || false,
         description: data.description,
         tags: data.tags,
     });

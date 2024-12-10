@@ -17,7 +17,6 @@ export default function CommentSection(props: CommentSectionProps) {
     const fetchData = async () => {
         if (!props.videoId) return;
         getAllParentComments(props.videoId).then((result) => {
-            console.log('Check result', result);
             if (result.success) {
                 setComments(result.comments);
             }
@@ -37,12 +36,14 @@ export default function CommentSection(props: CommentSectionProps) {
                 key={-1}
                 videoId={props.videoId}
                 onCommented={() => {
+                    console.log('commented');
                     fetchData();
                 }}
             />
             {comments?.map((comment, index) => (
                 <ParentCommentComponent
                     key={index}
+                    videoId={props.videoId}
                     comment={comment}
                 />
             ))}

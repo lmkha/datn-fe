@@ -4,34 +4,92 @@ import { Avatar, Box, Button, Divider, IconButton, Stack, TextField, Typography 
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { useState } from "react";
-import { ChildComment, ParentComment } from "../../types";
+import { ChildComment } from "../../types";
+import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
+import { formatTimeToShortText } from "@/core/logic/convert";
+import { replyComment } from "@/services/real/comment";
+import { useAppContext } from "@/contexts/app-context";
 
+
+interface State {
+    liked?: boolean;
+    openReply?: boolean;
+    replyContent?: string;
+}
 interface ChildCommentProps {
     comment?: ChildComment;
+    onReplied?: () => void;
     onLike?: () => void;
     onUnLike?: () => void;
 }
 export default function ChildCommentComponent(props: ChildCommentProps) {
-    const [liked, setLiked] = useState(false);
-    const [openReply, setOpenReply] = useState(false);
-    const [replyContent, setReplyContent] = useState('');
+    const { showAlert } = useAppContext();
+    const router = useRouter();
+    const [state, setState] = useState<State>();
+
+    // Only 2 levels of comments are supported, reply child -> transform to parent
+    const handleReply = async () => {
+        if (props.comment?.videoId && props.comment?.parentId && state?.replyContent) {
+            replyComment({
+                videoId: props.comment.videoId,
+                replyTo: props.comment.parentId,
+                content: state.replyContent
+            }).then((result) => {
+                if (result.success) {
+                    setState({ ...state, openReply: false, replyContent: '' });
+                    props.onReplied && props.onReplied();
+                } else {
+                    showAlert(result.message, 'error');
+                }
+            });
+        }
+    };
 
     return (
-        <Stack direction={'row'} sx={{
+        <Stack direction={'row'} spacing={2} sx={{
             width: '100%',
             minHeight: '50px',
             cursor: 'pointer',
         }}>
-            <Box padding={1}>
-                <Avatar
+            {props?.comment?.userAvatar ? (<Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                position: 'relative',
+                cursor: 'pointer',
+            }}
+                onClick={() => {
+                    props?.comment?.username &&
+                        router.push(`/@${props.comment.username}`);
+                }}
+            >
+                <CldImage
+                    fill={true}
+                    style={{
+                        objectFit: 'cover',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                    src={props.comment.userAvatar}
+                    alt="Image"
+                />
+            </Box>) :
+                (<Avatar
                     src="/images/avatar.png"
                     alt="avatar"
                     sx={{
-                        width: 35,
-                        height: 35,
+                        width: 40,
+                        height: 40,
+                        cursor: 'pointer',
                     }}
-                />
-            </Box>
+                    onClick={() => {
+                        props?.comment?.username &&
+                            router.push(`/@${props.comment.username}`);
+                    }}
+                />)
+            }
             <Stack sx={{
                 overflowY: 'auto',
                 width: '100%',
@@ -39,12 +97,10 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                 {/* Username, updated time */}
                 <Stack direction={'row'} spacing={2} alignItems={'center'}>
                     <Typography variant="body1" fontWeight={'bold'}>
-                        {/* {props?.comment?.username} */}
-                        Username
+                        {props?.comment?.username}
                     </Typography>
                     <Typography variant="body2">
-                        {/* {props?.comment?.createdAt} */}
-                        created at
+                        {formatTimeToShortText(props.comment?.createdAt || '')}
                     </Typography>
                 </Stack>
                 {/* Content */}
@@ -68,15 +124,15 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                     }}>
                         <IconButton onClick={(event) => {
                             event.stopPropagation();
-                            setLiked(!liked);
+
                         }}>
-                            {liked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
+                            {state?.liked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
                         </IconButton>
                         <Typography variant="body2">{props.comment?.likes}</Typography>
                     </Stack>
                     {/* Open Reply TextField */}
                     <Button
-                        onClick={() => setOpenReply(!openReply)}
+                        onClick={() => setState({ ...state, openReply: true })}
                         size="small"
                         sx={{
                             textTransform: 'none',
@@ -97,9 +153,14 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                     </Button>
                 </Stack>
                 {/* Reply TextField */}
-                {openReply && <TextField
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
+                {state?.openReply && <TextField
+                    value={state?.replyContent}
+                    onChange={(e) => setState({ ...state, replyContent: e.target.value })}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleReply();
+                        }
+                    }}
                     size="small"
                     placeholder="Add a reply..."
                     sx={{
@@ -114,7 +175,8 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                                     <Divider orientation="vertical" flexItem />
                                     {/* Cancel reply button */}
                                     <Button
-                                        onClick={() => setOpenReply(false)}
+                                        onClick={() => setState({ ...state, openReply: false })}
+                                        onMouseDown={(e) => e.preventDefault()}
                                         sx={{
                                             textTransform: 'none',
                                             borderRadius: '10px',
@@ -135,7 +197,9 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                                     {/* Send Reply button */}
                                     <Button
                                         variant="contained"
-                                        disabled={replyContent.length === 0}
+                                        onClick={handleReply}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        disabled={state?.replyContent?.length === 0}
                                         sx={{
                                             textTransform: 'none',
                                             borderRadius: '10px',
@@ -147,7 +211,7 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                                             fontSize={'14px'}
                                             fontWeight={'bold'}
                                             sx={{
-                                                color: replyContent.length === 0 ? 'black' : 'white',
+                                                color: state?.replyContent?.length === 0 ? 'black' : 'white',
                                             }}>
                                             Reply
                                         </Typography>

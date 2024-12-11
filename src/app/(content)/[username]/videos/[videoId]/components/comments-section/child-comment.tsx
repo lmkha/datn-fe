@@ -3,37 +3,56 @@
 import { Avatar, Box, Button, Divider, IconButton, Stack, TextField, Typography } from "@mui/material";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChildComment } from "../../types";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
 import { formatTimeToShortText } from "@/core/logic/convert";
-import { replyComment } from "@/services/real/comment";
+import { isCommentLiked, likeComment, replyComment, unlikeComment } from "@/services/real/comment";
 import { useAppContext } from "@/contexts/app-context";
+import EditDeleteCommentMenu from "./edit-delete-menu";
 
 
 interface State {
     liked?: boolean;
     openReply?: boolean;
     replyContent?: string;
+    comment?: ChildComment;
+    isVisible?: boolean;
 }
 interface ChildCommentProps {
     comment?: ChildComment;
     onReplied?: () => void;
-    onLike?: () => void;
-    onUnLike?: () => void;
+    isVisible?: boolean;
 }
 export default function ChildCommentComponent(props: ChildCommentProps) {
     const { showAlert } = useAppContext();
     const router = useRouter();
     const [state, setState] = useState<State>();
 
+    const fetchData = async () => {
+        const updatedState = {
+            ...state,
+            comment: props.comment,
+            isVisible: props.isVisible
+        };
+
+        if (props.comment?.id) {
+            const checkIsLikedResult = await isCommentLiked(props.comment.id);
+            if (checkIsLikedResult.success && checkIsLikedResult.isLiked) {
+                updatedState.liked = true;
+            }
+        }
+
+        setState(updatedState);
+    };
+
     // Only 2 levels of comments are supported, reply child -> transform to parent
     const handleReply = async () => {
-        if (props.comment?.videoId && props.comment?.parentId && state?.replyContent) {
+        if (state?.comment?.videoId && state?.comment?.parentId && state?.replyContent) {
             replyComment({
-                videoId: props.comment.videoId,
-                replyTo: props.comment.parentId,
+                videoId: state.comment.videoId,
+                replyTo: state.comment.parentId,
                 content: state.replyContent
             }).then((result) => {
                 if (result.success) {
@@ -46,13 +65,53 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
         }
     };
 
+    const handleLike = async () => {
+        if (!state?.comment?.id) return;
+        const result = await likeComment(state.comment.id);
+        if (result.success) {
+            setState((prevState) => ({
+                ...prevState,
+                comment: {
+                    ...prevState?.comment,
+                    likes: (prevState?.comment?.likes ?? 0) + 1,
+                },
+                liked: true,
+            }));
+        }
+    };
+
+    const handleUnLike = async () => {
+        if (!state?.comment?.id) return;
+        const result = await unlikeComment(state.comment.id);
+        if (result.success) {
+            setState((prevState) => ({
+                ...prevState,
+                comment: {
+                    ...prevState?.comment,
+                    likes: (prevState?.comment?.likes ?? 0) - 1,
+                },
+                liked: false,
+            }));
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        setState({ ...state, isVisible: props.isVisible });
+    }, [props.isVisible]);
+
+    if (!state?.isVisible) return null;
+
     return (
         <Stack direction={'row'} spacing={2} sx={{
             width: '100%',
             minHeight: '50px',
             cursor: 'pointer',
         }}>
-            {props?.comment?.userAvatar ? (<Box sx={{
+            {state?.comment?.userAvatar ? (<Box sx={{
                 width: 40,
                 height: 40,
                 borderRadius: '50%',
@@ -61,8 +120,8 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                 cursor: 'pointer',
             }}
                 onClick={() => {
-                    props?.comment?.username &&
-                        router.push(`/@${props.comment.username}`);
+                    state?.comment?.username &&
+                        router.push(`/@${state.comment.username}`);
                 }}
             >
                 <CldImage
@@ -72,7 +131,7 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                         width: '100%',
                         height: '100%',
                     }}
-                    src={props.comment.userAvatar}
+                    src={state.comment.userAvatar}
                     alt="Image"
                 />
             </Box>) :
@@ -85,8 +144,8 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                         cursor: 'pointer',
                     }}
                     onClick={() => {
-                        props?.comment?.username &&
-                            router.push(`/@${props.comment.username}`);
+                        state?.comment?.username &&
+                            router.push(`/@${state.comment.username}`);
                     }}
                 />)
             }
@@ -95,13 +154,30 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                 width: '100%',
             }}>
                 {/* Username, updated time */}
-                <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                    <Typography variant="body1" fontWeight={'bold'}>
-                        {props?.comment?.username}
-                    </Typography>
-                    <Typography variant="body2">
-                        {formatTimeToShortText(props.comment?.createdAt || '')}
-                    </Typography>
+                <Stack
+                    direction={'row'}
+                    spacing={2}
+                    sx={{
+                        width: '100%',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <Stack
+                        spacing={2}
+                        direction={'row'}
+                        sx={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Typography variant="body1" fontWeight={'bold'}>
+                            {props?.comment?.username}
+                        </Typography>
+                        <Typography variant="body2">
+                            {formatTimeToShortText(state?.comment?.createdAt || '')}
+                        </Typography>
+                    </Stack>
+                    <EditDeleteCommentMenu />
                 </Stack>
                 {/* Content */}
                 <Typography
@@ -114,21 +190,24 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                         WebkitLineClamp: 2,
                     }}
                 >
-                    {props.comment?.content}
+                    {state?.comment?.content}
                 </Typography>
                 {/* Like, Open Reply button */}
                 <Stack direction={'row'} spacing={4}>
-                    <Stack direction={'row'} spacing={1} sx={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                        <IconButton onClick={(event) => {
-                            event.stopPropagation();
-
-                        }}>
+                    <Stack direction={'row'} sx={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <IconButton
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                if (state?.liked) {
+                                    handleUnLike();
+                                } else {
+                                    handleLike();
+                                }
+                            }}
+                        >
                             {state?.liked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
                         </IconButton>
-                        <Typography variant="body2">{props.comment?.likes}</Typography>
+                        <Typography variant="body2">{state?.comment?.likes}</Typography>
                     </Stack>
                     {/* Open Reply TextField */}
                     <Button
@@ -167,9 +246,26 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                         '.MuiOutlinedInput-notchedOutline': {
                             border: 'none',
                         },
+                        width: '100%',
                     }}
                     slotProps={{
                         input: {
+                            startAdornment:
+                                <Button sx={{
+                                    textTransform: 'none',
+                                    borderRadius: '10px',
+                                    backgroundColor: 'transparent',
+                                    marginRight: 1,
+                                }}>
+                                    <Typography
+                                        variant="body2"
+                                        fontSize={'14px'}
+                                        fontWeight={'bold'}
+                                        sx={{ color: 'black' }}
+                                    >
+                                        @{props?.comment?.username}
+                                    </Typography>
+                                </Button>,
                             endAdornment:
                                 <Stack direction={'row'} spacing={1}>
                                     <Divider orientation="vertical" flexItem />

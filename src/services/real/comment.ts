@@ -116,3 +116,26 @@ export const getChildrenComments = async (parentCommentId: string): Promise<{
         comments,
     };
 };
+
+export const likeComment = async (commentId: string) => {
+    return commentAPI.likeComment({ commentId });
+};
+
+export const unlikeComment = async (commentId: string) => {
+    return commentAPI.unlikeComment({ commentId });
+};
+
+export const isCommentLiked = async (commentId: string) => {
+    const result = await commentAPI.isCommentLiked({ commentId });
+    if (!result.success) return {
+        success: false,
+        message: result.message,
+        isLiked: false
+    }
+
+    return {
+        success: result.success,
+        message: result.message,
+        isLiked: result.message === 'Liked' ? true : false,
+    }
+};

@@ -21,10 +21,7 @@ class Comment extends Base {
 
     async deleteComment(params: { commentId: string }) {
         try {
-            const response = await this.delete({
-                url: '/comments/',
-                params: params
-            });
+            const response = await this.delete({ url: `/comments/${params.commentId}` });
             return {
                 success: response.success,
                 message: response.message,
@@ -39,7 +36,7 @@ class Comment extends Base {
 
     async updateComment(data: { id: string, content: string }) {
         try {
-            const response = await this.patch({
+            const response = await this.put({
                 url: '/comments',
                 data: data
             });

@@ -4,7 +4,11 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconButton } from '@mui/material';
 
-export default function EditDeleteCommentMenu() {
+interface EditDeleteCommentMenuProps {
+    onDelete: () => void;
+    onEdit?: () => void;
+}
+export default function EditDeleteCommentMenu(props: EditDeleteCommentMenuProps) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -12,6 +16,17 @@ export default function EditDeleteCommentMenu() {
     };
     const handleClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleDelete = () => {
+        props.onDelete();
+        handleClose();
+    };
+    const handleEdit = () => {
+        if (props.onEdit) {
+            props.onEdit();
+        }
+        handleClose();
     };
 
     return (
@@ -34,8 +49,12 @@ export default function EditDeleteCommentMenu() {
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                <MenuItem onClick={handleClose}>Edit</MenuItem>
-                <MenuItem onClick={handleClose}>Delete</MenuItem>
+                {props?.onEdit && (<MenuItem onClick={handleEdit}>
+                    Edit
+                </MenuItem>)}
+                <MenuItem onClick={handleDelete}>
+                    Delete
+                </MenuItem>
             </Menu>
         </div>
     );

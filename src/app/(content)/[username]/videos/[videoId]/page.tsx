@@ -14,7 +14,7 @@ import { getPublicUserByUsername, getUserByUsername } from "@/services/real/user
 export default function VideoPage() {
     const { username, videoId } = useParams();
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
-    const [user, setUser] = useState<any>(null);
+    const [author, setUser] = useState<any>(null);
     const [video, setVideo] = useState<any>(null);
 
     const fetchData = async () => {
@@ -49,7 +49,7 @@ export default function VideoPage() {
                 <Grid2 size={12}>
                     <VideoSection
                         video={video}
-                        user={user}
+                        author={author}
                         changeTheaterMode={() => { }}
                     />
                 </Grid2>
@@ -61,7 +61,10 @@ export default function VideoPage() {
                     {/* Description, comments */}
                     <Stack>
                         <DescriptionComponent description={video?.description} />
-                        <CommentSection videoId={videoId as string} />
+                        <CommentSection
+                            videoId={videoId as string}
+                            author={author}
+                        />
                     </Stack>
                 </Grid2>
 

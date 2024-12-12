@@ -139,3 +139,11 @@ export const isCommentLiked = async (commentId: string) => {
         isLiked: result.message === 'Liked' ? true : false,
     }
 };
+
+export const updateComment = async (data: { commentId: string, content: string }) => {
+    return commentAPI.updateComment({ id: data.commentId, content: data.content });
+}
+
+export const deleteComment = async (commentId: string) => {
+    return commentAPI.deleteComment({ commentId });
+}

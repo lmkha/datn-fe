@@ -10,7 +10,7 @@ import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/con
 
 interface VideoSectionProps {
     video: any,
-    user: any,
+    author: any,
     changeTheaterMode: () => void;
 }
 export default function VideoSection(props: VideoSectionProps) {
@@ -36,7 +36,7 @@ export default function VideoSection(props: VideoSectionProps) {
                                 {props?.video?.title || 'Title'}
                             </Typography>
                             <AuthorInfoComponent
-                                user={props.user}
+                                user={props.author}
                             />
                         </Stack>
                     </Grid2>

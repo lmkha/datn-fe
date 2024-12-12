@@ -9,6 +9,7 @@ import { getAllParentComments } from "@/services/real/comment";
 
 interface CommentSectionProps {
     videoId: string;
+    author: any
 }
 
 export default function CommentSection(props: CommentSectionProps) {
@@ -44,6 +45,7 @@ export default function CommentSection(props: CommentSectionProps) {
                     key={index}
                     videoId={props.videoId}
                     comment={comment}
+                    author={props.author}
                 />
             ))}
         </Stack>

@@ -177,7 +177,7 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                             {formatTimeToShortText(state?.comment?.createdAt || '')}
                         </Typography>
                     </Stack>
-                    <EditDeleteCommentMenu />
+                    {/* <EditDeleteCommentMenu /> */}
                 </Stack>
                 {/* Content */}
                 <Typography

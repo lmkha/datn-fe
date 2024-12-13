@@ -7,7 +7,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 export default function Stepper({ activeStep }: { activeStep: number }) {
     return (
-        <Box sx={{ width: '50%' }}>
+        <Box sx={{ width: '100%' }}>
             <Grid2 container spacing={2} width={'100%'} sx={{
                 alignItems: 'center',
             }}>

@@ -91,7 +91,8 @@ class Auth extends Base {
     async resetPassword(data: { email: string }) {
         try {
             const response = await this.post({
-                url: `/auth/reset-password/?email=${data.email}`,
+                url: '/auth/reset-password',
+                params: data,
                 authRequired: false
             });
             return {

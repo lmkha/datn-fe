@@ -168,7 +168,7 @@ export default function LoginForm() {
             }}>
                 <Typography variant="body2" align="center">
                     <Box display="flex" justifyContent="center" alignItems="center">
-                        <Link href="/signup">
+                        <Link href="/forgot-password">
                             <Typography variant="body2" sx={{
                                 color: '#EA284E',
                                 cursor: 'pointer',

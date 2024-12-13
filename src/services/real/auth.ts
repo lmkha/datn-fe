@@ -51,3 +51,18 @@ export const verifyAccount = async (data: { username: string, otpCode: string })
         message: result.message
     }
 };
+
+export const resetPassword = async (data: { email: string }) => {
+    return auth.resetPassword(data);
+}
+
+export const verifyResetPassword = async (data: {
+    user: {
+        username: string,
+        email: string,
+        password: string,
+    },
+    otpCode: string,
+}) => {
+    return auth.resetPasswordVerification(data);
+}

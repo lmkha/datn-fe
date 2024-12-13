@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
-import Stepper from "../components/stepper";
+import Stepper from '@/core/components/stepper';
 import { useState } from "react";
 
 interface PageState {

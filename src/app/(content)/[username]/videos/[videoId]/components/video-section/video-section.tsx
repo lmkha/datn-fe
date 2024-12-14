@@ -12,6 +12,7 @@ interface VideoSectionProps {
     video: any,
     author: any,
     changeTheaterMode: () => void;
+    onComment?: () => void;
 }
 export default function VideoSection(props: VideoSectionProps) {
     return (
@@ -51,6 +52,7 @@ export default function VideoSection(props: VideoSectionProps) {
                                 videoId={props?.video?.id}
                                 likeCount={props?.video?.likesCount}
                                 commentCount={props?.video?.commentsCount}
+                                onComment={() => props.onComment && props.onComment()}
                             />
                         </Stack>
                     </Grid2>

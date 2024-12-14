@@ -16,6 +16,7 @@ export default function VideoPage() {
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
     const [author, setUser] = useState<any>(null);
     const [video, setVideo] = useState<any>(null);
+    const [isCommentFocused, setIsCommentFocused] = useState<boolean>(false);
 
     const fetchData = async () => {
         if (actualUsername && videoId) {
@@ -37,6 +38,10 @@ export default function VideoPage() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        console.log('isCommentFocused in page', isCommentFocused);
+    }, [isCommentFocused]);
+
     return (
         <Stack sx={{
             height: '100%',
@@ -51,6 +56,7 @@ export default function VideoPage() {
                         video={video}
                         author={author}
                         changeTheaterMode={() => { }}
+                        onComment={() => setIsCommentFocused(true)}
                     />
                 </Grid2>
             </Grid2>
@@ -64,6 +70,8 @@ export default function VideoPage() {
                         <CommentSection
                             videoId={videoId as string}
                             author={author}
+                            isCommentFocused={isCommentFocused}
+                            onCommentUnfocused={() => setIsCommentFocused(false)}
                         />
                     </Stack>
                 </Grid2>

@@ -16,6 +16,7 @@ export default function VideoPlayerComponent(props: VideoPlayerProps) {
                 width: '100%',
                 height: '530px',
                 borderRadius: '10px',
+                position: 'relative',
             }}>
                 {/* Video player */}
                 <ReactPlayer

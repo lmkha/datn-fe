@@ -18,6 +18,7 @@ interface ActionButtonProps {
     videoId: string;
     likeCount: number;
     commentCount: number;
+    onComment?: () => void;
 }
 
 export default function ActionButton(props: ActionButtonProps) {
@@ -65,6 +66,9 @@ export default function ActionButton(props: ActionButtonProps) {
 
     const handleComment = async () => {
         // Add your comment handling logic here
+        if (props.onComment) {
+            props.onComment();
+        }
     };
 
     const fetchData = async () => {

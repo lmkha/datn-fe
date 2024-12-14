@@ -67,6 +67,7 @@ export default function ParentCommentComponent(props: CommentProps) {
         if (state?.expanded && state?.comment?.id) {
             const result2 = await getChildrenComments(state.comment.id);
             if (result2.success) {
+                console.log('renewComment', result2.comments);
                 updatedState.childrenComments = result2.comments;
             }
         }
@@ -549,6 +550,16 @@ export default function ParentCommentComponent(props: CommentProps) {
                                 comment={child}
                                 onReplied={renewComment}
                                 isVisible={state?.expanded}
+                                author={props?.author}
+                                onDeleted={() => {
+                                    setState({
+                                        ...state,
+                                        comment: {
+                                            ...state.comment,
+                                            replyCount: (state.comment?.replyCount || 0) - 1
+                                        },
+                                    });
+                                }}
                             />
                         )
                     }

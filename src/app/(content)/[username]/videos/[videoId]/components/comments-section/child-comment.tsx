@@ -8,10 +8,11 @@ import { ChildComment } from "../../types";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
 import { formatTimeToShortText } from "@/core/logic/convert";
-import { isCommentLiked, likeComment, replyComment, unlikeComment } from "@/services/real/comment";
+import { deleteComment, isCommentLiked, likeComment, replyComment, unlikeComment, updateComment } from "@/services/real/comment";
 import { useAppContext } from "@/contexts/app-context";
 import EditDeleteCommentMenu from "./edit-delete-menu";
-
+import DeleteCommentDialog from "./delete-comment-dialog";
+import { get } from "@/hooks/use-local-storage";
 
 interface State {
     liked?: boolean;
@@ -19,13 +20,19 @@ interface State {
     replyContent?: string;
     comment?: ChildComment;
     isVisible?: boolean;
+    isEditMode?: boolean;
+    editContent?: string;
+    openDeleteDialog?: boolean;
 }
 interface ChildCommentProps {
     comment?: ChildComment;
     onReplied?: () => void;
     isVisible?: boolean;
+    author?: any;
+    onDeleted?: () => void;
 }
 export default function ChildCommentComponent(props: ChildCommentProps) {
+    const currentUser = get('user');
     const { showAlert } = useAppContext();
     const router = useRouter();
     const [state, setState] = useState<State>();
@@ -95,15 +102,66 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
         }
     };
 
+    const activeEditMode = async () => {
+        setState({
+            ...state,
+            isEditMode: true,
+            editContent: state?.comment?.content || '',
+        });
+    };
+
+    const handleEdit = async () => {
+        if (!state?.comment?.id || !state?.editContent || state?.editContent.length === 0) return;
+
+        const result = await updateComment({
+            commentId: state.comment.id,
+            content: state.editContent,
+        });
+
+        if (result.success) {
+            setState({
+                ...state,
+                isEditMode: false,
+                comment: {
+                    ...state.comment,
+                    content: state.editContent,
+                    isEdited: true
+                },
+            });
+        }
+    };
+
+    const handleOpenDeleteDialog = async () => {
+        setState({
+            ...state,
+            openDeleteDialog: true,
+        });
+    };
+
+    const handleDelete = async () => {
+        if (!state?.comment?.id) return;
+
+        const result = await deleteComment(state.comment.id);
+        if (result.success) {
+            setState({
+                ...state,
+                isVisible: false,
+                comment: undefined,
+                openDeleteDialog: false,
+            });
+            props.onDeleted && props.onDeleted();
+        }
+    };
+
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [props.comment?.id]);
 
     useEffect(() => {
         setState({ ...state, isVisible: props.isVisible });
     }, [props.isVisible]);
 
-    if (!state?.isVisible) return null;
+    if (!state?.comment || !state?.isVisible) return null;
 
     return (
         <Stack direction={'row'} spacing={2} sx={{
@@ -177,21 +235,116 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                             {formatTimeToShortText(state?.comment?.createdAt || '')}
                         </Typography>
                     </Stack>
-                    {/* <EditDeleteCommentMenu /> */}
+                    {/* More action Button */}
+                    {(currentUser?.username === state?.comment?.username ||
+                        currentUser?.username === props?.author?.username) &&
+                        (<EditDeleteCommentMenu
+                            onDelete={handleOpenDeleteDialog}
+                            onEdit={currentUser?.username === state?.comment?.username ? activeEditMode : undefined}
+                        />)}
                 </Stack>
-                {/* Content */}
-                <Typography
-                    variant="body2"
-                    sx={{
-                        display: '-webkit-box',
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        textOverflow: 'revert',
-                        WebkitLineClamp: 2,
-                    }}
-                >
-                    {state?.comment?.content}
-                </Typography>
+                {/* Content, if editMode is active, show TextField */}
+                {state?.isEditMode ?
+                    (<TextField
+                        value={state?.editContent}
+                        onChange={(e) => setState({ ...state, editContent: e.target.value })}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleEdit();
+                            }
+                        }}
+                        size="small"
+                        placeholder="Edit content..."
+                        sx={{
+                            '.MuiOutlinedInput-notchedOutline': {
+                                border: 'none',
+                            },
+                        }}
+                        slotProps={{
+                            input: {
+                                startAdornment:
+                                    <Button sx={{
+                                        textTransform: 'none',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'transparent',
+                                        marginRight: 1,
+                                    }}>
+                                        <Typography
+                                            variant="body2"
+                                            fontSize={'14px'}
+                                            fontWeight={'bold'}
+                                            sx={{ color: 'black' }}
+                                        >
+                                            @{state?.comment?.username}
+                                        </Typography>
+                                    </Button>,
+                                endAdornment:
+                                    <Stack direction={'row'} spacing={1}>
+                                        <Divider orientation="vertical" flexItem />
+                                        {/* Cancel edit button */}
+                                        <Button
+                                            onClick={() => setState({ ...state, isEditMode: false })}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            sx={{
+                                                textTransform: 'none',
+                                                borderRadius: '10px',
+                                                backgroundColor: 'transparent',
+                                                ":hover": {
+                                                    backgroundColor: 'lightgray',
+                                                }
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="body2"
+                                                fontSize={'14px'}
+                                                fontWeight={'bold'}
+                                                sx={{ color: 'black' }}>
+                                                Cancel
+                                            </Typography>
+                                        </Button>
+                                        {/* Send  button */}
+                                        <Button
+                                            onClick={handleEdit}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            variant="contained"
+                                            disabled={!state?.editContent || state?.editContent.length === 0}
+                                            sx={{
+                                                textTransform: 'none',
+                                                borderRadius: '10px',
+                                                backgroundColor: '#EA284E',
+                                            }}
+                                        >
+                                            < Typography
+                                                variant="body2"
+                                                fontSize={'14px'}
+                                                fontWeight={'bold'}
+                                                sx={{
+                                                    color: state?.replyContent && state?.replyContent.length === 0 ? 'black' : 'white',
+                                                }}>
+                                                Save
+                                            </Typography>
+                                        </Button>
+                                    </Stack>,
+                                sx: {
+                                    borderRadius: '10px',
+                                    backgroundColor: '#F8F8F8',
+                                }
+                            }
+                        }}
+                    />) :
+                    (<Typography
+                        variant="body2"
+                        sx={{
+                            display: '-webkit-box',
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'revert',
+                            WebkitLineClamp: 2,
+                        }}
+                    >
+                        {state?.comment?.content}
+                    </Typography>)
+                }
                 {/* Like, Open Reply button */}
                 <Stack direction={'row'} spacing={4}>
                     <Stack direction={'row'} sx={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -321,6 +474,11 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                     }}
                 />}
             </Stack>
+            <DeleteCommentDialog
+                open={state?.openDeleteDialog || false}
+                onClose={() => setState({ ...state, openDeleteDialog: false })}
+                onDelete={handleDelete}
+            />
         </Stack >
     );
 }

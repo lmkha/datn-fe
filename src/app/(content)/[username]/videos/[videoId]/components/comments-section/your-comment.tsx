@@ -1,7 +1,7 @@
 'use client';
 
 import { Avatar, Box, Button, Divider, Stack, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { get } from "@/hooks/use-local-storage";
 import { CldImage } from "next-cloudinary";
 import { addComment } from "@/services/real/comment";
@@ -14,9 +14,12 @@ interface State {
 
 interface CommentProps {
     videoId: string;
+    isFocused?: boolean;
     onCommented?: () => void;
+    onCommentUnfocused?: () => void;
 }
 export default function YourCommentComponent(props: CommentProps) {
+    const contentRef = React.useRef<HTMLInputElement>(null);
     const [state, setState] = useState<State>();
     const currentUser = get('user');
 
@@ -34,6 +37,19 @@ export default function YourCommentComponent(props: CommentProps) {
             });
         }
     };
+
+    useEffect(() => {
+        if (props?.isFocused) {
+            console.log('focused');
+            setState((prevState) => ({ ...prevState, expanded: true, isFocused: true }));
+            setTimeout(() => {
+                contentRef.current?.focus();
+            }, 0);
+        } else {
+            setState((prevState) => ({ ...prevState, isFocused: false }));
+            props?.onCommentUnfocused && props.onCommentUnfocused();
+        }
+    }, [props?.isFocused]);
 
     return (
 
@@ -95,13 +111,20 @@ export default function YourCommentComponent(props: CommentProps) {
                     }}
                     size="small"
                     placeholder="Add a comment..."
+                    inputRef={contentRef}
                     sx={{
                         '.MuiOutlinedInput-notchedOutline': {
                             border: 'none',
                         },
                     }}
-                    onFocus={() => setState({ ...state, isFocused: true })}
-                    onBlur={() => setState({ ...state, isFocused: false })}
+                    onFocus={() => {
+                        setState({ ...state, isFocused: true });
+                        props?.onCommentUnfocused && props.onCommentUnfocused();
+                    }}
+                    onBlur={() => {
+                        setState({ ...state, isFocused: false });
+                        props?.onCommentUnfocused && props.onCommentUnfocused();
+                    }}
                     slotProps={{
                         input: {
                             endAdornment:

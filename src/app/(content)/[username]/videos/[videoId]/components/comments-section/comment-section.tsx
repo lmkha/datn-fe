@@ -9,7 +9,9 @@ import { getAllParentComments } from "@/services/real/comment";
 
 interface CommentSectionProps {
     videoId: string;
-    author: any
+    author: any;
+    isCommentFocused: boolean;
+    onCommentUnfocused?: () => void;
 }
 
 export default function CommentSection(props: CommentSectionProps) {
@@ -34,6 +36,8 @@ export default function CommentSection(props: CommentSectionProps) {
             paddingTop: '10px',
         }}>
             <YourCommentComponent
+                isFocused={props.isCommentFocused}
+                onCommentUnfocused={props.onCommentUnfocused}
                 key={-1}
                 videoId={props.videoId}
                 onCommented={() => {

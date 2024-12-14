@@ -315,7 +315,7 @@ function Search() {
             />
 
             {/* Popper below the search field */}
-            <Popper open={open} anchorEl={anchorEl} placement="bottom-start" style={{ width: anchorEl?.offsetWidth }}>
+            {/* <Popper open={open} anchorEl={anchorEl} placement="bottom-start" style={{ width: anchorEl?.offsetWidth }}>
                 <Paper elevation={3} sx={{ borderRadius: 3 }}>
                     <List>
                         <ListItem>Search suggestion 1</ListItem>
@@ -330,7 +330,7 @@ function Search() {
                         <ListItem>Search suggestion 10</ListItem>
                     </List>
                 </Paper>
-            </Popper>
+            </Popper> */}
         </>
     );
 }

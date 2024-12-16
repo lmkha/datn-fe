@@ -20,6 +20,7 @@
     "axios": "^1.7.7",
     "dashjs": "^4.7.4",
     "dayjs": "^1.11.13",
+    "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "newman": "^6.2.1",
     "next": "14.2.15",
@@ -33,6 +34,7 @@
     "video.js": "^8.19.1"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

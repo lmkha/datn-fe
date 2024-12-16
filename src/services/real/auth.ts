@@ -1,11 +1,20 @@
 import auth from "@/api/auth"
 import { set, remove } from "@/hooks/use-local-storage";
 import { getCurrentUser } from "./user";
+import Cookies from "js-cookie";
 
 export const login = async ({ username, password }: { username: string, password: string }) => {
     const result = await auth.login({ username, password });
     if (result.success) {
         set("accessToken", result.token);
+
+        Cookies.set("accessToken", result.token, {
+            expires: 7,
+            secure: false,
+            sameSite: "lax",
+            path: "/",
+        });
+
         await getCurrentUser().then((result) => {
             if (result.success && result.data) {
                 set("user", result.data);
@@ -20,6 +29,7 @@ export const login = async ({ username, password }: { username: string, password
 
 export const logout = () => {
     remove('accessToken');
+    Cookies.remove("accessToken", { path: "/" });
     remove('user');
 }
 

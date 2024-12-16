@@ -2,9 +2,11 @@
 
 import React, { createContext, useState, ReactNode, useContext } from "react";
 
+type Severity = 'error' | 'info' | 'success' | 'warning';
+
 interface AlertState {
     text: string;
-    severity: 'error' | 'info' | 'success' | 'warning';
+    severity: Severity;
     isOpen: boolean;
 }
 
@@ -18,7 +20,7 @@ interface AppContextProps {
     alertState: AlertState;
     setTheme: (theme: "light" | "dark") => void;
     setLanguage: (language: "en" | "vi") => void;
-    showAlert: (text: string, severity: 'error' | 'info' | 'success' | 'warning') => void;
+    showAlert: ({ message, severity }: { message: string, severity: Severity }) => void;
     hideAlert: () => void;
 }
 
@@ -46,8 +48,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     // Functions to manage Alert
-    const showAlert = (text: string, severity: 'error' | 'info' | 'success' | 'warning') => {
-        setAlertState({ text, severity, isOpen: true });
+    const showAlert = ({ message, severity }: { message: string, severity: Severity }) => {
+        setAlertState((prev) => ({ ...prev, text: message, severity, isOpen: true }));
     };
 
     const hideAlert = () => {

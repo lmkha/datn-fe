@@ -75,6 +75,7 @@ function LayoutContent({
                     flexDirection: "row",
                     flexGrow: 1,
                     width: "100%",
+                    height: "calc(100% - 57px)",
                 }}
             >
                 {/* Drawer */}
@@ -89,7 +90,7 @@ function LayoutContent({
                         marginLeft: state?.openDrawer ? "15%" : "4%",
                         transition: "margin-left 0.3s ease",
                         borderLeft: "1px solid lightgray",
-                        overflow: "auto",
+                        overflowY: "auto",
                     }}
                 >
                     {children}

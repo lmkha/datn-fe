@@ -110,10 +110,6 @@ export default function CommentDetailPage() {
                                                 <ChatBubbleOutlineOutlinedIcon />
                                                 <Typography variant="body2">1000</Typography>
                                             </Stack>
-                                            <Stack direction={'row'}>
-                                                <ShortcutIcon />
-                                                <Typography variant="body2">1000</Typography>
-                                            </Stack>
                                         </Stack>
                                     </Stack>
                                 </Stack>
@@ -154,10 +150,6 @@ export default function CommentDetailPage() {
                         label="Likes"
                         options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
                     />
-                    <SelectComponent
-                        label="Dislikes"
-                        options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
-                    />
                     {/* Date picker */}
 
                 </Stack>
@@ -177,8 +169,6 @@ export default function CommentDetailPage() {
 interface SelectComponentProps {
     label: string;
     options: string[];
-    // value: string;
-    // onChange: (value: string) => void;
 }
 function SelectComponent(props: SelectComponentProps) {
     const [selectedValue, setSelectedValue] = useState('');
@@ -304,17 +294,10 @@ function CommentItem() {
                                     </Button>
                                     <Stack direction={'row'} justifyContent={'center'} alignItems={'center'}>
                                         <IconButton>
-                                            <ThumbUpOutlinedIcon />
+                                            <FavoriteBorderOutlinedIcon />
                                         </IconButton>
                                         <Typography variant="body2" color="textSecondary">100</Typography>
                                     </Stack>
-                                    <Stack direction={'row'} justifyContent={'center'} alignItems={'center'}>
-                                        <IconButton>
-                                            <ThumbDownOutlinedIcon />
-                                        </IconButton>
-                                        <Typography variant="body2" color="textSecondary">100</Typography>
-                                    </Stack>
-
                                     <Button
                                         sx={{
                                             textTransform: 'none',

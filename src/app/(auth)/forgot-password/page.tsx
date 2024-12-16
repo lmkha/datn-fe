@@ -27,9 +27,9 @@ export default function ChangePasswordPage() {
                 activeStep: 2,
                 email: email,
             });
-            showAlert(result.message, 'success');
+            showAlert({ message: result.message, severity: 'success' });
         } else {
-            showAlert(result.message, 'error');
+            showAlert({ message: result.message, severity: 'error' });
         }
     };
 
@@ -184,11 +184,7 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
     const handleSendAgain = async () => {
         if (!state?.email) return;
         const result = await resetPassword({ email: state.email });
-        if (result.success) {
-            showAlert(result.message, 'success');
-        } else {
-            showAlert(result.message, 'error');
-        }
+        showAlert({ message: result.message, severity: result.success ? 'success' : 'error' });
     };
 
     useEffect(() => {
@@ -212,11 +208,10 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
 
         if (result.success) {
             setState({ ...state, isSubmitting: false, success: true });
-            showAlert(result.message, 'success');
         } else {
             setState({ ...state, isSubmitting: false, success: false });
-            showAlert(result.message, 'error');
         }
+        showAlert({ message: result.message, severity: result.success ? 'success' : 'error' });
     };
 
     return (

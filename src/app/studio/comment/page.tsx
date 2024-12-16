@@ -72,11 +72,6 @@ export default function CommentPage() {
                         label="Likes"
                         options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
                     />
-                    <SelectComponent
-                        label="Dislikes"
-                        options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
-                    />
-                    {/* Date picker */}
 
                 </Stack>
                 <Divider />

@@ -66,7 +66,7 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                     setState({ ...state, openReply: false, replyContent: '' });
                     props.onReplied && props.onReplied();
                 } else {
-                    showAlert(result.message, 'error');
+                    showAlert({ message: result.message, severity: 'error' });
                 }
             });
         }

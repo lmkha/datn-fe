@@ -97,7 +97,7 @@ export default function UploadVideoPage() {
         }).then((response) => {
             setState({ ...state, isUploading: false, success: response.success });
             if (!response.success) {
-                showAlert(response.message, 'error');
+                showAlert({ message: response.message, severity: 'error' });
             }
         })
     };

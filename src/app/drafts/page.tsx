@@ -18,7 +18,7 @@ export default function DraftPage() {
             </Typography>
             <Button
                 onClick={() => {
-                    showAlert('This is a success Alert.', 'success');
+                    showAlert({ message: 'Hello', severity: 'success' });
                 }}
             >
                 Check

@@ -57,15 +57,15 @@ export default function PostPage() {
                         }}
                     />
                     {/* Filter */}
-                    <Stack direction={'row'} justifyContent={'space-between'}>
-                        <SelectComponent
-                            label="Sort by"
-                            options={['Post time', 'Video views', 'Likes', 'Comments', 'Shares']}
-                        />
-                        <SelectComponent
-                            label="Order by"
-                            options={['Newest to oldest', 'Oldest to newest']}
-                        />
+                    <Stack direction={'row'} spacing={2} sx={{
+                        width: '60%',
+                    }}>
+                        <Box sx={{ width: '170px' }}>
+                            <SelectComponent
+                                label="Order by"
+                                options={['Newest to oldest', 'Oldest to newest']}
+                            />
+                        </Box>
                         <SelectComponent
                             label="Video views"
                             options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
@@ -77,14 +77,6 @@ export default function PostPage() {
                         <SelectComponent
                             label="Comments"
                             options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
-                        />
-                        <SelectComponent
-                            label="Shares"
-                            options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
-                        />
-                        <SelectComponent
-                            label="Privacy"
-                            options={['Everyone', 'Only me', 'Followers']}
                         />
                     </Stack>
 
@@ -138,8 +130,6 @@ export default function PostPage() {
 interface SelectComponentProps {
     label: string;
     options: string[];
-    // value: string;
-    // onChange: (value: string) => void;
 }
 function SelectComponent(props: SelectComponentProps) {
     const [selectedValue, setSelectedValue] = useState('');
@@ -265,10 +255,6 @@ function PostItem(props: PostItemProps) {
                                 </Stack>
                                 <Stack direction={'row'}>
                                     <ChatBubbleOutlineOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                                <Stack direction={'row'}>
-                                    <ShortcutIcon />
                                     <Typography variant="body2">1000</Typography>
                                 </Stack>
                             </Stack>
@@ -415,10 +401,6 @@ function DeletePostConfirmDialog(props: DeletePostConfirmDialogProps) {
                                 </Stack>
                                 <Stack direction={'row'}>
                                     <ChatBubbleOutlineOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                                <Stack direction={'row'}>
-                                    <ShortcutIcon />
                                     <Typography variant="body2">1000</Typography>
                                 </Stack>
                             </Stack>

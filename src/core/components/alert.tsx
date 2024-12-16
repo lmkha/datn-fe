@@ -1,10 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import Box from '@mui/material/Box';
 import Slide from '@mui/material/Slide';
 import Alert from '@mui/material/Alert';
 import { useAppContext } from '@/contexts/app-context';
+import { Box } from '@mui/material';
 
 export default function AlertComponent() {
     const { alertState, hideAlert } = useAppContext();
@@ -20,6 +20,7 @@ export default function AlertComponent() {
     }, [alertState.isOpen, hideAlert]);
 
     return (
+
         <Slide direction="down" in={alertState.isOpen} mountOnEnter unmountOnExit>
             <Alert
                 variant='filled'
@@ -27,17 +28,15 @@ export default function AlertComponent() {
                 sx={{
                     position: 'fixed',
                     top: '20px',
-                    left: '50%',
+                    left: '45%',
                     transform: 'translateX(-50%)',
                     height: 'auto',
                     width: 'auto',
                     zIndex: 1000,
-                    outline: '1px solid red',
                 }}
             >
                 {alertState.text}
             </Alert>
-
         </Slide>
     );
 }

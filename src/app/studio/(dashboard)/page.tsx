@@ -9,6 +9,9 @@ import { Avatar, Box, Button, FormControl, Grid2, MenuItem, Select, SelectChange
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
 import Image from "next/legacy/image";
+import { get } from '@/hooks/use-local-storage';
+import { CldImage } from 'next-cloudinary';
+import UserAvatar from '@/core/components/avatar';
 
 export default function StudioDashBoard() {
     const router = useRouter();
@@ -270,6 +273,7 @@ function RecentPost() {
 }
 
 function AccountInfo() {
+    const user = get('user');
     return (
         <Stack spacing={1} sx={{
             backgroundColor: 'white',
@@ -277,34 +281,27 @@ function AccountInfo() {
             padding: 2,
         }}>
             <Stack direction={'row'} spacing={2}>
-                <Avatar
-                    alt="Avt"
-                    src="/images/avatar.png"
-                    sx={{
-                        width: 100,
-                        height: 100,
-                    }}
-                />
+                <UserAvatar src={user?.profilePic} size={100} />
                 <Stack>
-                    <Typography variant="h5" fontWeight={'bold'}>@lmkha</Typography>
-                    <Typography variant="body1">Lê Minh Kha</Typography>
+                    <Typography variant="h5" fontWeight={'bold'}>@{user?.username}</Typography>
+                    <Typography variant="body1">{user?.fullName}</Typography>
                 </Stack>
             </Stack>
-            <Stack direction={'row'} justifyContent={'space-between'}>
+            <Stack direction={'row'} justifyContent={'space-evenly'}>
                 <Stack justifyContent={'center'} alignItems={'center'}>
-                    <Typography variant='h6' fontWeight={600}>0</Typography>
+                    <Typography variant='h6' fontWeight={600}>{user?.followerCount}</Typography>
                     <Typography color='textSecondary'>Followers</Typography>
                 </Stack>
 
                 <Stack justifyContent={'center'} alignItems={'center'}>
-                    <Typography variant='h6' fontWeight={600}>0</Typography>
+                    <Typography variant='h6' fontWeight={600}>{user?.followingCount}</Typography>
                     <Typography color='textSecondary'>Following</Typography>
                 </Stack>
 
-                <Stack justifyContent={'center'} alignItems={'center'}>
+                {/* <Stack justifyContent={'center'} alignItems={'center'}>
                     <Typography variant='h6' fontWeight={600}>0</Typography>
                     <Typography color='textSecondary'>Profile views</Typography>
-                </Stack>
+                </Stack> */}
             </Stack>
         </Stack>
     );

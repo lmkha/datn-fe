@@ -33,6 +33,7 @@ import { useUserContext } from "@/contexts/user-context";
 import { logout } from "@/services/real/auth";
 import { get, set } from "@/hooks/use-local-storage";
 import { CldImage } from "next-cloudinary";
+import UserAvatar from "./avatar";
 
 interface HeaderProps {
     title?: string;
@@ -169,26 +170,7 @@ function Account() {
             ) : (
                 <>
                     <IconButton onClick={handleClick}>
-                        {user?.profilePic ?
-                            (<Box sx={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: '50%',
-                                overflow: 'hidden',
-                                position: 'relative',
-                            }}>
-                                <CldImage
-                                    fill={true}
-                                    style={{
-                                        objectFit: 'cover',
-                                        width: '100%',
-                                        height: '100%',
-                                    }}
-                                    src={user.profilePic}
-                                    alt="Image"
-                                />
-                            </Box>) :
-                            (<Avatar alt="Avt" src="/images/avatar.png" />)}
+                        <UserAvatar src={user?.profilePic} size={40} />
                     </IconButton>
                     <Popover
                         open={open}

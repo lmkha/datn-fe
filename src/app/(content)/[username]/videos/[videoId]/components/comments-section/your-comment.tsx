@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { get } from "@/hooks/use-local-storage";
 import { CldImage } from "next-cloudinary";
 import { addComment } from "@/services/real/comment";
+import UserAvatar from "@/core/components/avatar";
 
 interface State {
     expanded?: boolean;
@@ -63,33 +64,10 @@ export default function YourCommentComponent(props: CommentProps) {
 
         }}>
             {/* Avatar */}
-            {currentUser?.profilePic ?
-                (<Box sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    position: 'relative',
-                }}>
-                    <CldImage
-                        fill={true}
-                        style={{
-                            objectFit: 'cover',
-                            width: '100%',
-                            height: '100%',
-                        }}
-                        src={currentUser.profilePic}
-                        alt="Image"
-                    />
-                </Box>) :
-                (<Avatar
-                    src="/images/avatar.png"
-                    alt="avatar"
-                    sx={{
-                        width: 40,
-                        height: 40,
-                    }}
-                />)}
+            <UserAvatar
+                src={currentUser?.profilePic}
+                size={40}
+            />
             <Stack spacing={1} sx={{
                 overflowY: 'auto',
                 width: '100%',

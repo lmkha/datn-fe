@@ -13,6 +13,7 @@ import VideoItem from "../components/video-item";
 import PlaylistItem from "../components/playlist-item";
 import LikedVideo from "../components/liked-video-item";
 import { getAllPlaylistByUserId } from "@/services/real/playlist";
+import UserAvatar from "@/core/components/avatar";
 
 interface PageState {
     user?: any;
@@ -67,33 +68,7 @@ export default function MyProfile({ username }: MyProfileProps) {
             <Grid2 container direction={'row'} spacing={20}>
                 {/* Avatar */}
                 <Grid2 size={2}>
-                    {state?.user?.profilePic ?
-                        (<Box sx={{
-                            width: 200,
-                            height: 200,
-                            borderRadius: '50%',
-                            overflow: 'hidden',
-                            position: 'relative',
-                        }}>
-                            <CldImage
-                                fill={true}
-                                style={{
-                                    objectFit: 'cover',
-                                    width: '100%',
-                                    height: '100%',
-                                }}
-                                src={state?.user.profilePic}
-                                alt="Image"
-                            />
-                        </Box>) :
-                        (<Avatar
-                            src="/images/avatar.png"
-                            alt="avatar"
-                            sx={{
-                                width: 200,
-                                height: 200,
-                            }}
-                        />)}
+                    <UserAvatar src={state?.user?.profilePic} size={200} />
                 </Grid2>
 
                 {/* Username, button, following, followers */}

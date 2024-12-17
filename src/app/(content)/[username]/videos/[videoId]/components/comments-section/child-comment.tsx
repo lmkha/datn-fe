@@ -13,6 +13,7 @@ import { useAppContext } from "@/contexts/app-context";
 import EditDeleteCommentMenu from "./edit-delete-menu";
 import DeleteCommentDialog from "./delete-comment-dialog";
 import { get } from "@/hooks/use-local-storage";
+import UserAvatar from "@/core/components/avatar";
 
 interface State {
     liked?: boolean;
@@ -167,46 +168,17 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
         <Stack direction={'row'} spacing={2} sx={{
             width: '100%',
             minHeight: '50px',
-            cursor: 'pointer',
         }}>
-            {state?.comment?.userAvatar ? (<Box sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                overflow: 'hidden',
-                position: 'relative',
-                cursor: 'pointer',
-            }}
+            <UserAvatar
+                src={state?.comment?.userAvatar}
+                size={40}
                 onClick={() => {
-                    state?.comment?.username &&
-                        router.push(`/@${state.comment.username}`);
+                    state?.comment?.username && router.push(`/@${state.comment.username}`);
                 }}
-            >
-                <CldImage
-                    fill={true}
-                    style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                    }}
-                    src={state.comment.userAvatar}
-                    alt="Image"
-                />
-            </Box>) :
-                (<Avatar
-                    src="/images/avatar.png"
-                    alt="avatar"
-                    sx={{
-                        width: 40,
-                        height: 40,
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => {
-                        state?.comment?.username &&
-                            router.push(`/@${state.comment.username}`);
-                    }}
-                />)
-            }
+                sx={{
+                    cursor: 'pointer',
+                }}
+            />
             <Stack sx={{
                 overflowY: 'auto',
                 width: '100%',

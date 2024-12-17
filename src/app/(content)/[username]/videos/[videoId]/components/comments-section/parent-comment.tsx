@@ -13,6 +13,7 @@ import { deleteComment, getChildrenComments, getCommentById, isCommentLiked, lik
 import EditDeleteCommentMenu from "./edit-delete-menu";
 import { get } from "@/hooks/use-local-storage";
 import DeleteCommentDialog from "./delete-comment-dialog";
+import UserAvatar from "@/core/components/avatar";
 
 interface State {
     liked?: boolean;
@@ -202,48 +203,19 @@ export default function ParentCommentComponent(props: CommentProps) {
         <Stack direction={'row'} spacing={2} sx={{
             width: '100%',
             minHeight: '50px',
-            cursor: 'pointer',
             margin: 1,
         }}>
             {/* Avatar */}
-            {state?.comment?.userAvatar ? (<Box sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                overflow: 'hidden',
-                position: 'relative',
-                cursor: 'pointer',
-            }}
-                onClick={() => {
-                    state?.comment?.username &&
-                        router.push(`/@${state?.comment.username}`);
+            <UserAvatar
+                src={state?.comment?.userAvatar}
+                size={40}
+                sx={{
+                    cursor: 'pointer',
                 }}
-            >
-                <CldImage
-                    fill={true}
-                    style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                    }}
-                    src={state?.comment.userAvatar}
-                    alt="Image"
-                />
-            </Box>) :
-                (<Avatar
-                    src="/images/avatar.png"
-                    alt="avatar"
-                    sx={{
-                        width: 40,
-                        height: 40,
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => {
-                        state?.comment?.username &&
-                            router.push(`/@${state?.comment.username}`);
-                    }}
-                />)
-            }
+                onClick={() => {
+                    state?.comment?.username && router.push(`/@${state?.comment.username}`);
+                }}
+            />
             <Stack sx={{
                 overflowY: 'auto',
                 width: '100%',

@@ -8,6 +8,7 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import { useRouter } from "next/navigation";
 import { get } from "@/hooks/use-local-storage";
 import { CldImage } from "next-cloudinary";
+import UserAvatar from "@/core/components/avatar";
 
 export type SelectedRoute = 'FOR_YOU' | 'EXPLORE' | 'FOLLOWING' | 'PROFILE' | 'NONE';
 interface DrawerProps {
@@ -60,42 +61,13 @@ export default function Drawer(props: DrawerProps) {
                         />
                         <DrawerMenuItem
                             onClick={() => { router.push(`/@${user?.username}`) }}
-                            icon={user?.profilePic ?
-                                (<Box sx={{
-                                    width: 25,
-                                    height: 25,
-                                    borderRadius: '50%',
-                                    overflow: 'hidden',
-                                    position: 'relative',
-                                }}>
-                                    <CldImage
-                                        fill={true}
-                                        style={{
-                                            objectFit: 'cover',
-                                            width: '100%',
-                                            height: '100%',
-                                        }}
-                                        src={user.profilePic}
-                                        alt="Image"
-                                    />
-                                </Box>) :
-                                (<Avatar
-                                    src="/images/avatar.png"
-                                    alt="avatar"
-                                    sx={{
-                                        width: 25,
-                                        height: 25,
-                                    }}
-                                />)}
+                            icon={<UserAvatar src={user?.profilePic} size={25} />}
                             text={'Profile'}
                             sx={{ height: 50 }}
                             selected={props.selectedRoute === 'PROFILE'}
                         />
                     </>
-
                 )}
-
-
             </MenuList>
         </Box >
     )

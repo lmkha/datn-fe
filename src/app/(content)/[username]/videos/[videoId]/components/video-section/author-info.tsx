@@ -1,8 +1,8 @@
 'use client';
 
+import UserAvatar from "@/core/components/avatar";
 import { formatNumberToShortText } from "@/core/logic/convert";
-import { Avatar, Box, Stack, Typography } from "@mui/material";
-import { CldImage } from "next-cloudinary";
+import { Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 interface AuthorInfoProps {
@@ -14,33 +14,7 @@ export default function AuthorInfoComponent(props: AuthorInfoProps) {
     return (
         <>
             <Stack direction={'row'} spacing={1} alignItems={'center'}>
-                {props.user?.profilePic ?
-                    (<Box sx={{
-                        width: 50,
-                        height: 50,
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        position: 'relative',
-                    }}>
-                        <CldImage
-                            fill={true}
-                            style={{
-                                objectFit: 'cover',
-                                width: '100%',
-                                height: '100%',
-                            }}
-                            src={props.user.profilePic}
-                            alt="Image"
-                        />
-                    </Box>) :
-                    (<Avatar
-                        src="/images/avatar.png"
-                        alt="avatar"
-                        sx={{
-                            width: 50,
-                            height: 50,
-                        }}
-                    />)}
+                <UserAvatar src={props?.user?.profilePic} size={50} />
                 <Stack>
                     <Typography
                         onClick={() => {

@@ -1,4 +1,5 @@
 import axiosInstance from "@/configs/axios-instance";
+import { AxiosRequestConfig } from "axios";
 
 type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
 
@@ -7,7 +8,7 @@ interface RequestOptions {
     method?: HttpMethod;
     data?: any;
     params?: any;
-    config?: any;
+    config?: AxiosRequestConfig;
     authRequired?: boolean;
 }
 
@@ -20,7 +21,7 @@ class Base {
         }
 
         try {
-            const updatedConfig = { ...config };
+            const updatedConfig: AxiosRequestConfig = { ...config };
             if (authRequired) {
                 const accessToken = localStorage.getItem("accessToken");
                 if (accessToken) {

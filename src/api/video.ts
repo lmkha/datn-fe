@@ -76,6 +76,15 @@ class Video extends Base {
             const response = await this.post({
                 url: `/file/video/${data.videoId}`,
                 data: formData,
+                config: {
+                    timeout: 300000,
+                    onUploadProgress(progressEvent) {
+                        const percentCompleted = Math.round(
+                            (progressEvent.loaded * 100) / (progressEvent.total || 1)
+                        );
+                        console.log(`Upload Progress: ${percentCompleted}%`);
+                    },
+                }
             });
             return {
                 success: response.success,

@@ -20,23 +20,31 @@ export default function AlertComponent() {
     }, [alertState.isOpen, hideAlert]);
 
     return (
-
         <Slide direction="down" in={alertState.isOpen} mountOnEnter unmountOnExit>
-            <Alert
-                variant='filled'
-                severity={alertState.severity}
+            <Box
                 sx={{
                     position: 'fixed',
                     top: '20px',
-                    left: '45%',
+                    left: '0px',
                     transform: 'translateX(-50%)',
-                    height: 'auto',
-                    width: 'auto',
                     zIndex: 1000,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%',
                 }}
             >
-                {alertState.text}
-            </Alert>
+                <Alert
+                    variant='filled'
+                    severity={alertState.severity}
+                    sx={{
+                        width: 'auto',
+                        height: 'auto',
+                    }}
+                >
+                    {alertState.text}
+                </Alert>
+            </Box>
+
         </Slide>
     );
 }

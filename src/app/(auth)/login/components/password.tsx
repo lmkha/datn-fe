@@ -8,15 +8,16 @@ import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { SxProps, Theme } from '@mui/material';
 
 interface PasswordProps {
-    label?: string;
     showPassword: boolean;
-    isError?: boolean;
-    helperText?: string;
     onChange: (value: string) => void;
     validatePassword: (password: string) => void;
     onChangeShowPassword: () => void;
+    isError?: boolean;
+    helperText?: string;
+    label?: string;
     onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
@@ -81,7 +82,6 @@ export default function Password(
                         </InputAdornment>
                     }
                     label="Password"
-
                 />
                 {isError && <FormHelperText error>{helperText}</FormHelperText>}
             </FormControl>

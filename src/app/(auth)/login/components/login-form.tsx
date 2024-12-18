@@ -29,7 +29,6 @@ export default function LoginForm() {
         isProcessing: false,
     });
 
-
     const handleSubmit = async () => {
         setState({ ...state, isProcessing: true })
         const validateResult = await validateLoginForm(state);

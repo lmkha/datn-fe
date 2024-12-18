@@ -21,7 +21,6 @@ async function isValidPassword(password: string): Promise<string | null> {
     return null;
 }
 
-
 export async function validateLoginForm(state: LoginFormState): Promise<LoginFormErrorField[]> {
     const errors: LoginFormErrorField[] = [];
 

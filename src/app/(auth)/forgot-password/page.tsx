@@ -6,7 +6,12 @@ import Stepper from '@/core/components/stepper';
 import { useEffect, useState } from "react";
 import { isValidEmail } from "@/core/logic/validate";
 import { useAppContext } from "@/contexts/app-context";
-import { resetPassword, verifyResetPassword } from "@/services/real/auth";
+import { login, resetPassword, verifyResetPassword } from "@/services/real/auth";
+import { useRouter } from "next/navigation";
+import Password from "@/app/(auth)/login/components/password";
+import { LoginFormState } from "@/app/(auth)/login/components/login-form";
+import { validateLoginForm } from "@/validators/login-validator";
+import { ForgotPasswordErrorField, validateForgotPassword } from "@/validators/forgot-pw-validator";
 
 interface State {
     activeStep?: number;
@@ -15,7 +20,7 @@ interface State {
     isSubmitting?: boolean;
     email?: string;
 }
-export default function ChangePasswordPage() {
+export default function ResetPasswordPage() {
     const [state, setState] = useState<State>();
     const { showAlert } = useAppContext();
 
@@ -34,71 +39,191 @@ export default function ChangePasswordPage() {
     };
 
     return (
-        <Box sx={{
+        <Stack sx={{
             width: '100%',
             height: '100%',
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'start',
             alignItems: 'center',
         }}>
-            <Stack spacing={3} sx={{
-                padding: 5,
-                width: '95%',
+            <Header />
+            <Box sx={{
+                width: '100%',
                 height: '90%',
-                backgroundColor: '#F8F8F8',
-                borderRadius: '10px',
+                padding: 5,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
             }}>
-                <Typography
-                    variant="h5"
-                    fontWeight="bold"
-                    sx={{ textAlign: 'start' }}
-                >
-                    Reset Password
-                </Typography>
-                <Grid2 container sx={{
+                <Stack spacing={3} sx={{
+                    padding: 5,
                     width: '100%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '50px',
+                    height: '100%',
+                    backgroundColor: '#F8F8F8',
+                    borderRadius: '10px',
                 }}>
-                    <Grid2 size={3}>
-                        <Box sx={{
-                            display: 'flex',
-                            width: '100%',
-                            justifyContent: 'end',
-                        }}>
-                            {state?.activeStep === 2 && (<IconButton
-                                onClick={() => setState({ ...state, activeStep: 1 })}
-                                sx={{
-                                    color: '#FE2C55',
-                                }}
-                            >
-                                <ArrowBackIosIcon />
-                            </IconButton>)}
-                        </Box>
-                    </Grid2>
-                    <Grid2 size={6}>
-                        <Box
-                            sx={{
+                    <Typography
+                        variant="h5"
+                        fontWeight="bold"
+                        sx={{ textAlign: 'start' }}
+                    >
+                        Reset Password
+                    </Typography>
+                    <Grid2 container sx={{
+                        width: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '50px',
+                    }}>
+                        <Grid2 size={3}>
+                            <Box sx={{
                                 display: 'flex',
                                 width: '100%',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Stepper activeStep={state?.activeStep || 1} />
-                        </Box>
-                    </Grid2>
-                    <Grid2 size={3}>
+                                justifyContent: 'end',
+                            }}>
+                                {state?.activeStep === 2 && (<IconButton
+                                    onClick={() => setState({ ...state, activeStep: 1 })}
+                                    sx={{
+                                        color: '#FE2C55',
+                                    }}
+                                >
+                                    <ArrowBackIosIcon />
+                                </IconButton>)}
+                            </Box>
+                        </Grid2>
+                        <Grid2 size={6}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    width: '100%',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Stepper activeStep={state?.activeStep || 1} />
+                            </Box>
+                        </Grid2>
+                        <Grid2 size={3}>
 
+                        </Grid2>
                     </Grid2>
-                </Grid2>
-                {state?.activeStep === 2 ?
-                    (<EnterNewPasswordStep email={state?.email} />) :
-                    (<SendOTPStepComponent
-                        onSendOTP={handleSendOTP}
-                    />)
-                }
+                    {state?.activeStep === 2 ?
+                        (<EnterNewPasswordStep email={state?.email} />) :
+                        (<SendOTPStepComponent
+                            onSendOTP={handleSendOTP}
+                        />)
+                    }
 
+                </Stack>
+            </Box>
+        </Stack>
+    );
+}
+
+function Header() {
+    const { showAlert } = useAppContext();
+    const [state, setState] = useState<LoginFormState>({
+        username: '',
+        password: '',
+        showPassword: false,
+        openVerifyModal: false,
+        isProcessing: false,
+    });
+    const router = useRouter();
+
+    const handleSubmit = async () => {
+        setState({ ...state, isProcessing: true })
+        const validateResult = await validateLoginForm(state);
+        if (validateResult.length > 0) {
+            setState({ ...state, isProcessing: false, errors: validateResult });
+            showAlert({ message: validateResult[0].message, severity: 'error' });
+            return;
+        }
+        await login({ username: state.username, password: state.password }).then((result) => {
+            if (result.success) {
+                router.push('/');
+                setState({
+                    ...state,
+                    isProcessing: false,
+                    errors: [],
+                });
+            } else {
+                showAlert({ message: result.message, severity: 'error' });
+                setState({
+                    ...state,
+                    isProcessing: false,
+                    errors: [],
+                });
+            }
+        });
+    };
+
+    return (
+        <Box sx={{
+            width: '100%',
+            height: '10%',
+            borderBottom: '1px solid lightgray',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            display: 'flex',
+            padding: 1
+        }}>
+            <Typography
+                onClick={() => router.push('/')}
+                variant="h4"
+                sx={{
+                    fontWeight: 'bold',
+                    mb: 1,
+                    color: '#EA284E',
+                    cursor: 'pointer',
+                }}
+            >
+                MeTube
+            </Typography>
+
+            <Stack direction={'row'} spacing={1} justifyContent={'center'} alignItems={'center'}>
+                <TextField
+                    label="Username"
+                    size="medium"
+                    value={state?.username}
+                    onChange={(e) => setState({ ...state, username: e.target.value })}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                    sx={{
+                        width: '40%',
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: 3,
+                            '&:hover fieldset': {
+                                borderColor: 'black',
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'black',
+                            },
+                        },
+                        '& .MuiInputLabel-root.Mui-focused': {
+                            color: 'black',
+                        },
+                    }}
+                />
+                <Box sx={{ width: '40%' }}>
+                    <Password
+                        showPassword={state.showPassword}
+                        onChange={(value) => setState({ ...state, password: value })}
+                        validatePassword={() => { }}
+                        onChangeShowPassword={() => setState({ ...state, showPassword: !state.showPassword })}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                    />
+                </Box>
+                <Button
+                    onClick={handleSubmit}
+                    variant="contained"
+                    sx={{
+                        width: '20%',
+                        height: '50px',
+                        backgroundColor: '#FE2C55',
+                        color: 'white',
+                    }}
+                >
+                    Login
+                </Button>
             </Stack>
         </Box>
     );
@@ -141,7 +266,7 @@ function SendOTPStepComponent(props: SendOTPStepProps) {
                 helperText={state?.error}
                 onChange={(e) => setState({ ...state, email: e.target.value })}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendOTP()}
-                size="small"
+                size="medium"
                 sx={{
                     width: '50%',
                     marginTop: 2,
@@ -151,6 +276,7 @@ function SendOTPStepComponent(props: SendOTPStepProps) {
             <Button
                 onClick={handleSendOTP}
                 sx={{
+                    height: 40,
                     textTransform: 'none',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -167,14 +293,19 @@ function SendOTPStepComponent(props: SendOTPStepProps) {
 interface EnterNewPasswordStepProps {
     email?: string;
 }
+export interface EnterNewPasswordStepState {
+    email?: string;
+    username?: string;
+    otpCode?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+}
 function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
-    interface State {
-        email?: string;
-        otpCode?: string;
-        newPassword?: string;
-        confirmPassword?: string;
+    const router = useRouter();
+    interface State extends EnterNewPasswordStepState {
         isSubmitting?: boolean;
         success?: boolean;
+        errorFields?: ForgotPasswordErrorField[];
     }
 
     const [state, setState] = useState<State>();
@@ -194,24 +325,30 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
     }, [props?.email]);
 
     const handleResetPassword = async () => {
-        console.log(state);
-        if (!state?.newPassword || !state?.confirmPassword || !state?.email || !state?.otpCode) return;
         setState({ ...state, isSubmitting: true });
+
+        const validateResult = await validateForgotPassword(state as EnterNewPasswordStepState);
+        if (validateResult.length > 0) {
+            setState({ ...state, isSubmitting: false, errorFields: validateResult });
+            return;
+        }
+        if (!state?.newPassword || !state?.confirmPassword || !state?.email || !state?.otpCode || !state?.username) return;
         const result = await verifyResetPassword({
             otpCode: state.otpCode,
             user: {
                 email: state.email,
                 password: state.newPassword,
-                username: 'lmkha',
+                username: state.username,
             }
         });
 
+        showAlert({ message: result.message, severity: result.success ? 'success' : 'error' });
         if (result.success) {
             setState({ ...state, isSubmitting: false, success: true });
+            router.push('/login');
         } else {
             setState({ ...state, isSubmitting: false, success: false });
         }
-        showAlert({ message: result.message, severity: result.success ? 'success' : 'error' });
     };
 
     return (
@@ -225,10 +362,27 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
             }}
         >
             <TextField
+                label="Username"
+                size="small"
+                value={state?.username}
+                onChange={(e) => setState({ ...state, username: e.target.value })}
+                error={!!state?.errorFields?.find((field) => field.field === 'username')}
+                helperText={state?.errorFields?.find((field) => field.field === 'username')?.message}
+                onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
+                sx={{
+                    width: '50%',
+                    marginTop: 2,
+                    backgroundColor: 'white',
+                }}
+            />
+            <TextField
                 label="New Password"
                 size="small"
                 value={state?.newPassword}
                 onChange={(e) => setState({ ...state, newPassword: e.target.value })}
+                error={!!state?.errorFields?.find((field) => field.field === 'newPassword')}
+                helperText={state?.errorFields?.find((field) => field.field === 'newPassword')?.message}
+                onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
                 sx={{
                     width: '50%',
                     marginTop: 2,
@@ -240,6 +394,9 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
                 size="small"
                 value={state?.confirmPassword}
                 onChange={(e) => setState({ ...state, confirmPassword: e.target.value })}
+                error={!!state?.errorFields?.find((field) => field.field === 'confirmPassword')}
+                helperText={state?.errorFields?.find((field) => field.field === 'confirmPassword')?.message}
+                onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
                 sx={{
                     width: '50%',
                     marginTop: 2,
@@ -252,6 +409,9 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
                     size="small"
                     value={state?.otpCode}
                     onChange={(e) => setState({ ...state, otpCode: e.target.value })}
+                    error={!!state?.errorFields?.find((field) => field.field === 'otpCode')}
+                    helperText={state?.errorFields?.find((field) => field.field === 'otpCode')?.message}
+                    onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
                     sx={{
                         width: '50%',
                         marginTop: 2,

@@ -1,6 +1,6 @@
 'use client';
 
-import { Grid2, Box, Typography } from '@mui/material';
+import { Grid2, Box } from '@mui/material';
 import QuoteSection from './components/quote-section';
 import LoginForm from './components/login-form';
 

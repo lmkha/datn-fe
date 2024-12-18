@@ -1,5 +1,5 @@
 import { SignUpPageState } from "@/app/(auth)/signup/page";
-import { doPasswordsMatch, isValidEmailForSignUp, isValidPassword, isValidUsername } from "@/core/logic/validate";
+import { doPasswordsMatch, isValidEmail, isValidPassword, isValidUsername } from "@/core/logic/validate";
 
 export interface SignUpPageErrorField {
     field: 'email' | 'fullName' | 'username' | 'password' | 'confirmPassword';
@@ -13,7 +13,7 @@ export async function validateSignUpForm(state: SignUpPageState): Promise<SignUp
         errors.push({ field: 'fullName', message: 'Full name is required' });
     }
 
-    await isValidEmailForSignUp(state.email).then((error) => {
+    await isValidEmail(state.email, false).then((error) => {
         if (error) {
             errors.push({ field: 'email', message: error });
         }

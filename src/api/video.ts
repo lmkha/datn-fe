@@ -66,10 +66,13 @@ class Video extends Base {
         }
     }
 
-    async uploadVideoFile(data: {
-        file: File,
-        videoId: string,
-    }) {
+    async uploadVideoFile(
+        data: {
+            file: File,
+            videoId: string,
+        },
+        progressCallback?: (progress: number) => void
+    ) {
         try {
             const formData = new FormData();
             formData.append("file", data.file);
@@ -79,10 +82,12 @@ class Video extends Base {
                 config: {
                     timeout: 300000,
                     onUploadProgress(progressEvent) {
-                        const percentCompleted = Math.round(
-                            (progressEvent.loaded * 100) / (progressEvent.total || 1)
-                        );
-                        console.log(`Upload Progress: ${percentCompleted}%`);
+                        if (progressEvent.lengthComputable && progressEvent.total) {
+                            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                            if (progressCallback) {
+                                progressCallback(progress);
+                            }
+                        }
                     },
                 }
             });

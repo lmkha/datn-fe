@@ -3,16 +3,19 @@ import { getPublicUserId } from "./user";
 import { get } from "@/hooks/use-local-storage";
 import { addVideoToPlayList } from "./playlist";
 
-export const postVideo = async (data: {
-    title: string;
-    isPrivate: boolean;
-    videoFile: File;
-    thumbnailFile?: File;
-    commentOff?: boolean;
-    description?: string;
-    tags?: string[];
-    playlistId?: string;
-}) => {
+export const postVideo = async (
+    data: {
+        title: string;
+        isPrivate: boolean;
+        videoFile: File;
+        thumbnailFile?: File;
+        commentOff?: boolean;
+        description?: string;
+        tags?: string[];
+        playlistId?: string;
+    },
+    progressCallback?: (progress: number) => void
+) => {
     // Upload video meta data
     const uploadVideoMetaDataResult = await videoAPI.uploadVideoMetaData({
         title: data.title,
@@ -46,7 +49,7 @@ export const postVideo = async (data: {
     const uploadVideoFileResult = await videoAPI.uploadVideoFile({
         videoId: uploadVideoMetaDataResult.data.id,
         file: data.videoFile,
-    });
+    }, progressCallback);
 
     return uploadVideoFileResult;
 };

@@ -28,9 +28,10 @@ export const login = async ({ username, password }: { username: string, password
 }
 
 export const logout = () => {
-    remove('accessToken');
     Cookies.remove("accessToken", { path: "/" });
+    remove('accessToken');
     remove('user');
+    remove("searchQuery");
 }
 
 export const isUsernameTaken = async (username: string) => {

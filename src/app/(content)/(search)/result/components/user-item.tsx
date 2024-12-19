@@ -1,16 +1,16 @@
 'use client';
 
-import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
+import { Button, Grid2, Stack, Typography } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { formatNumberToShortText } from "@/core/logic/convert";
-import { CldImage } from "next-cloudinary";
 import { followUser, isFollowing } from "@/services/real/user";
 import UnFollowConfirmDialog from "@/app/(content)/components/unfollow-dialog";
 import { get } from "@/hooks/use-local-storage";
+import UserAvatar from "@/core/components/avatar";
 
 interface State {
-    openUnFollowConfirmDialog: boolean;
+    openUnFollowConfirmDialog?: boolean;
     isFollowing?: boolean;
     followingCount?: number;
     followersCount?: number;
@@ -24,25 +24,34 @@ export default function UserItem(props: UserItemProps) {
     const [state, setState] = useState<State>({ openUnFollowConfirmDialog: false });
 
     const fetchData = async () => {
-        props?.user?.username && isFollowing({ username: props?.user?.username }).then((result) => {
-            if (result.success) {
-                setState((prev) => ({ ...prev, isFollowing: result.isFollowing }));
-            } else {
-                setState((prev) => ({ ...prev, isFollowing: false }));
-            }
-        });
+        if (!props.user?.username) return;
+        const result = await isFollowing({ username: props.user.username });
+        const resultState = { ...state };
+        resultState.followersCount = parseInt(props?.user?.followerCount) || 0;
+        resultState.followingCount = parseInt(props?.user?.followingCount) || 0;
+        if (result.success) {
+            resultState.isFollowing = result.isFollowing;
+        } else {
+            resultState.isFollowing = false;
+        }
+        setState(resultState);
     };
 
     const handleFollow = async () => {
         if (!props.user?.username) return;
         if (state.isFollowing) {
             setState({ ...state, openUnFollowConfirmDialog: true });
-        } else {
-            followUser({ username: props.user.username }).then((result) => {
-                if (result.success) {
-                    setState({ ...state, isFollowing: true });
-                }
+            return;
+        }
+        const result = await followUser({ username: props.user.username });
+        if (result.success) {
+            setState({
+                ...state,
+                isFollowing: true,
+                followersCount: state?.followersCount ? state.followersCount + 1 : 1
             });
+        } else {
+            setState({ ...state, isFollowing: false });
         }
     };
 
@@ -54,7 +63,6 @@ export default function UserItem(props: UserItemProps) {
         });
         fetchData();
     }, []);
-
 
     return (
         <>
@@ -68,42 +76,17 @@ export default function UserItem(props: UserItemProps) {
             }}>
                 {/* Avatar */}
                 <Grid2 size={2} height={'100%'}>
-                    {props?.user?.profilePic ?
-                        (<Box sx={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: '50%',
-                            overflow: 'hidden',
-                            position: 'relative',
+                    <UserAvatar
+                        src={props?.user?.profilePic}
+                        size={100}
+                        onClick={(e) => {
+                            props?.user?.username && router.push(`/@${props.user.username}`);
+                            e.stopPropagation();
+                        }}
+                        sx={{
                             cursor: 'pointer',
                         }}
-                            onClick={(e) => {
-                                props?.user?.username && router.push(`/@${props.user.username}`);
-                                e.stopPropagation();
-                            }}
-                        >
-                            <CldImage
-                                fill={true}
-                                style={{
-                                    objectFit: 'cover',
-                                }}
-                                src={props.user.profilePic}
-                                alt="Image"
-                            />
-                        </Box>) :
-                        (<Avatar
-                            src="/images/avatar.png"
-                            alt="avatar"
-                            sx={{
-                                width: 100,
-                                height: 100,
-                                cursor: 'pointer',
-                            }}
-                            onClick={(e) => {
-                                props?.user?.username && router.push(`/@${props.user.username}`);
-                                e.stopPropagation();
-                            }}
-                        />)}
+                    />
                 </Grid2>
                 {/* Info */}
                 <Grid2 size={8}>
@@ -160,7 +143,7 @@ export default function UserItem(props: UserItemProps) {
             </Grid2>
 
             <UnFollowConfirmDialog
-                open={state.openUnFollowConfirmDialog}
+                open={state?.openUnFollowConfirmDialog || false}
                 onClose={() => setState({ ...state, openUnFollowConfirmDialog: false })}
                 username={props?.user?.username}
                 fullName={props?.user?.fullName}
@@ -170,7 +153,8 @@ export default function UserItem(props: UserItemProps) {
                         setState({
                             ...state,
                             isFollowing: false,
-                            openUnFollowConfirmDialog: false
+                            openUnFollowConfirmDialog: false,
+                            followersCount: state?.followersCount ? state.followersCount - 1 : 0
                         });
                     }
                 }}

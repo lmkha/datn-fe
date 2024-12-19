@@ -1,9 +1,7 @@
 'use client';
 
 import {
-    Avatar,
     IconButton,
-    InputAdornment,
     Stack,
     TextField,
     Typography,
@@ -12,11 +10,6 @@ import {
     ListItemIcon,
     Grid2,
     Button,
-    Popper,
-    Paper,
-    List,
-    ListItem,
-    Box,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useState, MouseEvent, useEffect } from 'react';
@@ -29,11 +22,10 @@ import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from "next/navigation";
-import { useUserContext } from "@/contexts/user-context";
 import { logout } from "@/services/real/auth";
 import { get, set } from "@/hooks/use-local-storage";
-import { CldImage } from "next-cloudinary";
 import UserAvatar from "./avatar";
+import ClearIcon from '@mui/icons-material/Clear';
 
 interface HeaderProps {
     title?: string;
@@ -254,6 +246,17 @@ function Search() {
         }
     };
 
+    const handleSubmit = () => {
+        if (searchQuery.length === 0) return;
+        router.push(`/result?q=${searchQuery}`);
+        setOpen(false);
+    }
+
+    const handleClear = () => {
+        setSearchQuery("");
+        set("searchQuery", "");
+    }
+
     useEffect(() => {
         const storedQuery = get("searchQuery") || "";
         setSearchQuery(storedQuery);
@@ -265,12 +268,7 @@ function Search() {
                 size="small"
                 value={searchQuery}
                 onChange={handleInputChange}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        router.push(`/result?q=${searchQuery}`);
-                    }
-                    setOpen(false);
-                }}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                 sx={{
                     width: '50%',
                     '& .MuiOutlinedInput-root': {
@@ -286,33 +284,38 @@ function Search() {
                 slotProps={{
                     input: {
                         endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton>
+                            <Stack direction={'row'} spacing={1}>
+                                {searchQuery.length > 0 && (
+                                    <IconButton onClick={handleClear}>
+                                        <ClearIcon />
+                                    </IconButton>
+                                )}
+                                <IconButton onClick={handleSubmit}>
                                     <SearchIcon />
                                 </IconButton>
-                            </InputAdornment>
+                            </Stack>
                         )
                     }
                 }}
             />
-
-            {/* Popper below the search field */}
-            {/* <Popper open={open} anchorEl={anchorEl} placement="bottom-start" style={{ width: anchorEl?.offsetWidth }}>
-                <Paper elevation={3} sx={{ borderRadius: 3 }}>
-                    <List>
-                        <ListItem>Search suggestion 1</ListItem>
-                        <ListItem>Search suggestion 2</ListItem>
-                        <ListItem>Search suggestion 3</ListItem>
-                        <ListItem>Search suggestion 4</ListItem>
-                        <ListItem>Search suggestion 5</ListItem>
-                        <ListItem>Search suggestion 6</ListItem>
-                        <ListItem>Search suggestion 7</ListItem>
-                        <ListItem>Search suggestion 8</ListItem>
-                        <ListItem>Search suggestion 9</ListItem>
-                        <ListItem>Search suggestion 10</ListItem>
-                    </List>
-                </Paper>
-            </Popper> */}
         </>
     );
 }
+
+{/* Popper below the search field */ }
+{/* <Popper open={open} anchorEl={anchorEl} placement="bottom-start" style={{ width: anchorEl?.offsetWidth }}>
+    <Paper elevation={3} sx={{ borderRadius: 3 }}>
+        <List>
+            <ListItem>Search suggestion 1</ListItem>
+            <ListItem>Search suggestion 2</ListItem>
+            <ListItem>Search suggestion 3</ListItem>
+            <ListItem>Search suggestion 4</ListItem>
+            <ListItem>Search suggestion 5</ListItem>
+            <ListItem>Search suggestion 6</ListItem>
+            <ListItem>Search suggestion 7</ListItem>
+            <ListItem>Search suggestion 8</ListItem>
+            <ListItem>Search suggestion 9</ListItem>
+            <ListItem>Search suggestion 10</ListItem>
+        </List>
+    </Paper>
+</Popper> */}

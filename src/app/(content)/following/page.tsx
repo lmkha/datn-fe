@@ -28,7 +28,6 @@ export default function FollowingPage() {
         fetchData();
     }, []);
 
-
     return (
         <Stack spacing={2} sx={{
             paddingTop: 1,

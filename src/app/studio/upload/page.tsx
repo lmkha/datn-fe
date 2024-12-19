@@ -81,25 +81,41 @@ export default function UploadVideoPage() {
         }
     }, [state?.videoFile]);
 
+    const validate = () => {
+        if (!state?.title) {
+            showAlert({ message: 'Title is required', severity: 'error' });
+            return false;
+        }
+        if (!state?.videoFile) {
+            showAlert({ message: 'Video file is required', severity: 'error' });
+            return false;
+        }
+        return true;
+    };
+
     const handleUpload = async () => {
         setState({ ...state, isUploading: true });
-        if (!state?.videoFile) {
+        const isValid = validate();
+        if (!isValid) {
             setState({ ...state, isUploading: false });
             return;
         }
-        postVideo({
-            title: state?.title || '',
+
+        const result = await postVideo({
+            title: state?.title as string,
             isPrivate: state?.visibility === 'private',
-            videoFile: state?.videoFile,
+            videoFile: state?.videoFile as File,
             thumbnailFile: state?.thumbnailFile,
             description: state?.description,
             tags: state?.hashtags,
-        }).then((response) => {
-            setState({ ...state, isUploading: false, success: response.success });
-            if (!response.success) {
-                showAlert({ message: response.message, severity: 'error' });
-            }
-        })
+        });
+
+        if (result.success) {
+            setState({ ...state, isUploading: false, success: true });
+        } else {
+            showAlert({ message: result.message, severity: 'error' });
+            setState({ ...state, isUploading: false });
+        }
     };
 
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import ParentCommentComponent from "./parent-comment";
 import { ParentComment } from "../../types";
 import YourCommentComponent from "./your-comment";
@@ -11,19 +11,38 @@ interface CommentSectionProps {
     videoId: string;
     author: any;
     isCommentFocused: boolean;
+    isCommentOff?: boolean | null;
     onCommentUnfocused?: () => void;
 }
 
 export default function CommentSection(props: CommentSectionProps) {
+    if (props?.isCommentOff) {
+        return (
+            <Stack sx={{
+                py: 5,
+                px: 2,
+            }}>
+                <Typography
+                    variant="body1"
+                    fontWeight={'bold'}
+                    sx={{
+                        color: 'gray'
+                    }}
+                >
+                    Comments are turned off for this video.
+                </Typography>
+            </Stack>
+        )
+    }
+
     const [comments, setComments] = useState<ParentComment[]>();
 
     const fetchData = async () => {
         if (!props.videoId) return;
-        getAllParentComments(props.videoId).then((result) => {
-            if (result.success) {
-                setComments(result.comments);
-            }
-        });
+        const result = await getAllParentComments(props.videoId);
+        if (result.success) {
+            setComments(result.comments);
+        }
     };
 
     useEffect(() => {
@@ -46,7 +65,7 @@ export default function CommentSection(props: CommentSectionProps) {
             />
             {comments?.map((comment, index) => (
                 <ParentCommentComponent
-                    key={index}
+                    key={comment.id}
                     videoId={props.videoId}
                     comment={comment}
                     author={props.author}

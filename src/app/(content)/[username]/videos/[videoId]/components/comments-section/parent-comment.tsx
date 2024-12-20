@@ -496,7 +496,7 @@ export default function ParentCommentComponent(props: CommentProps) {
                     <Button
                         onClick={handleExpand}
                         sx={{
-                            width: '100px',
+                            width: 'fit-content',
                             textTransform: 'none',
                             backgroundColor: '#FFF2F5'
                         }}
@@ -505,7 +505,10 @@ export default function ParentCommentComponent(props: CommentProps) {
                             variant="body2"
                             fontSize={'12px'}
                             fontWeight={'bold'}
-                            sx={{ color: 'black' }}
+                            sx={{
+                                color: 'black',
+                                whiteSpace: 'nowrap'
+                            }}
                         >
                             {state?.expanded ? `Hide ${state.comment?.replyCount === 1 ? 'reply' : 'replies'}` :
                                 (state?.comment?.replyCount === 1 ? `View ${state?.comment?.replyCount} reply` :

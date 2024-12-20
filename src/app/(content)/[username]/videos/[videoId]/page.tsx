@@ -70,6 +70,7 @@ export default function VideoPage() {
                         <CommentSection
                             videoId={videoId as string}
                             author={author}
+                            isCommentOff={video?.isCommentOff}
                             isCommentFocused={isCommentFocused}
                             onCommentUnfocused={() => setIsCommentFocused(false)}
                         />

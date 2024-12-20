@@ -1,16 +1,22 @@
 'use client';
 
-import { Avatar, Box, Button, Divider, Stack, TextField, Typography } from "@mui/material";
+import { Button, Divider, Stack, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { get } from "@/hooks/use-local-storage";
-import { CldImage } from "next-cloudinary";
 import { addComment } from "@/services/real/comment";
 import UserAvatar from "@/core/components/avatar";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { useRouter } from "next/navigation";
 
 interface State {
     expanded?: boolean;
     isFocused?: boolean;
     content?: string;
+    openLoginRequestDialog?: boolean;
 }
 
 interface CommentProps {
@@ -23,8 +29,13 @@ export default function YourCommentComponent(props: CommentProps) {
     const contentRef = React.useRef<HTMLInputElement>(null);
     const [state, setState] = useState<State>();
     const currentUser = get<any>('user');
+    const isLogged = get<string>("accessToken") ? true : false;
 
     const handleAddComment = async () => {
+        if (!isLogged) {
+            setState({ ...state, openLoginRequestDialog: true });
+            return;
+        }
         if (state?.content && state?.content.length > 0) {
             addComment({ videoId: props.videoId, content: state.content }).then((result) => {
                 if (result.success) {
@@ -53,7 +64,6 @@ export default function YourCommentComponent(props: CommentProps) {
     }, [props?.isFocused]);
 
     return (
-
         <Stack direction={'row'} spacing={2} sx={{
             width: '100%',
             minHeight: '50px',
@@ -161,6 +171,65 @@ export default function YourCommentComponent(props: CommentProps) {
                     }}
                 />}
             </Stack>
+
+            <LoginRequestDialog
+                open={state?.openLoginRequestDialog}
+                onClose={() => setState({ ...state, openLoginRequestDialog: false })}
+            />
         </Stack >
+    );
+}
+
+interface LoginRequestDialogProps {
+    open?: boolean;
+    onClose?: () => void;
+}
+export function LoginRequestDialog(props: LoginRequestDialogProps) {
+    const router = useRouter();
+
+    const handleLogin = async () => {
+        props.onClose && props.onClose();
+        router.push('/login');
+    };
+
+    return (
+        <Dialog
+            open={props.open || false}
+            onClose={props.onClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">
+                <Typography variant="h6" fontWeight={'bold'}>Login Required</Typography>
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    <Typography variant="body1" fontWeight={600}>You need to login to comment.</Typography>
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button
+                    onClick={props.onClose}
+                    sx={{
+                        textTransform: 'none',
+                        backgroundColor: 'transparent',
+                        color: 'black',
+                    }}
+                >
+                    <Typography variant="body1" fontWeight={600}>Cancel</Typography>
+                </Button>
+                <Button
+                    // autoFocus
+                    onClick={handleLogin}
+                    sx={{
+                        textTransform: 'none',
+                        backgroundColor: '#EA284E',
+                        color: 'white',
+                    }}
+                >
+                    <Typography variant="body1" fontWeight={'bold'}>Login</Typography>
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import UserAvatar from "@/core/components/avatar";
 import { unFollowUser } from "@/services/real/user";
 import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, Typography } from "@mui/material";
 import { CldImage } from "next-cloudinary";
@@ -54,26 +55,10 @@ export default function UnFollowConfirmDialog(props: UnFollowConfirmDialogProps)
                         alignItems: 'center',
                         display: 'flex',
                     }}>
-                        {props?.profilePic ?
-                            (<CldImage
-                                width={150}
-                                height={150}
-                                style={{
-                                    objectFit: 'cover',
-                                    height: '100%',
-                                    borderRadius: '10px',
-                                }}
-                                src={props?.profilePic}
-                                alt="Image"
-                            />) :
-                            (<Avatar
-                                alt="Avt"
-                                src="/images/avatar.png"
-                                sx={{
-                                    height: 150,
-                                    width: 150,
-                                }}
-                            />)}
+                        <UserAvatar
+                            src={props?.profilePic}
+                            size={150}
+                        />
                     </Box>
                 </DialogContentText>
             </DialogContent>

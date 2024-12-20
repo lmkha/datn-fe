@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
+import { Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import { useParams, useRouter } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useEffect, useState } from "react";
@@ -186,8 +186,9 @@ export default function MyProfile({ username }: MyProfileProps) {
                         ) : state.selectedTab === 'playlists' ? (
                             state?.playlists && state.playlists.map((playlist, index) =>
                                 <PlaylistItem
-                                    index={index}
+                                    key={playlist.id}
                                     playlist={playlist}
+                                    username={username}
                                 />)
                         ) : (
                             // Liked videos

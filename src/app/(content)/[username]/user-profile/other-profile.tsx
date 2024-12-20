@@ -13,11 +13,13 @@ import PlaylistItem from "../components/playlist-item";
 import LikedVideo from "../components/liked-video-item";
 import { get } from "@/hooks/use-local-storage";
 import UserAvatar from "@/core/components/avatar";
+import { getAllPlaylistByUserId } from "@/services/real/playlist";
 
 interface State {
     user?: any;
     videos?: any[];
     username?: string;
+    playlists?: any[];
     selectedTab?: Tab;
     isFollowing?: boolean;
 }
@@ -42,6 +44,12 @@ export default function OtherProfile({ username }: OtherProfileProps) {
                             ...prevState,
                             user: result.user,
                             videos: videosResult.data,
+                        }));
+                    });
+                    getAllPlaylistByUserId(result.user.id).then((playlistsResult) => {
+                        setState((prevState) => ({
+                            ...prevState,
+                            playlists: playlistsResult.data,
                         }));
                     });
                 }
@@ -197,8 +205,17 @@ export default function OtherProfile({ username }: OtherProfileProps) {
                                     thumbnail={video.thumbnailUrl}
 
                                 />)
-                            ) :
-                            ([...Array(5)].map((_, index) => <PlaylistItem key={index} index={index} />))
+                            ) : state.selectedTab === 'playlists' ? (
+                                state?.playlists && state.playlists.map((playlist, index) =>
+                                    <PlaylistItem
+                                        key={playlist.id}
+                                        playlist={playlist}
+                                        username={username}
+                                    />)
+                            ) : (
+                                // Liked videos
+                                ([...Array(10)].map((_, index) => <LikedVideo key={index} index={index} />))
+                            )
                     }
                 </Grid2>
             </Box>

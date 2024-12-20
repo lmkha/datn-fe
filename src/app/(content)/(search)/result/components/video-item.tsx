@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, Box, Grid2, Stack, Typography } from "@mui/material";
+import { Box, Grid2, Stack, Typography } from "@mui/material";
 import Image from "next/legacy/image";
 import { useRouter } from 'next/navigation';
 import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
@@ -9,6 +9,7 @@ import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutline
 import ShortcutIcon from '@mui/icons-material/Shortcut';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import { CldImage } from "next-cloudinary";
+import UserAvatar from "@/core/components/avatar";
 
 interface VideoItemProps {
     video: any;
@@ -168,44 +169,17 @@ export default function VideoItem(props: VideoItemProps) {
                         </Stack>
                         {/* Account info */}
                         <Stack direction={'row'} spacing={2} sx={{ alignItems: 'center' }}>
-                            {props?.video?.user?.profilePic ?
-                                (<Box sx={{
-                                    width: 50,
-                                    height: 50,
-                                    borderRadius: '50%',
-                                    overflow: 'hidden',
-                                    position: 'relative',
+                            <UserAvatar
+                                src={props?.video?.user?.profilePic}
+                                size={50}
+                                sx={{
                                     cursor: 'pointer',
                                 }}
-                                    onClick={(e) => {
-                                        props.video?.user?.username && router.push(`/@${props.video.user.username}`);
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <CldImage
-                                        fill={true}
-                                        style={{
-                                            objectFit: 'cover',
-                                            width: '100%',
-                                            height: '100%',
-                                        }}
-                                        src={props.video.user.profilePic}
-                                        alt="Image"
-                                    />
-                                </Box>) :
-                                (<Avatar
-                                    src="/images/avatar.png"
-                                    alt="avatar"
-                                    sx={{
-                                        width: 50,
-                                        height: 50,
-                                        cursor: 'pointer',
-                                    }}
-                                    onClick={(e) => {
-                                        props.video?.user?.username && router.push(`/@${props.video.user.username}`);
-                                        e.stopPropagation();
-                                    }}
-                                />)}
+                                onClick={(e) => {
+                                    props.video?.user?.username && router.push(`/@${props.video.user.username}`);
+                                    e.stopPropagation();
+                                }}
+                            />
                             <Typography variant="body1" fontWeight={'bold'}
                                 sx={{
                                     cursor: 'pointer',

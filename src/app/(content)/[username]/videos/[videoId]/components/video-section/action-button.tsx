@@ -7,12 +7,16 @@ import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutline
 import { formatNumberToShortText } from "@/core/logic/convert";
 import { useEffect, useState } from "react";
 import { isLikedVideo, likeVideo, unlikeVideo } from "@/services/real/video";
+import { get } from "@/hooks/use-local-storage";
+import RequestLoginDialog from "@/core/components/require-login-dialog";
 
 interface State {
     liked?: boolean;
     likeCount?: number;
     commentCount?: number;
     isLoading?: boolean;
+    openLoginRequestDialog?: boolean;
+    loginRequestDialogMessage?: string;
 }
 interface ActionButtonProps {
     videoId: string;
@@ -22,6 +26,7 @@ interface ActionButtonProps {
 }
 
 export default function ActionButton(props: ActionButtonProps) {
+    const isLogged = get<string>("accessToken") ? true : false;
     const [state, setState] = useState<State>({
         liked: false,
         likeCount: props.likeCount,
@@ -41,6 +46,14 @@ export default function ActionButton(props: ActionButtonProps) {
     };
 
     const handleLike = async () => {
+        if (!isLogged) {
+            setState({
+                ...state,
+                openLoginRequestDialog: true,
+                loginRequestDialogMessage: "You need to login to like this video."
+            });
+            return;
+        }
         if (!props.videoId) return;
 
         if (state?.liked) {
@@ -65,7 +78,14 @@ export default function ActionButton(props: ActionButtonProps) {
     };
 
     const handleComment = async () => {
-        // Add your comment handling logic here
+        if (!isLogged) {
+            setState({
+                ...state,
+                openLoginRequestDialog: true,
+                loginRequestDialogMessage: "You need to login to comment this video."
+            });
+            return;
+        }
         if (props.onComment) {
             props.onComment();
         }
@@ -118,6 +138,16 @@ export default function ActionButton(props: ActionButtonProps) {
                 </IconButton>
                 <Typography variant="body2">{formatNumberToShortText(state?.commentCount || 0)}</Typography>
             </Stack>
+
+            {/* Request login dialog */}
+            <RequestLoginDialog
+                open={state?.openLoginRequestDialog || false}
+                onClose={() => setState({ ...state, openLoginRequestDialog: false })}
+                title="Login Required"
+                description={state?.loginRequestDialogMessage || "You need to login to perform this action."}
+                submitText="Login"
+                cancelText="Cancel"
+            />
         </>
     );
 }

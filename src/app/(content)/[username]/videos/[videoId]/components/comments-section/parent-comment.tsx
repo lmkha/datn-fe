@@ -14,6 +14,7 @@ import EditDeleteCommentMenu from "./edit-delete-menu";
 import { get } from "@/hooks/use-local-storage";
 import DeleteCommentDialog from "./delete-comment-dialog";
 import UserAvatar from "@/core/components/avatar";
+import RequestLoginDialog from "@/core/components/require-login-dialog";
 
 interface State {
     liked?: boolean;
@@ -25,6 +26,7 @@ interface State {
     openDeleteDialog?: boolean;
     comment?: ParentComment;
     childrenComments?: ChildComment[];
+    openLoginRequestDialog?: boolean;
 }
 interface CommentProps {
     videoId: string;
@@ -33,6 +35,7 @@ interface CommentProps {
 }
 export default function ParentCommentComponent(props: CommentProps) {
     const currentUser = get<any>('user');
+    const isLogged = get<string>("accessToken") ? true : false;
     const router = useRouter();
     const [state, setState] = useState<State>();
 
@@ -77,6 +80,11 @@ export default function ParentCommentComponent(props: CommentProps) {
     };
 
     const handleReply = async () => {
+        if (!isLogged) {
+            setState({ ...state, openLoginRequestDialog: true });
+            return;
+        }
+
         if (state?.comment?.videoId && state?.comment?.id && state?.replyContent && state?.replyContent?.length > 0) {
             const result = await replyComment({
                 videoId: state.comment.videoId,
@@ -544,6 +552,14 @@ export default function ParentCommentComponent(props: CommentProps) {
                 open={state?.openDeleteDialog || false}
                 onClose={() => setState({ ...state, openDeleteDialog: false })}
                 onDelete={handleDelete}
+            />
+            <RequestLoginDialog
+                open={state?.openLoginRequestDialog || false}
+                onClose={() => setState({ ...state, openLoginRequestDialog: false })}
+                title="Login Required"
+                description="You need to login to reply to this comment."
+                submitText="Login"
+                cancelText="Cancel"
             />
         </Stack >
     );

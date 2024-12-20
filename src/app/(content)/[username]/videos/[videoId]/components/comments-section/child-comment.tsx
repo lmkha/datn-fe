@@ -14,6 +14,7 @@ import EditDeleteCommentMenu from "./edit-delete-menu";
 import DeleteCommentDialog from "./delete-comment-dialog";
 import { get } from "@/hooks/use-local-storage";
 import UserAvatar from "@/core/components/avatar";
+import RequestLoginDialog from "@/core/components/require-login-dialog";
 
 interface State {
     liked?: boolean;
@@ -24,6 +25,7 @@ interface State {
     isEditMode?: boolean;
     editContent?: string;
     openDeleteDialog?: boolean;
+    openLoginRequestDialog?: boolean;
 }
 interface ChildCommentProps {
     comment?: ChildComment;
@@ -34,6 +36,7 @@ interface ChildCommentProps {
 }
 export default function ChildCommentComponent(props: ChildCommentProps) {
     const currentUser = get<any>('user');
+    const isLogged = get<string>("accessToken") ? true : false;
     const { showAlert } = useAppContext();
     const router = useRouter();
     const [state, setState] = useState<State>();
@@ -57,6 +60,10 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
 
     // Only 2 levels of comments are supported, reply child -> transform to parent
     const handleReply = async () => {
+        if (!isLogged) {
+            setState({ ...state, openLoginRequestDialog: true });
+            return;
+        }
         if (state?.comment?.videoId && state?.comment?.parentId && state?.replyContent) {
             replyComment({
                 videoId: state.comment.videoId,
@@ -450,6 +457,14 @@ export default function ChildCommentComponent(props: ChildCommentProps) {
                 open={state?.openDeleteDialog || false}
                 onClose={() => setState({ ...state, openDeleteDialog: false })}
                 onDelete={handleDelete}
+            />
+            <RequestLoginDialog
+                open={state?.openLoginRequestDialog || false}
+                onClose={() => setState({ ...state, openLoginRequestDialog: false })}
+                title="Login Required"
+                description="You need to login to reply to this comment."
+                submitText="Login"
+                cancelText="Cancel"
             />
         </Stack >
     );

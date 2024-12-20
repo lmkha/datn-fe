@@ -5,12 +5,7 @@ import React, { useEffect, useState } from "react";
 import { get } from "@/hooks/use-local-storage";
 import { addComment } from "@/services/real/comment";
 import UserAvatar from "@/core/components/avatar";
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import { useRouter } from "next/navigation";
+import RequestLoginDialog from "@/core/components/require-login-dialog";
 
 interface State {
     expanded?: boolean;
@@ -172,64 +167,14 @@ export default function YourCommentComponent(props: CommentProps) {
                 />}
             </Stack>
 
-            <LoginRequestDialog
-                open={state?.openLoginRequestDialog}
+            <RequestLoginDialog
+                open={state?.openLoginRequestDialog || false}
                 onClose={() => setState({ ...state, openLoginRequestDialog: false })}
+                title="Login Required"
+                description="You need to login to comment."
+                submitText="Login"
+                cancelText="Cancel"
             />
         </Stack >
-    );
-}
-
-interface LoginRequestDialogProps {
-    open?: boolean;
-    onClose?: () => void;
-}
-export function LoginRequestDialog(props: LoginRequestDialogProps) {
-    const router = useRouter();
-
-    const handleLogin = async () => {
-        props.onClose && props.onClose();
-        router.push('/login');
-    };
-
-    return (
-        <Dialog
-            open={props.open || false}
-            onClose={props.onClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-                <Typography variant="h6" fontWeight={'bold'}>Login Required</Typography>
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    <Typography variant="body1" fontWeight={600}>You need to login to comment.</Typography>
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button
-                    onClick={props.onClose}
-                    sx={{
-                        textTransform: 'none',
-                        backgroundColor: 'transparent',
-                        color: 'black',
-                    }}
-                >
-                    <Typography variant="body1" fontWeight={600}>Cancel</Typography>
-                </Button>
-                <Button
-                    // autoFocus
-                    onClick={handleLogin}
-                    sx={{
-                        textTransform: 'none',
-                        backgroundColor: '#EA284E',
-                        color: 'white',
-                    }}
-                >
-                    <Typography variant="body1" fontWeight={'bold'}>Login</Typography>
-                </Button>
-            </DialogActions>
-        </Dialog>
     );
 }

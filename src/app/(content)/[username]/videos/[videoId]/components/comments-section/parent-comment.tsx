@@ -32,7 +32,7 @@ interface CommentProps {
     author?: any;
 }
 export default function ParentCommentComponent(props: CommentProps) {
-    const currentUser = get('user');
+    const currentUser = get<any>('user');
     const router = useRouter();
     const [state, setState] = useState<State>();
 

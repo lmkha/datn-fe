@@ -19,7 +19,7 @@ interface FollowingItemProps {
 }
 export default function FollowingItem(props: FollowingItemProps) {
     const router = useRouter();
-    const currentUser = get('user');
+    const currentUser = get<any>('user');
     const [state, setState] = useState<State>({ openUnFollowConfirmDialog: false });
 
     const fetchData = async () => {

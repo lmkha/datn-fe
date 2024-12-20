@@ -26,7 +26,7 @@ interface PageState {
     updating?: boolean;
 }
 export default function EditProfilePage() {
-    const user = get('user');
+    const user = get<any>('user');
     const [state, setState] = React.useState<PageState>({
         avatar: user?.profilePic,
         fullName: user?.fullName,

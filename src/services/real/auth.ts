@@ -1,12 +1,12 @@
 import auth from "@/api/auth"
-import { set, remove } from "@/hooks/use-local-storage";
+import { set, remove, setAccessToken } from "@/hooks/use-local-storage";
 import { getCurrentUser } from "./user";
 import Cookies from "js-cookie";
 
 export const login = async ({ username, password }: { username: string, password: string }) => {
     const result = await auth.login({ username, password });
     if (result.success) {
-        set("accessToken", result.token);
+        setAccessToken(result.token);
 
         Cookies.set("accessToken", result.token, {
             expires: 7,

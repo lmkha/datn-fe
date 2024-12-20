@@ -62,7 +62,7 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 // Create the provider component
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const user = get("user");
+    const user = get<any>('user');
     const [state, dispatch] = useReducer(userReducer, {
         ...initialUserState,
         userId: user?.id || null,

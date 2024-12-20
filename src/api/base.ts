@@ -1,4 +1,5 @@
 import axiosInstance from "@/configs/axios-instance";
+import { get } from "@/hooks/use-local-storage";
 import { AxiosRequestConfig } from "axios";
 
 type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
@@ -23,12 +24,11 @@ class Base {
         try {
             const updatedConfig: AxiosRequestConfig = { ...config };
             if (authRequired) {
-                const accessToken = localStorage.getItem("accessToken");
+                const accessToken = get("accessToken");
                 if (accessToken) {
-                    const sanitizedToken = accessToken.replace(/^"+|"+$/g, "");
                     updatedConfig.headers = {
                         ...updatedConfig.headers,
-                        Authorization: `Bearer ${sanitizedToken}`,
+                        Authorization: `Bearer ${accessToken}`,
                     };
                 }
             }

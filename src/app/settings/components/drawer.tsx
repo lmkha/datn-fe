@@ -16,7 +16,7 @@ interface DrawerProps {
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
     // const { state: userState } = useUserContext();
-    const userState = get('user');
+    const userState = get<any>('user');
 
     return (
         < Box

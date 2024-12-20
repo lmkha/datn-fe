@@ -19,7 +19,7 @@ interface PlayListSelectProps {
     onSelected?: (playlistId: string) => void;
 }
 export default function PlayListSelect(props: PlayListSelectProps) {
-    const user = get('user');
+    const user = get<any>('user');
     const [state, setState] = React.useState<State>();
 
     const fetchData = async () => {

@@ -273,7 +273,7 @@ function RecentPost() {
 }
 
 function AccountInfo() {
-    const user = get('user');
+    const user = get<any>('user');
     return (
         <Stack spacing={1} sx={{
             backgroundColor: 'white',

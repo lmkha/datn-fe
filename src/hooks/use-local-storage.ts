@@ -2,35 +2,56 @@ import { useState, useEffect } from "react";
 
 type Key = 'accessToken' | 'user' | 'searchQuery';
 
-export default function useLocalStorage(key: Key, defaultValue: any) {
-    const [value, setValue] = useState(defaultValue);
-    useEffect(() => {
-        const storedValue = window.localStorage.getItem(key);
-        if (storedValue !== null) {
-            setValue(JSON.parse(storedValue));
+export default function useLocalStorage<T>(key: Key, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+    const [value, setValue] = useState<T>(() => {
+        try {
+            const storedValue = window.localStorage.getItem(key);
+            return storedValue !== null ? JSON.parse(storedValue) : defaultValue;
+        } catch {
+            return defaultValue;
         }
-    }, [key]);
+    });
+
     useEffect(() => {
-        window.localStorage.setItem(key, JSON.stringify(value));
+        try {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            console.error("Failed to save to localStorage:", error);
+        }
     }, [key, value]);
+
     return [value, setValue];
 }
 
-export function set(key: Key, value: any) {
-    window.localStorage.setItem(key, JSON.stringify(value));
+export function set<T>(key: Key, value: T) {
+    try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+        console.error("Failed to save to localStorage:", error);
+    }
 }
 
-export function get(key: Key) {
-    if (typeof window == "undefined") {
+export function setAccessToken(value: string) {
+    try {
+        window.localStorage.setItem('accessToken', JSON.stringify(value));
+    } catch (error) {
+        console.error("Failed to save accessToken:", error);
+    }
+}
+
+export function get<T>(key: Key): T | null {
+    try {
+        const storedValue = window.localStorage.getItem(key);
+        return storedValue !== null ? JSON.parse(storedValue) : null;
+    } catch {
         return null;
     }
-    const value = window.localStorage.getItem(key);
-    if (value !== null) {
-        return JSON.parse(value);
-    }
-    return null;
 }
 
 export function remove(key: Key) {
-    window.localStorage.removeItem(key);
+    try {
+        window.localStorage.removeItem(key);
+    } catch (error) {
+        console.error("Failed to remove from localStorage:", error);
+    }
 }

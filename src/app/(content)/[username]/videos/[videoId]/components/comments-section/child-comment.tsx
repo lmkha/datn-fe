@@ -33,7 +33,7 @@ interface ChildCommentProps {
     onDeleted?: () => void;
 }
 export default function ChildCommentComponent(props: ChildCommentProps) {
-    const currentUser = get('user');
+    const currentUser = get<any>('user');
     const { showAlert } = useAppContext();
     const router = useRouter();
     const [state, setState] = useState<State>();

@@ -19,7 +19,7 @@ interface UserItemProps {
     user: any;
 }
 export default function UserItem(props: UserItemProps) {
-    const currentUser = get('user');
+    const currentUser = get<any>('user');
     const router = useRouter();
     const [state, setState] = useState<State>({ openUnFollowConfirmDialog: false });
 

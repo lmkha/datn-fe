@@ -9,7 +9,7 @@ export default function ProfilePage() {
     const params = useParams();
     const { username } = params;
     const actualUsername = username ? decodeURIComponent((username as string)).replace('@', '') : '';
-    const currentUser = get('user');
+    const currentUser = get<any>('user');
 
     return (
         currentUser && currentUser?.username && currentUser?.username === actualUsername ?

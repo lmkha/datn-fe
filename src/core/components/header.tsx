@@ -38,7 +38,7 @@ interface HeaderProps {
 }
 
 export default function Header(props: HeaderProps) {
-    const accessToken = get("accessToken");
+    const accessToken = get<string>("accessToken");
     return (
         <>
             <Grid2 container sx={{
@@ -126,7 +126,7 @@ export default function Header(props: HeaderProps) {
 
 function Account() {
     const router = useRouter();
-    const user = get("user");
+    const user = get<any>('user');
     const accessToken = get("accessToken");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -258,7 +258,7 @@ function Search() {
     }
 
     useEffect(() => {
-        const storedQuery = get("searchQuery") || "";
+        const storedQuery = get<string>("searchQuery") || "";
         setSearchQuery(storedQuery);
     }, []);
 

@@ -22,7 +22,7 @@ interface CommentProps {
 export default function YourCommentComponent(props: CommentProps) {
     const contentRef = React.useRef<HTMLInputElement>(null);
     const [state, setState] = useState<State>();
-    const currentUser = get('user');
+    const currentUser = get<any>('user');
 
     const handleAddComment = async () => {
         if (state?.content && state?.content.length > 0) {

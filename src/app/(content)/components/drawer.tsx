@@ -19,7 +19,7 @@ interface DrawerProps {
 export default function Drawer(props: DrawerProps) {
     const router = useRouter();
     const accessToken = get("accessToken");
-    const user = get("user");
+    const user = get<any>('user');
 
     return (
         < Box

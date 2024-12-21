@@ -1,6 +1,7 @@
 import commentAPI from "@/api/comment";
 import { ChildCommentModel, ParentCommentModel } from "../models/comment";
 import { getPublicUserId } from "./user";
+import { getVideoByVideoId } from "./video";
 
 export const addComment = async (data: { videoId: string, content: string }) => {
     return commentAPI.addComment(data);
@@ -147,3 +148,41 @@ export const updateComment = async (data: { commentId: string, content: string }
 export const deleteComment = async (commentId: string) => {
     return commentAPI.deleteComment({ commentId });
 }
+
+export const getMyRecentVideoComments = async () => {
+    const result = await commentAPI.getAllMyVideoComments({ pageNumber: 0, pageSize: 5 });
+    if (!result.success) return {
+        success: false,
+        message: result.message,
+        comments: []
+    }
+
+    const comments = await Promise.all(
+        (result.comments || []).map(async (comment: any) => {
+            const { user } = await getPublicUserId({ userId: comment.userId });
+            const video = await getVideoByVideoId(comment.videoId);
+            return {
+                id: comment.id,
+                content: comment.content,
+                likes: comment.likeCount,
+                childrenIds: comment.replies || [],
+                replyCount: comment.replyCount,
+                videoId: comment.videoId,
+                userId: comment.userId,
+                username: user?.username || "Anonymous",
+                userAvatar: user?.profilePic || null,
+                createdAt: comment.createdAt,
+                updatedAt: comment.updatedAt,
+                isEdited: comment.isEdited,
+                videoTitle: video?.data?.title || null,
+                thumbnailUrl: video?.data?.thumbnailUrl || null,
+            };
+        })
+    );
+
+    return {
+        success: result.success,
+        message: result.message,
+        comments,
+    };
+};

@@ -213,6 +213,30 @@ class Comment extends Base {
             }
         }
     }
+
+    async getAllMyVideoComments(params: { pageSize?: number, pageNumber?: number }) {
+        try {
+            const response = await this.get({
+                url: '/comments/myVideosComments',
+                params: {
+                    page: params.pageNumber,
+                    size: params.pageSize,
+                }
+            });
+            return {
+                success: response.success,
+                message: response.message,
+                comments: response.data
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Get my video comments failed",
+                comments: []
+            }
+        }
+    }
+
 }
 
 const commentAPI = new Comment();

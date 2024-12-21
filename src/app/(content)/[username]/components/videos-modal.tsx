@@ -41,8 +41,6 @@ export default function VideosModal(props: VideosModalProps) {
     const [state, setState] = React.useState<State>();
 
     const fetchData = async () => {
-        console.log('props?.videoIds:', props?.videoIds);
-
         if (!props?.videoIds || props?.videoIds?.length === 0) {
             return;
         }
@@ -115,10 +113,6 @@ interface VideoItemProps {
 }
 function VideoItem(props: VideoItemProps) {
     const router = useRouter();
-
-    React.useEffect(() => {
-        console.log('ThumbnailUrl:', props?.video?.thumbnailUrl);
-    }, [props?.video]);
 
     return (
         <Box

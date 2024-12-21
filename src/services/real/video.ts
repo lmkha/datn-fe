@@ -163,3 +163,28 @@ export const unlikeVideo = async (videoId: string) => {
     }
     return await videoAPI.unLikeAVideo({ videoId });
 };
+
+export const getMyRecentVideos = async (videoCount: number = 5): Promise<{
+    success: boolean;
+    message: string;
+    videos?: any[];
+}> => {
+    const myUserId = get<any>("user")?.id;
+    if (!myUserId) {
+        return {
+            success: false,
+            message: "Please login to get your recent videos"
+        };
+    }
+    const response = await videoAPI.getVideosByUserId({ userId: myUserId });
+    if (!response.success || !response.data) {
+        return response;
+    }
+
+    // Return only videoCount videos
+    return {
+        success: true,
+        message: response.message,
+        videos: response.data.slice(0, videoCount)
+    };
+};

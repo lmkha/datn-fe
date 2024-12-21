@@ -5,15 +5,18 @@ import { HTMLAttributes } from "react";
 
 interface VideoThumbnailProps extends HTMLAttributes<HTMLDivElement> {
     thumbnailUrl?: string;
+    width?: number | string;
+    height?: number | string;
     sx?: SxProps<Theme>;
 }
 
 export default function VideoThumbnail(props: VideoThumbnailProps) {
+    const { thumbnailUrl, width = '100%', height = '100%', sx, ...rest } = props;
     return (
         <Box
             sx={{
-                width: '100%',
-                height: '100%',
+                width: width,
+                height: height,
                 borderRadius: '10px',
                 overflow: 'hidden',
                 position: 'relative',
@@ -21,9 +24,9 @@ export default function VideoThumbnail(props: VideoThumbnailProps) {
                     opacity: 1,
                     visibility: 'visible',
                 },
-                ...props.sx,
+                ...sx,
             }}
-            {...props}
+            {...rest}
         >
             {props?.thumbnailUrl ? (
                 <CldImage

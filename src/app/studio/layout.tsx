@@ -91,6 +91,7 @@ function LayoutContent({
                         transition: "margin-left 0.3s ease",
                         borderLeft: "1px solid lightgray",
                         overflowY: "auto",
+                        backgroundColor: '#F8F8F8',
                     }}
                 >
                     {children}

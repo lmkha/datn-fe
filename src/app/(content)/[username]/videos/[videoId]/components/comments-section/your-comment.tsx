@@ -47,7 +47,6 @@ export default function YourCommentComponent(props: CommentProps) {
 
     useEffect(() => {
         if (props?.isFocused) {
-            console.log('focused');
             setState((prevState) => ({ ...prevState, expanded: true, isFocused: true }));
             setTimeout(() => {
                 contentRef.current?.focus();

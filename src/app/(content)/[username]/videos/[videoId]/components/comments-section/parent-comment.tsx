@@ -71,7 +71,6 @@ export default function ParentCommentComponent(props: CommentProps) {
         if (state?.expanded && state?.comment?.id) {
             const result2 = await getChildrenComments(state.comment.id);
             if (result2.success) {
-                console.log('renewComment', result2.comments);
                 updatedState.childrenComments = result2.comments;
             }
         }

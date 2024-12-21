@@ -308,7 +308,6 @@ export default function UploadVideoPage() {
                         <WhoCanWatchViewSelect />
                         {/* Playlist */}
                         <PlayListSelect onSelected={(playlistId) => {
-                            console.log('playlistId', playlistId);
                             setState({ ...state, playlist: playlistId });
                         }} />
                         {/* Submit button */}

@@ -99,7 +99,6 @@ export default function PlayListSelect(props: PlayListSelectProps) {
                 open={state?.openCreateNewPlaylistModal || false}
                 onClose={() => setState({ ...state, openCreateNewPlaylistModal: false })}
                 onCreated={() => {
-                    console.log('created');
                     fetchData();
                 }}
             />

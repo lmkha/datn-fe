@@ -37,7 +37,6 @@ export function formatTimeToShortText(createdAt: string): string {
     return "just now";
 }
 
-
 export const formatDuration = (durationInSeconds: number): string => {
     const hours = Math.floor(durationInSeconds / 3600);
     const minutes = Math.floor((durationInSeconds % 3600) / 60);
@@ -50,4 +49,22 @@ export const formatSize = (sizeInBytes: number): string => {
         return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
     }
     return `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+export const formatDate = (isoDate: string | null | undefined): string => {
+    if (!isoDate) {
+        return "Invalid date";
+    }
+
+    const date = new Date(isoDate);
+    if (isNaN(date.getTime())) {
+        return "Invalid date";
+    }
+
+    const options: Intl.DateTimeFormatOptions = {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    };
+    return date.toLocaleDateString("en-US", options);
 };

@@ -7,9 +7,8 @@ import VideoSection from "./components/video-section/video-section";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import DescriptionComponent from "./components/video-section/description-component";
-import { getRecommendedVideos as _mock_getRecommendedVideos, getVideoById as _mock_getVideoById } from "@/services/mock/video";
 import { getVideoByVideoId } from "@/services/real/video";
-import { getPublicUserByUsername, getUserByUsername } from "@/services/real/user";
+import { getPublicUserByUsername } from "@/services/real/user";
 
 export default function VideoPage() {
     const { username, videoId } = useParams();
@@ -37,10 +36,6 @@ export default function VideoPage() {
     useEffect(() => {
         fetchData();
     }, []);
-
-    useEffect(() => {
-        console.log('isCommentFocused in page', isCommentFocused);
-    }, [isCommentFocused]);
 
     return (
         <Stack sx={{

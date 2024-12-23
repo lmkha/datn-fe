@@ -17,6 +17,10 @@ export default function RecentPostItem(props: RecentPostItemProps) {
             backgroundColor: '#F8F8F8',
             borderRadius: '10px',
             height: 100,
+            cursor: 'pointer',
+            ":hover": {
+                backgroundColor: '#FFF2F5',
+            },
         }}>
             <Grid2 size={3}>
                 <VideoThumbnail

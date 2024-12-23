@@ -15,5 +15,6 @@ export const config = {
     matcher: [
         '/studio/:path*',
         '/settings/:path*',
+        '/following/:path*',
     ]
 };

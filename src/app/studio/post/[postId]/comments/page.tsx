@@ -1,27 +1,77 @@
 'use client';
 
-import { Avatar, Box, Button, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid2, Stack, TextField, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import ShortcutIcon from '@mui/icons-material/Shortcut';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import Chip from '@mui/material/Chip';
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
-import ThumbUpRoundedIcon from '@mui/icons-material/ThumbUpRounded';
-import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
-import ThumbDownRoundedIcon from '@mui/icons-material/ThumbDownRounded';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useEffect, useState } from "react";
-import SendIcon from '@mui/icons-material/Send';
-import Image from "next/legacy/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
+import VideoThumbnail from "@/core/components/video-thumbnail";
+import { getVideoByVideoId } from "@/services/real/video";
+import { useAppContext } from "@/contexts/app-context";
+import { formatNumberToShortText } from "@/core/logic/convert";
+import { getCommentById, getCommentsByVideoId } from "@/services/real/comment";
+import ReplyRecentComment from "./components/reply-recent-comment";
+import CommentItem from "./components/comment-item";
+import SelectComponent from "./components/select";
+
+interface State {
+    post?: any;
+    comments?: any[];
+    recentComment?: any;
+    repliedRecentComment?: boolean;
+}
 
 export default function CommentDetailPage() {
+    const [state, setState] = useState<State>();
     const router = useRouter();
+    const postId = useParams().postId;
+    const commentId = useSearchParams().get('commentId');
+    const { showAlert } = useAppContext();
+
+    const fetchPost = async () => {
+        if (!postId) undefined;
+        const result = await getVideoByVideoId(postId as string);
+        if (result.success) {
+            return result.data;
+        } else {
+            showAlert({ message: result.message, severity: 'error' });
+            return undefined;
+        }
+    };
+
+    const fetchRecentComment = async () => {
+        if (!commentId) return undefined;
+        const result = await getCommentById(commentId as string);
+        if (result.success) {
+            return result.comment;
+        } else {
+            showAlert({ message: result.message, severity: 'error' });
+            return undefined;
+        }
+    };
+
+    const fetchComments = async () => {
+        if (!postId) return undefined;
+        const result = await getCommentsByVideoId(postId as string);
+        if (result.success) {
+            return result.comments;
+        } else {
+            showAlert({ message: result.message, severity: 'error' });
+            return undefined;
+        }
+    };
+
+    const fetchData = async () => {
+        const [post, recentComment, comments] = await Promise.all([fetchPost(), fetchRecentComment(), fetchComments()]);
+        setState({ post: post, comments: comments, recentComment: recentComment });
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
         <Stack spacing={2} sx={{
@@ -41,7 +91,7 @@ export default function CommentDetailPage() {
             }}>
                 {/* Title(clickable -> back to all comments) */}
                 <Button
-                    onClick={() => router.back()}
+                    onClick={() => router.push('/studio/post')}
                     sx={{
                         textTransform: 'none',
                         color: 'black',
@@ -54,7 +104,7 @@ export default function CommentDetailPage() {
                 </Button>
                 <Typography variant="h5" fontWeight={'bold'}>All comments of this post</Typography>
 
-                {/* Current comment, post info */}
+                {/* Post info, reply comment */}
                 <Box sx={{
                     width: '100%',
                     height: '300px',
@@ -63,27 +113,15 @@ export default function CommentDetailPage() {
                 }}>
                     <Grid2 container direction={'row'} height={'100%'}>
                         <Grid2 size={4} padding={1}>
-                            <Box
-                                sx={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: '10px',
-                                    overflow: 'hidden',
-                                    position: 'relative',
-                                }}
-                            >
-                                <Image
-                                    src="/images/video-image.jpg"
-                                    alt="Image"
-                                    layout="fill"
-                                    objectFit="cover"
-                                />
-                            </Box>
+                            <VideoThumbnail
+                                thumbnailUrl={state?.post?.thumbnailUrl}
+                            />
                         </Grid2>
                         <Grid2 size={8}>
                             {/* Title, metrics, reply input */}
                             <Grid2 size={8} height={'100%'} width={'100%'} padding={1}>
                                 <Stack sx={{ justifyContent: 'space-between', height: '100%', width: '100%' }}>
+                                    {/* Video info */}
                                     <Stack spacing={1}>
                                         {/* Title */}
                                         <Typography variant="h6" fontWeight={'bold'}
@@ -94,29 +132,33 @@ export default function CommentDetailPage() {
                                                 textOverflow: 'ellipsis',
                                             }}
                                         >
-                                            This is the title of the post that is very long and should be truncated
+                                            {/* This is the title of the post that is very long and should be truncated */}
+                                            {state?.post?.title}
                                         </Typography>
                                         {/* Metrics */}
                                         <Stack direction={'row'} spacing={2}>
                                             <Stack direction={'row'} >
                                                 <PlayArrowOutlinedIcon />
-                                                <Typography variant="body2">1000</Typography>
+                                                <Typography variant="body2">{formatNumberToShortText(state?.post?.viewsCount)}</Typography>
                                             </Stack>
                                             <Stack direction={'row'}>
                                                 <FavoriteBorderOutlinedIcon />
-                                                <Typography variant="body2">1000</Typography>
+                                                <Typography variant="body2">{formatNumberToShortText(state?.post?.likesCount)}</Typography>
                                             </Stack>
                                             <Stack direction={'row'}>
                                                 <ChatBubbleOutlineOutlinedIcon />
-                                                <Typography variant="body2">1000</Typography>
+                                                <Typography variant="body2">{formatNumberToShortText(state?.post?.commentsCount)}</Typography>
                                             </Stack>
                                         </Stack>
                                     </Stack>
+                                    {/* Reply input */}
+                                    {commentId && !state?.repliedRecentComment && <ReplyRecentComment recentComment={state?.recentComment} />}
                                 </Stack>
                             </Grid2>
                         </Grid2>
                     </Grid2>
                 </Box>
+
                 {/* Search title */}
                 <TextField
                     size="small"
@@ -150,193 +192,13 @@ export default function CommentDetailPage() {
                         label="Likes"
                         options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
                     />
-                    {/* Date picker */}
-
                 </Stack>
                 <Divider />
                 {/* Comments */}
-                <CommentItem />
-                <CommentItem />
-                <CommentItem />
-                <CommentItem />
-                <CommentItem />
-
+                {state?.comments?.map((comment) => (
+                    <CommentItem key={comment.id} comment={comment} />
+                ))}
             </Stack>
         </Stack>
-    );
-}
-
-interface SelectComponentProps {
-    label: string;
-    options: string[];
-}
-function SelectComponent(props: SelectComponentProps) {
-    const [selectedValue, setSelectedValue] = useState('');
-
-    const handleChange = (event: SelectChangeEvent<string>) => {
-        setSelectedValue(event.target.value);
-    };
-
-    return (
-        <FormControl
-            size="small"
-            sx={{
-                minWidth: 140,
-                borderRadius: '10px',
-                '.MuiOutlinedInput-root': {
-                    borderRadius: '10px',
-                    backgroundColor: '#F8F8F8',
-                },
-                '.MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                    borderRadius: '10px',
-                },
-            }}
-        >
-            <InputLabel id={props.label}>{props.label}</InputLabel>
-            <Select
-                sx={{
-                    borderRadius: '10px',
-                    backgroundColor: '#F8F8F8',
-                    '.MuiSelect-select': {
-                        borderRadius: '10px',
-                    },
-                }}
-                labelId={props.label}
-                value={selectedValue}
-                onChange={handleChange}
-                label={props.label}
-                id="order-by-select"
-            >
-                {props.options.map((option) => (
-                    <MenuItem
-                        key={option}
-                        value={option}
-                        sx={{
-                            '&.Mui-focusVisible': {
-                                outline: 'none',
-                                backgroundColor: 'transparent',
-                            },
-                        }}
-                    >
-                        {option}
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
-
-    );
-}
-
-function CommentItem() {
-    const [openReply, setOpenReply] = useState(false);
-    return (
-        <>
-            <Grid2 container direction={'row'} spacing={2} sx={{
-                justifyContent: 'start',
-                alignItems: 'center',
-            }}>
-                {/* Comment */}
-                <Grid2 size={7} sx={{
-                    height: '100%',
-                }}>
-                    {/* Comment info */}
-                    <Grid2 container height={'100%'}>
-                        {/* Avatar */}
-                        <Grid2 size={1}>
-                            <Avatar
-                                alt="Avt"
-                                src="/images/avatar.png"
-                                sx={{
-                                    width: 'auto',
-                                    aspectRatio: '1',
-                                }}
-                            />
-                        </Grid2>
-                        {/* username, content, metrics, reply textField */}
-                        <Grid2 size={11}>
-                            <Stack height={'100%'} justifyContent={'space-between'} display={'flex'}>
-                                <Box>
-                                    {/* Username */}
-                                    <Stack direction={'row'} spacing={1} alignItems={'center'}>
-                                        <Typography variant="body1" fontWeight={'bold'}>Username</Typography>
-                                        <Typography
-                                            variant="body2"
-                                            sx={{ color: '#EA284E', }}
-                                        >Follower
-                                        </Typography>
-                                    </Stack>
-                                    {/* Content */}
-                                    <Typography
-                                        variant="body2"
-                                        style={{
-                                            display: '-webkit-box',
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            WebkitLineClamp: 2,
-                                            whiteSpace: 'normal',
-                                        }}
-                                    >This is the best video that I had watched</Typography>
-                                </Box>
-                                {/* Metrics */}
-                                <Stack direction={'row'} alignItems={'center'} spacing={2}>
-                                    <Typography variant="body2" color="textSecondary">10 days ago</Typography>
-                                    <Button
-                                        onClick={() => setOpenReply(!openReply)}
-                                        sx={{
-                                            textTransform: 'none',
-                                            fontWeight: 'bold',
-                                            color: '#EA284E',
-                                        }}
-                                        startIcon={<ChatBubbleOutlineOutlinedIcon sx={{ fontWeight: 'bold' }} />}>
-                                        Reply
-                                    </Button>
-                                    <Stack direction={'row'} justifyContent={'center'} alignItems={'center'}>
-                                        <IconButton>
-                                            <FavoriteBorderOutlinedIcon />
-                                        </IconButton>
-                                        <Typography variant="body2" color="textSecondary">100</Typography>
-                                    </Stack>
-                                    <Button
-                                        sx={{
-                                            textTransform: 'none',
-                                            color: 'gray'
-                                        }}
-                                        startIcon={<DeleteForeverOutlinedIcon sx={{ fontWeight: 'bold' }} />}>
-                                        Delete
-                                    </Button>
-                                </Stack>
-                                {/* Reply input */}
-                                {openReply && (
-                                    <TextField
-                                        size="small"
-                                        placeholder="Reply to this comment"
-                                        sx={{
-                                            '.MuiOutlinedInput-notchedOutline': {
-                                                border: 'none',
-                                            },
-                                        }}
-                                        slotProps={{
-                                            input: {
-                                                endAdornment: <IconButton>
-                                                    <SendIcon />
-                                                </IconButton>,
-                                                sx: {
-                                                    borderRadius: '10px',
-                                                    backgroundColor: '#E0E0E0',
-                                                }
-                                            }
-                                        }}
-                                    />
-                                )}
-                            </Stack>
-
-                        </Grid2>
-                    </Grid2>
-                </Grid2>
-            </Grid2>
-            <Divider />
-        </>
     );
 }

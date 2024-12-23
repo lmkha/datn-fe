@@ -134,6 +134,12 @@ export default function StudioDashBoardPage() {
                             <Button variant='outlined' color='inherit'
                                 sx={{
                                     textTransform: 'none',
+                                    border: '1px solid black',
+                                    ":hover": {
+                                        border: '1px solid #EA284E',
+                                        backgroundColor: '#EA284E',
+                                        color: 'white',
+                                    }
                                 }}
                                 onClick={() => router.push('/studio/post')}
                             >Show all</Button>
@@ -163,6 +169,12 @@ export default function StudioDashBoardPage() {
                             <Button variant='outlined' color='inherit'
                                 sx={{
                                     textTransform: 'none',
+                                    border: '1px solid black',
+                                    ":hover": {
+                                        border: '1px solid #EA284E',
+                                        backgroundColor: '#EA284E',
+                                        color: 'white',
+                                    }
                                 }}
                                 onClick={() => router.push('/studio/comment')}
                             >Show all</Button>

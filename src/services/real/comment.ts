@@ -11,6 +11,43 @@ export const replyComment = async (data: { videoId: string, replyTo: string, con
     return commentAPI.addComment(data);
 };
 
+export const replyCommentInStudio = async (data: { videoId: string, replyTo: string, content: string }) => {
+    const result = await commentAPI.addComment(data);
+    if (!result.success) return {
+        success: false,
+        message: result.message,
+        newComment: null
+    }
+
+    const { user } = await getPublicUserId({ userId: result.newComment.userId });
+    const video = await getVideoByVideoId(result.newComment.videoId);
+    const newComment = {
+        id: result.newComment.id,
+        content: result.newComment.content,
+        likes: result.newComment.likeCount,
+        childrenIds: result.newComment.replies || [],
+        replyCount: result.newComment.replyCount,
+        videoId: result.newComment.videoId,
+        userId: result.newComment.userId,
+        username: user?.username || "Anonymous",
+        userAvatar: user?.profilePic || null,
+        createdAt: result.newComment.createdAt,
+        updatedAt: result.newComment.updatedAt,
+        isEdited: result.newComment.isEdited,
+        videoTitle: video?.data?.title || null,
+        thumbnailUrl: video?.data?.thumbnailUrl || null,
+        videoViews: video?.data?.viewsCount || 0,
+        videoLikes: video?.data?.likesCount || 0,
+        videoComments: video?.data?.commentsCount || 0,
+    };
+
+    return {
+        success: true,
+        message: result.message,
+        newComment: newComment
+    };
+};
+
 export const getCommentById = async (commentId: string): Promise<{
     success: boolean;
     message: string;
@@ -186,3 +223,85 @@ export const getMyRecentVideoComments = async () => {
         comments,
     };
 };
+
+export const getAllMyVideoComments = async () => {
+    const result = await commentAPI.getAllMyVideoComments({ pageNumber: 0, pageSize: 1000 });
+    if (!result.success) return {
+        success: false,
+        message: result.message,
+        comments: []
+    }
+
+    const comments = await Promise.all(
+        (result.comments || []).map(async (comment: any) => {
+            const { user } = await getPublicUserId({ userId: comment.userId });
+            const video = await getVideoByVideoId(comment.videoId);
+            return {
+                id: comment.id,
+                content: comment.content,
+                likes: comment.likeCount,
+                childrenIds: comment.replies || [],
+                replyCount: comment.replyCount,
+                videoId: comment.videoId,
+                userId: comment.userId,
+                username: user?.username || "Anonymous",
+                userAvatar: user?.profilePic || null,
+                createdAt: comment.createdAt,
+                updatedAt: comment.updatedAt,
+                isEdited: comment.isEdited,
+                videoTitle: video?.data?.title || null,
+                thumbnailUrl: video?.data?.thumbnailUrl || null,
+                videoViews: video?.data?.viewsCount || 0,
+                videoLikes: video?.data?.likesCount || 0,
+                videoComments: video?.data?.commentsCount || 0,
+            };
+        })
+    );
+
+    return {
+        success: result.success,
+        message: result.message,
+        comments,
+    };
+};
+
+export const getCommentsByVideoId = async (videoId: string): Promise<{
+    success: boolean;
+    message: string;
+    comments: any[];
+}> => {
+    const result = await commentAPI.getAllCommentByVideoId({ videoId: videoId, order: 'newest' });
+    if (!result.success) return {
+        success: false,
+        message: result.message,
+        comments: []
+    }
+
+    const comments = await Promise.all(
+        (result.comments || []).map(async (comment: any) => {
+            const { user } = await getPublicUserId({ userId: comment.userId });
+            return {
+                id: comment.id,
+                content: comment.content,
+                likes: comment.likeCount,
+                childrenIds: comment.replies || [],
+                replyCount: comment.replyCount,
+                videoId: comment.videoId,
+                userId: comment.userId,
+                username: user?.username || "Anonymous",
+                userAvatar: user?.profilePic || null,
+                createdAt: comment.createdAt,
+                updatedAt: comment.updatedAt,
+                isEdited: comment.isEdited,
+            };
+        })
+    );
+
+    return {
+        success: result.success,
+        message: result.message,
+        comments,
+    };
+};
+
+export const filterFetchedComments = (comments: any[]) => { };

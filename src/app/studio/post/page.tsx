@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import ShortcutIcon from '@mui/icons-material/Shortcut';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
@@ -199,7 +198,7 @@ function PostItem(props: PostItemProps) {
         <Grid2 container direction={'row'} spacing={2} sx={{
             borderRadius: '10px',
             border: '1px solid #E0E0E0',
-            height: '100px',
+            height: 150,
             justifyContent: 'center',
             alignItems: 'center',
         }}>
@@ -232,28 +231,54 @@ function PostItem(props: PostItemProps) {
 
                     {/* Title, metrics */}
                     <Grid2 size={8}>
-                        <Stack sx={{ justifyContent: 'space-between', height: '100%' }}>
-                            {/* Title */}
-                            <Typography variant="body1" fontWeight={'bold'}
-                                sx={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}
-                            >
-                                This is the title of the post that is very long and should be truncated
-                            </Typography>
+                        <Stack sx={{
+                            justifyContent: 'space-between',
+                            height: '100%',
+                            padding: 1
+                        }}>
+                            {/* Title, description */}
+                            <Stack>
+                                <Typography variant="h6" fontWeight={'bold'}
+                                    sx={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}
+                                >
+                                    This is the title of the post that is very long and should be truncated
+                                </Typography>
+                                <Typography variant="body1"
+                                    sx={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        color: '#6E6E6E',
+                                    }}
+                                >
+                                    This is the title of the post that is very long and should be truncated
+                                </Typography>
+
+                            </Stack>
                             {/* Metrics */}
                             <Stack direction={'row'} spacing={2}>
-                                <Stack direction={'row'} >
+                                <Stack direction={'row'} sx={{
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
                                     <PlayArrowOutlinedIcon />
                                     <Typography variant="body2">1000</Typography>
                                 </Stack>
-                                <Stack direction={'row'}>
+                                <Stack direction={'row'} sx={{
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
                                     <FavoriteBorderOutlinedIcon />
                                     <Typography variant="body2">1000</Typography>
                                 </Stack>
-                                <Stack direction={'row'}>
+                                <Stack direction={'row'} sx={{
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
                                     <ChatBubbleOutlineOutlinedIcon />
                                     <Typography variant="body2">1000</Typography>
                                 </Stack>

@@ -10,6 +10,7 @@ class Comment extends Base {
             return {
                 success: response.success,
                 message: response.message,
+                newComment: response.data
             }
         } catch (err: any) {
             return {
@@ -43,6 +44,7 @@ class Comment extends Base {
             return {
                 success: response.success,
                 message: response.message,
+                updatedComment: response.data
             }
         } catch (err: any) {
             return {
@@ -184,7 +186,7 @@ class Comment extends Base {
             return {
                 success: response.success,
                 message: response.message,
-                comments: response.comments
+                comments: response.data
             }
         } catch (err: any) {
             return {

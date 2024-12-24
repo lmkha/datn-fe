@@ -69,7 +69,6 @@ export const resetPassword = async (data: { email: string }) => {
 
 export const verifyResetPassword = async (data: {
     user: {
-        username: string,
         email: string,
         password: string,
     },

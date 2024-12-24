@@ -4,10 +4,12 @@ import { Divider, Stack, TextField, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import CommentItem from "./components/comment-item";
 import SelectComponent from "./components/select";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteComment, getAllMyVideoComments, replyCommentInStudio, updateComment } from "@/services/real/comment";
 import DeleteCommentDialog from "./components/confirm-delete-dialog";
 import { useAppContext } from "@/contexts/app-context";
+import { debounce } from "lodash";
+import CommentItemSkeleton from "./components/comment-item-skeleton";
 
 interface FilterValue {
     search?: string;
@@ -17,13 +19,18 @@ interface FilterValue {
 }
 interface State {
     comments?: any[];
-    filterValue?: FilterValue;
     openDeleteDialog?: boolean;
     deletedComment?: any;
+    isFiltering?: boolean;
+    isFetching?: boolean;
 }
+
+type FilterField = 'search' | 'status' | 'postedBy' | 'likes';
 
 export default function CommentPage() {
     const allComment = useRef<any[]>();
+    const filteredCommentsByStatus = useRef<any[]>();
+    const [filterValue, setFilterValue] = useState<FilterValue>();
     const [state, setState] = useState<State>();
     const { showAlert } = useAppContext();
 
@@ -33,7 +40,17 @@ export default function CommentPage() {
         return result.comments;
     };
 
+    const fetchAllCommentWithStatusFilter = async (status: 'all' | 'replied' | 'not-replied') => {
+        const result = await getAllMyVideoComments(status);
+        if (!result.success) return undefined;
+        return result.comments;
+    };
+
     const fetchData = async () => {
+        setState({
+            ...state,
+            isFetching: true,
+        });
         const [comments] = await Promise.all([
             fetchAllComments(),
         ]);
@@ -41,27 +58,51 @@ export default function CommentPage() {
         setState({
             ...state,
             comments: comments,
+            isFetching: false,
         });
     };
 
-    const updateFilterField = (field: string, value: string) => {
-        setState({
-            ...state,
-            filterValue: {
-                ...state?.filterValue,
-                [field]: value,
-            }
-        });
+    const updateFilterField = (field: FilterField, value: string) => {
+        setFilterValue({ ...filterValue, [field]: value });
     };
 
-    const handleDeleteComment = async (commentId: string) => {
+    const debounceHandleUpdateSearchValue = useCallback(
+        debounce((searchValue: string) => {
+            updateFilterField('search', searchValue)
+        }, 500),
+        []
+    );
+
+    const handleUpdateStatusFilter = async (status: string) => {
+        if (!status) return;
+        if (status === 'All comments') {
+            setState({ ...state, comments: allComment.current });
+            return;
+        }
+        if (status === 'Replied') {
+            filteredCommentsByStatus.current = await fetchAllCommentWithStatusFilter('replied');
+            setState({ ...state, comments: filteredCommentsByStatus.current });
+            return;
+        }
+        if (status === 'Not replied') {
+            filteredCommentsByStatus.current = await fetchAllCommentWithStatusFilter('not-replied');
+            setState({ ...state, comments: filteredCommentsByStatus.current });
+            return;
+        }
+    };
+
+    const handleDeleteComment = async (commentId: string, childrenIds?: string[]) => {
         if (!commentId || !allComment.current || state?.comments?.length === 0) return;
         const result = await deleteComment(commentId);
         if (!result.success) {
             showAlert({ message: 'Failed to delete comment', severity: 'error' });
             return;
         }
-        const updatedComments = state?.comments?.filter(comment => comment.id !== commentId);
+        const updatedComments = state?.comments?.filter(comment => {
+            if (comment.id === commentId) return false;
+            if (childrenIds && childrenIds.includes(comment.id)) return false;
+            return true;
+        });
 
         allComment.current = updatedComments;
 
@@ -114,11 +155,63 @@ export default function CommentPage() {
         });
     };
 
-    const filter = () => { };
+    const filterStatusValue = (comments: any[], status: string): any[] => {
+        return comments.filter(comment => {
+            if (status === 'Not replied') return !comment.replyCount;
+            if (status === 'Replied') return comment.replyCount;
+            return true;
+        });
+    };
+
+    const filterSearchValue = (comments: any[], search: string): any[] => {
+        return comments.filter(comment =>
+            comment.content.toLowerCase().includes(search.toLowerCase()) ||
+            comment.username.toLowerCase().includes(search.toLowerCase())
+        );
+    };
+
+    const filterPostedByValue = (comments: any[], postedBy: string): any[] => {
+        return comments.filter(comment => {
+            if (postedBy === 'Followers') return comment.isFollower;
+            if (postedBy === 'Non-followers') return !comment.isFollower;
+            return true;
+        });
+    };
+
+    const filterLikesValue = (comments: any[], likes: string): any[] => {
+        return comments.filter(comment => {
+            if (likes === '0') return comment.likes === 0;
+            if (likes === '1 - 10') return comment.likes > 0 && comment.likes <= 10;
+            if (likes === '>10') return comment.likes > 10;
+            return true;
+        });
+    };
+
+    const filter = async () => {
+        if (!allComment.current) return;
+        const isFilterCommentWithStatus = filterValue?.status && filterValue?.status !== 'All comments';
+        if (isFilterCommentWithStatus && !filteredCommentsByStatus.current) return;
+
+        setState({ ...state, isFiltering: true });
+
+        let comments = isFilterCommentWithStatus ? filteredCommentsByStatus.current || [] : allComment.current;
+        const { search, status, postedBy, likes } = filterValue || {};
+
+        if (status) comments = filterStatusValue(comments, status);
+        if (search) comments = filterSearchValue(comments, search);
+        if (postedBy) comments = filterPostedByValue(comments, postedBy);
+        if (likes) comments = filterLikesValue(comments, likes);
+
+        setState({ ...state, comments: comments, isFiltering: false });
+    }
 
     useEffect(() => {
         fetchData();
     }, []);
+
+    useEffect(() => {
+        filter();
+    }, [filterValue?.search, filterValue?.status, filterValue?.postedBy, filterValue?.likes]);
 
     return (
         <>
@@ -142,6 +235,7 @@ export default function CommentPage() {
                     {/* Search title */}
                     <TextField
                         size="small"
+                        onChange={(e) => debounceHandleUpdateSearchValue(e.target.value)}
                         placeholder="Search for comments or username"
                         sx={{
                             '.MuiOutlinedInput-notchedOutline': {
@@ -163,7 +257,7 @@ export default function CommentPage() {
                         <SelectComponent
                             label="Status"
                             options={['All comments', 'Not replied', 'Replied']}
-                            onChange={(value) => updateFilterField('status', value)}
+                            onChange={(value) => handleUpdateStatusFilter(value)}
                         />
                         <SelectComponent
                             label="Posted by"
@@ -172,22 +266,27 @@ export default function CommentPage() {
                         />
                         <SelectComponent
                             label="Likes"
-                            options={['All', '<10', '10 - 100', '>100']}
+                            options={['All', '0', '1 - 10', '>10']}
                             onChange={(value) => updateFilterField('likes', value)}
                         />
 
                     </Stack>
                     <Divider />
                     {/* Comments */}
-                    {state?.comments?.map((comment, index) => (
-                        <CommentItem
-                            key={comment.id}
-                            comment={comment}
-                            onReply={handleReplyComment}
-                            onUpdate={handleEditComment}
-                            onDelete={(comment) => { setState({ ...state, openDeleteDialog: true, deletedComment: comment }) }}
-                        />
-                    ))}
+                    {state?.isFiltering || state?.isFetching ?
+                        (Array.from({ length: 5 }).map((_, index) => (
+                            <CommentItemSkeleton key={index} />
+                        ))) :
+                        (state?.comments?.map((comment, index) => (
+                            <CommentItem
+                                key={comment.id}
+                                comment={comment}
+                                onReply={handleReplyComment}
+                                onUpdate={handleEditComment}
+                                onDelete={(comment) => { setState({ ...state, openDeleteDialog: true, deletedComment: comment }) }}
+                            />
+                        )))
+                    }
                 </Stack>
             </Stack>
 
@@ -195,7 +294,7 @@ export default function CommentPage() {
                 open={state?.openDeleteDialog || false}
                 comment={state?.deletedComment}
                 onClose={() => setState({ ...state, openDeleteDialog: false, deletedComment: null })}
-                onDelete={() => handleDeleteComment(state?.deletedComment?.id)}
+                onDelete={() => handleDeleteComment(state?.deletedComment?.id, state?.deletedComment?.childrenIds)}
             />
         </>
     );

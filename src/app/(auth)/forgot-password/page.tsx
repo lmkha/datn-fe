@@ -3,7 +3,7 @@
 import { Box, Button, CircularProgress, Grid2, IconButton, Stack, TextField, Typography } from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Stepper from '@/core/components/stepper';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { isValidEmail } from "@/core/logic/validate";
 import { useAppContext } from "@/contexts/app-context";
 import { login, resetPassword, verifyResetPassword } from "@/services/real/auth";
@@ -102,17 +102,12 @@ export default function ResetPasswordPage() {
                                 <Stepper activeStep={state?.activeStep || 1} />
                             </Box>
                         </Grid2>
-                        <Grid2 size={3}>
-
-                        </Grid2>
+                        <Grid2 size={3} />
                     </Grid2>
                     {state?.activeStep === 2 ?
                         (<EnterNewPasswordStep email={state?.email} />) :
-                        (<SendOTPStepComponent
-                            onSendOTP={handleSendOTP}
-                        />)
+                        (<SendOTPStepComponent onSendOTP={handleSendOTP} />)
                     }
-
                 </Stack>
             </Box>
         </Stack>
@@ -313,32 +308,30 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
     const { showAlert } = useAppContext();
 
     const handleSendAgain = async () => {
-        if (!state?.email) return;
-        const result = await resetPassword({ email: state.email });
+        if (!props?.email) return;
+        const result = await resetPassword({ email: props.email });
         showAlert({ message: result.message, severity: result.success ? 'success' : 'error' });
     };
-
-    useEffect(() => {
-        if (props?.email) {
-            setState({ ...state, email: props.email });
-        }
-    }, [props?.email]);
 
     const handleResetPassword = async () => {
         setState({ ...state, isSubmitting: true });
 
-        const validateResult = await validateForgotPassword(state as EnterNewPasswordStepState);
+        const validateResult = await validateForgotPassword({
+            email: props.email,
+            newPassword: state?.newPassword,
+            confirmPassword: state?.confirmPassword,
+            otpCode: state?.otpCode,
+        });
         if (validateResult.length > 0) {
             setState({ ...state, isSubmitting: false, errorFields: validateResult });
             return;
         }
-        if (!state?.newPassword || !state?.confirmPassword || !state?.email || !state?.otpCode || !state?.username) return;
+        if (!state?.newPassword || !state?.confirmPassword || !props?.email || !state?.otpCode) return;
         const result = await verifyResetPassword({
             otpCode: state.otpCode,
             user: {
-                email: state.email,
+                email: props.email,
                 password: state.newPassword,
-                username: state.username,
             }
         });
 
@@ -361,20 +354,6 @@ function EnterNewPasswordStep(props: EnterNewPasswordStepProps) {
                 alignItems: 'center',
             }}
         >
-            <TextField
-                label="Username"
-                size="small"
-                value={state?.username}
-                onChange={(e) => setState({ ...state, username: e.target.value })}
-                error={!!state?.errorFields?.find((field) => field.field === 'username')}
-                helperText={state?.errorFields?.find((field) => field.field === 'username')?.message}
-                onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
-                sx={{
-                    width: '50%',
-                    marginTop: 2,
-                    backgroundColor: 'white',
-                }}
-            />
             <TextField
                 label="New Password"
                 size="small"

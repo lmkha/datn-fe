@@ -35,8 +35,17 @@ export default function CommentItem(props: CommentItemProps) {
 
     const handleReply = () => {
         if (!state?.replyContent || state?.replyContent.length === 0) return;
-        props?.onReply && props?.onReply(props?.comment?.videoId, props?.comment?.id, state?.replyContent);
         setState({ replyContent: '' });
+        // Reply child comment
+        if (props?.comment?.parentId) {
+            props?.onReply && props?.onReply(props?.comment?.videoId, props?.comment?.parentId, state?.replyContent);
+            return;
+        }
+        // Reply parent comment
+        if (props?.comment?.id) {
+            props?.onReply && props?.onReply(props?.comment?.videoId, props?.comment?.id, state?.replyContent);
+            return;
+        }
     };
 
     const handleChangeEditMode = () => {

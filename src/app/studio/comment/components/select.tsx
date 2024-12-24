@@ -14,6 +14,9 @@ export default function SelectComponent(props: SelectComponentProps) {
 
     const handleChange = (event: SelectChangeEvent<string>) => {
         setSelectedValue(event.target.value);
+        if (props.onChange) {
+            props.onChange(event.target.value);
+        }
     };
 
     return (

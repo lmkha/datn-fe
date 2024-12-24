@@ -2,7 +2,7 @@ import { EnterNewPasswordStepState } from "@/app/(auth)/forgot-password/page";
 import { doPasswordsMatch, isValidEmail, isValidOtpCode, isValidPassword, isValidUsername } from "@/core/logic/validate";
 
 export interface ForgotPasswordErrorField {
-    field: 'email' | 'username' | 'newPassword' | 'confirmPassword' | 'otpCode';
+    field: 'email' | 'newPassword' | 'confirmPassword' | 'otpCode';
     message: string;
 }
 
@@ -12,12 +12,6 @@ export async function validateForgotPassword(state: EnterNewPasswordStepState): 
     await isValidEmail(state.email).then((error) => {
         if (error) {
             errors.push({ field: 'email', message: error });
-        }
-    });
-
-    await isValidUsername(state.username, true).then((error) => {
-        if (error) {
-            errors.push({ field: 'username', message: error });
         }
     });
 

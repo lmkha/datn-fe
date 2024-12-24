@@ -216,13 +216,15 @@ class Comment extends Base {
         }
     }
 
-    async getAllMyVideoComments(params: { pageSize?: number, pageNumber?: number }) {
+    async getAllMyVideoComments(params: { pageSize?: number, pageNumber?: number, repliedFilter?: 'all' | 'replied' | 'not-replied' }) {
+        const defaultRepliedFilter = 'all';
         try {
             const response = await this.get({
                 url: '/comments/myVideosComments',
                 params: {
                     page: params.pageNumber,
                     size: params.pageSize,
+                    repliedFilter: params.repliedFilter || defaultRepliedFilter
                 }
             });
             return {

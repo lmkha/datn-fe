@@ -224,8 +224,8 @@ export const getMyRecentVideoComments = async () => {
     };
 };
 
-export const getAllMyVideoComments = async () => {
-    const result = await commentAPI.getAllMyVideoComments({ pageNumber: 0, pageSize: 1000 });
+export const getAllMyVideoComments = async (repliedFilter: 'all' | 'replied' | 'not-replied' = 'all') => {
+    const result = await commentAPI.getAllMyVideoComments({ pageNumber: 0, pageSize: 1000, repliedFilter: repliedFilter });
     if (!result.success) return {
         success: false,
         message: result.message,
@@ -237,6 +237,7 @@ export const getAllMyVideoComments = async () => {
             const { user } = await getPublicUserId({ userId: comment.userId });
             const video = await getVideoByVideoId(comment.videoId);
             return {
+                parentId: comment.replyTo || null,
                 id: comment.id,
                 content: comment.content,
                 likes: comment.likeCount,

@@ -200,6 +200,21 @@ class User extends Base {
             }
         }
     }
+
+    async isMyFollower(params: { username: string }) {
+        try {
+            const response = await this.get({ url: `/users/${params.username}/checkFollower` });
+            return {
+                success: response.success,
+                message: response.message,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Check is my follower failed",
+            }
+        }
+    };
 }
 
 const userAPI = new User();

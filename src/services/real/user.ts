@@ -125,3 +125,12 @@ export const isFollowing = async (params: { username: string }) => {
         isFollowing: result.message === "Followed",
     }
 };
+
+export const isMyFollower = async (params: { username: string }) => {
+    const result = await userAPI.isMyFollower(params);
+    return {
+        success: result.success,
+        message: "Check is my follower successfully",
+        isMyFollower: result.message === "Followed",
+    }
+};

@@ -1,21 +1,169 @@
 'use client';
 
-import React, { useState } from "react";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid2, IconButton, InputLabel, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Divider, Grid2, Stack, TextField, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
-import Chip from '@mui/material/Chip';
-import Image from "next/legacy/image";
-import { useRouter } from "next/navigation";
+import SelectComponent from "./components/select";
+import PostItem from "./components/post-item";
+import DeletePostConfirmDialog from "./components/confirm-delete-dialog";
+import { debounce } from "lodash";
+import { get } from "@/hooks/use-local-storage";
+import { getVideosByUserId } from "@/services/real/video";
+import PostItemSkeleton from "./components/post-item-skeleton";
+
+type FilterField = 'search' | 'orderBy' | 'videoViews' | 'likes' | 'comments' | 'status' | 'privacy';
+
+interface State {
+    posts?: any[];
+    openDeletePostConfirmDialog?: boolean;
+    deletedPost?: any;
+    isFetching?: boolean;
+    isFiltering?: boolean;
+}
+
+interface FilterValue {
+    search?: string;
+    orderBy?: string;
+    videoViews?: string;
+    likes?: string;
+    comments?: string;
+    status?: string;
+    privacy?: string;
+}
 
 export default function PostPage() {
-    const router = useRouter();
-    const [openDeletePostConfirmDialog, setOpenDeletePostConfirmDialog] = useState(false);
+    const allPosts = useRef<any[]>();
+    const [state, setState] = useState<State>();
+    const [filterValue, setFilterValue] = useState<FilterValue>();
+
+    const updateFilterField = (field: FilterField, value: string) => {
+        setFilterValue({ ...filterValue, [field]: value });
+    };
+
+    const debounceHandleUpdateSearchValue = useCallback(
+        debounce((searchValue: string) => {
+            updateFilterField('search', searchValue)
+        }, 500),
+        []
+    );
+
+    const fetchAllPosts = async () => {
+        const myUserId = get<any>('user')?.id;
+        if (!myUserId) return undefined;
+        const result = await getVideosByUserId(myUserId);
+        if (!result.success) return undefined;
+        return result.data;
+    };
+
+    const fetchData = async () => {
+        setState({ ...state, isFetching: true });
+        const [posts] = await Promise.all([
+            fetchAllPosts(),
+        ]);
+        allPosts.current = posts;
+        setState({ ...state, posts: posts, isFetching: false });
+    };
+
+    const orderPosts = (posts: any[], orderBy: 'Newest to oldest' | 'Oldest to newest') => {
+        if (orderBy === 'Newest to oldest') {
+            return posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        }
+        return posts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    };
+
+    const filterBySearch = (posts: any[], search: string) => {
+        return posts.filter((post) => post.title.toLowerCase().includes(search.toLowerCase()));
+    };
+
+    const filterByVideoViews = (posts: any[], videoViews: string) => {
+        if (videoViews === '1 - 10') {
+            return posts.filter((post) => post.viewsCount >= 1 && post.viewsCount <= 10);
+        }
+        if (videoViews === '10 - 100') {
+            return posts.filter((post) => post.viewsCount >= 10 && post.viewsCount <= 100);
+        }
+        if (videoViews === '> 100') {
+            return posts.filter((post) => post.viewsCount > 100);
+        }
+        return posts;
+    };
+
+    const filterByLikes = (posts: any[], likes: string) => {
+        if (likes === '1 - 10') {
+            return posts.filter((post) => post.likesCount >= 1 && post.likesCount <= 10);
+        }
+        if (likes === '10 - 100') {
+            return posts.filter((post) => post.likesCount >= 10 && post.likesCount <= 100);
+        }
+        if (likes === '> 100') {
+            return posts.filter((post) => post.likesCount > 100);
+        }
+        return posts;
+    };
+
+    const filterByComments = (posts: any[], comments: string) => {
+        if (comments === '1 - 10') {
+            return posts.filter((post) => post.commentsCount >= 1 && post.commentsCount <= 10);
+        }
+        if (comments === '10 - 100') {
+            return posts.filter((post) => post.commentsCount >= 10 && post.commentsCount <= 100);
+        }
+        if (comments === '> 100') {
+            return posts.filter((post) => post.commentsCount > 100);
+        }
+        return posts;
+    };
+
+    const filterByStatus = (posts: any[], status: string) => {
+        if (status === 'Posted') {
+            return posts.filter((post) => post?.isUploaded === true && post?.isProcessed === true);
+        }
+        if (status === 'Processing') {
+            return posts.filter((post) => post?.isUploaded === true && post?.isProcessed === false);
+        }
+        if (status === 'Uploading') {
+            return posts.filter((post) => post?.isUploaded === false);
+        }
+        return posts;
+    };
+
+    const filterByPrivacy = (posts: any[], privacy: string) => {
+        if (privacy === 'only me') {
+            return posts.filter((post) => post?.isPrivate === true);
+        }
+        if (privacy === 'everyone') {
+            return posts.filter((post) => post?.isPrivate === false);
+        }
+        return posts;
+    };
+
+    const filter = () => {
+        if (state?.isFiltering) return;
+        if (!allPosts.current) return;
+
+        setState({ ...state, isFiltering: true });
+
+        let posts = allPosts.current || [];
+        if (filterValue?.search) posts = filterBySearch(posts, filterValue.search);
+        if (filterValue?.orderBy) posts = orderPosts(posts, filterValue.orderBy as any);
+        if (filterValue?.videoViews) posts = filterByVideoViews(posts, filterValue.videoViews);
+        if (filterValue?.likes) posts = filterByLikes(posts, filterValue.likes);
+        if (filterValue?.comments) posts = filterByComments(posts, filterValue.comments);
+        if (filterValue?.status) posts = filterByStatus(posts, filterValue.status);
+        if (filterValue?.privacy) posts = filterByPrivacy(posts, filterValue.privacy);
+
+        setTimeout(() => {
+            setState({ ...state, posts, isFiltering: false });
+        }, 500);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        filter();
+    }, [filterValue]);
 
     return (
         <>
@@ -40,6 +188,7 @@ export default function PostPage() {
                     <TextField
                         size="small"
                         placeholder="Search for posts title"
+                        onChange={(e) => debounceHandleUpdateSearchValue(e.target.value)}
                         sx={{
                             '.MuiOutlinedInput-notchedOutline': {
                                 border: 'none',
@@ -63,19 +212,33 @@ export default function PostPage() {
                             <SelectComponent
                                 label="Order by"
                                 options={['Newest to oldest', 'Oldest to newest']}
+                                onChange={(value) => updateFilterField('orderBy', value)}
                             />
                         </Box>
                         <SelectComponent
                             label="Video views"
-                            options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
+                            options={['All', '1 - 10', '10 - 100', '> 100']}
+                            onChange={(value) => updateFilterField('videoViews', value)}
                         />
                         <SelectComponent
                             label="Likes"
-                            options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
+                            options={['All', '1 - 10', '10 - 100', '> 100']}
+                            onChange={(value) => updateFilterField('likes', value)}
                         />
                         <SelectComponent
                             label="Comments"
-                            options={['All', '< 1000', '1K - 10K', '10K - 100K', '> 100K']}
+                            options={['All', '1 - 10', '10 - 100', '> 100']}
+                            onChange={(value) => updateFilterField('comments', value)}
+                        />
+                        <SelectComponent
+                            label="Status"
+                            options={['All', 'Posted', 'Processing', 'Uploading']}
+                            onChange={(value) => updateFilterField('status', value)}
+                        />
+                        <SelectComponent
+                            label="Privacy"
+                            options={['All', 'only me', 'everyone']}
+                            onChange={(value) => updateFilterField('privacy', value)}
                         />
                     </Stack>
 
@@ -108,365 +271,28 @@ export default function PostPage() {
                         </Grid2>
                         <Divider />
                         {/* Post items */}
-                        <PostItem onDeleteItem={() => { setOpenDeletePostConfirmDialog(true) }} />
-                        <PostItem onDeleteItem={() => { setOpenDeletePostConfirmDialog(true) }} />
-                        <PostItem onDeleteItem={() => { setOpenDeletePostConfirmDialog(true) }} />
-                        <PostItem onDeleteItem={() => { setOpenDeletePostConfirmDialog(true) }} />
-                        <PostItem onDeleteItem={() => { setOpenDeletePostConfirmDialog(true) }} />
-                        <PostItem onDeleteItem={() => { setOpenDeletePostConfirmDialog(true) }} />
-
+                        {state?.isFetching || state?.isFiltering ?
+                            (Array.from({ length: 5 }).map((_, idx) => (
+                                <PostItemSkeleton key={idx} />
+                            ))) :
+                            (state?.posts?.map((post) => (
+                                <PostItem
+                                    key={post.id}
+                                    post={post}
+                                    onDeleteItem={() => {
+                                        setState({ ...state, openDeletePostConfirmDialog: true, deletedPost: post });
+                                    }}
+                                />
+                            )))
+                        }
                     </Stack>
                 </Stack>
             </Stack>
             <DeletePostConfirmDialog
-                open={openDeletePostConfirmDialog}
-                onClose={() => setOpenDeletePostConfirmDialog(false)}
+                open={state?.openDeletePostConfirmDialog || false}
+                onClose={() => setState({ ...state, openDeletePostConfirmDialog: false })}
+                post={state?.deletedPost}
             />
         </>
-    );
-}
-
-interface SelectComponentProps {
-    label: string;
-    options: string[];
-}
-function SelectComponent(props: SelectComponentProps) {
-    const [selectedValue, setSelectedValue] = useState('');
-
-    const handleChange = (event: SelectChangeEvent<string>) => {
-        setSelectedValue(event.target.value);
-    };
-
-    return (
-        <FormControl
-            size="small"
-            sx={{
-                minWidth: 140,
-                borderRadius: '10px',
-                '.MuiOutlinedInput-root': {
-                    borderRadius: '10px',
-                    backgroundColor: '#F8F8F8',
-                },
-                '.MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                    borderRadius: '10px',
-                },
-            }}
-        >
-            <InputLabel id={props.label}>{props.label}</InputLabel>
-            <Select
-                sx={{
-                    borderRadius: '10px',
-                    backgroundColor: '#F8F8F8',
-                    '.MuiSelect-select': {
-                        borderRadius: '10px',
-                    },
-                }}
-                labelId={props.label}
-                value={selectedValue}
-                onChange={handleChange}
-                label={props.label}
-                id="order-by-select"
-            >
-                {props.options.map((option) => (
-                    <MenuItem
-                        key={option}
-                        value={option}
-                        sx={{
-                            '&.Mui-focusVisible': {
-                                outline: 'none',
-                                backgroundColor: 'transparent',
-                            },
-                        }}
-                    >
-                        {option}
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
-
-    );
-}
-
-interface PostItemProps {
-    onDeleteItem: () => void;
-}
-function PostItem(props: PostItemProps) {
-    const router = useRouter();
-
-    return (
-        <Grid2 container direction={'row'} spacing={2} sx={{
-            borderRadius: '10px',
-            border: '1px solid #E0E0E0',
-            height: 150,
-            justifyContent: 'center',
-            alignItems: 'center',
-        }}>
-            {/* Post: thumbnail, title, metrics */}
-            <Grid2 size={6} height={'100%'}>
-                <Grid2 container direction={'row'} spacing={1} height={'100%'}>
-                    {/* Thumbnail */}
-                    <Grid2 size={4} sx={{
-                        height: '100%',
-                        backgroundColor: 'black',
-                        borderRadius: '10px',
-                    }}>
-                        <Box
-                            sx={{
-                                width: '100%',
-                                height: '100%',
-                                borderRadius: '10px',
-                                overflow: 'hidden',
-                                position: 'relative',
-                            }}
-                        >
-                            <Image
-                                src="/images/video-image.jpg"
-                                alt="Image"
-                                layout="fill"
-                                objectFit="cover"
-                            />
-                        </Box>
-                    </Grid2>
-
-                    {/* Title, metrics */}
-                    <Grid2 size={8}>
-                        <Stack sx={{
-                            justifyContent: 'space-between',
-                            height: '100%',
-                            padding: 1
-                        }}>
-                            {/* Title, description */}
-                            <Stack>
-                                <Typography variant="h6" fontWeight={'bold'}
-                                    sx={{
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}
-                                >
-                                    This is the title of the post that is very long and should be truncated
-                                </Typography>
-                                <Typography variant="body1"
-                                    sx={{
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        color: '#6E6E6E',
-                                    }}
-                                >
-                                    This is the title of the post that is very long and should be truncated
-                                </Typography>
-
-                            </Stack>
-                            {/* Metrics */}
-                            <Stack direction={'row'} spacing={2}>
-                                <Stack direction={'row'} sx={{
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}>
-                                    <PlayArrowOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                                <Stack direction={'row'} sx={{
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}>
-                                    <FavoriteBorderOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                                <Stack direction={'row'} sx={{
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}>
-                                    <ChatBubbleOutlineOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                            </Stack>
-                        </Stack>
-                    </Grid2>
-                </Grid2>
-            </Grid2>
-
-            {/* Action: edit, delete */}
-            <Grid2 size={2}>
-                <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'center'}>
-                    <Tooltip title="Comments">
-                        <IconButton onClick={() => {
-                            router.push('/studio/post/tempPostId/comments');
-                        }}>
-                            <ChatBubbleOutlineOutlinedIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Edit post">
-                        <IconButton onClick={() => router.push('/studio/post/tempPostId/edit')}>
-                            <EditOutlinedIcon />
-                        </IconButton>
-                    </Tooltip>
-
-                    <Tooltip title="Delete post" onClick={props.onDeleteItem}>
-                        <IconButton>
-                            <DeleteForeverOutlinedIcon />
-                        </IconButton>
-                    </Tooltip>
-                </Stack>
-            </Grid2>
-
-            {/* Status info: status, last changed */}
-            <Grid2 size={2}>
-                <Stack direction={'row'} spacing={1} alignItems={'center'}>
-                    <Chip
-                        label="Posted"
-                        sx={{
-                            backgroundColor: '#E6F7F1',
-                            color: '#4FAB7E',
-                            fontWeight: 'bold',
-                        }}
-                    />
-                    <Typography variant="body2">2 days ago</Typography>
-                </Stack>
-            </Grid2>
-
-            {/* Privacy */}
-            <Grid2 size={2}>
-                {/* <Typography variant="body2">Privacy</Typography> */}
-                <SelectComponent
-                    label=""
-                    options={['Everyone', 'Only me', 'Followers']}
-                />
-            </Grid2>
-        </Grid2>
-    );
-}
-
-interface DeletePostConfirmDialogProps {
-    open: boolean;
-    onClose: () => void;
-}
-function DeletePostConfirmDialog(props: DeletePostConfirmDialogProps) {
-    return (
-        <Dialog
-            sx={{
-                height: 'auto',
-                width: 'auto',
-            }}
-            open={props.open}
-            onClose={props.onClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-                <Typography variant="body1" fontWeight={'bold'}>Are you sure you want to delete this post?</Typography>
-            </DialogTitle>
-            <DialogContent sx={{
-                width: '500px',
-                height: 'auto',
-                padding: '20px',
-            }}>
-                {/* Post: thumbnail, title, metrics */}
-                <Grid2 container direction={'row'} spacing={1} sx={{
-                    width: '100%',
-                    height: '100px',
-                    backgroundColor: '#F8F8F8',
-                    borderRadius: '10px',
-                }}>
-                    {/* Thumbnail */}
-                    <Grid2 size={4} sx={{
-                        height: '100%',
-                        backgroundColor: 'black',
-                        borderRadius: '10px',
-                    }}>
-                        <Box
-                            sx={{
-                                width: '100%',
-                                height: '100%',
-                                borderRadius: '10px',
-                                overflow: 'hidden',
-                                position: 'relative',
-                            }}
-                        >
-                            <Image
-                                src="/images/video-image.jpg"
-                                alt="Image"
-                                layout="fill"
-                                objectFit="cover"
-                            />
-                        </Box>
-                    </Grid2>
-
-                    {/* Title, metrics */}
-                    <Grid2 size={8}>
-                        <Stack sx={{
-                            justifyContent: 'space-between',
-                            height: '100%',
-                            width: '100%',
-                        }}>
-                            {/* Title */}
-                            <Typography
-                                variant="body1"
-                                fontWeight="bold"
-                                sx={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    width: '100%',
-                                }}
-                            >
-                                This is the title of the post that is very long and should be truncated
-                            </Typography>
-                            {/* Metrics */}
-                            <Stack direction={'row'} spacing={2}>
-                                <Stack direction={'row'} >
-                                    <PlayArrowOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                                <Stack direction={'row'}>
-                                    <FavoriteBorderOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                                <Stack direction={'row'}>
-                                    <ChatBubbleOutlineOutlinedIcon />
-                                    <Typography variant="body2">1000</Typography>
-                                </Stack>
-                            </Stack>
-                        </Stack>
-                    </Grid2>
-                </Grid2>
-            </DialogContent>
-            <DialogActions sx={{
-                justifyContent: 'space-between',
-            }}>
-                <Button
-                    onClick={props.onClose}
-                    color="inherit"
-                    autoFocus
-                    variant="outlined"
-                    sx={{
-                        width: '40%',
-                        height: '50px',
-                        color: 'black',
-                        borderRadius: '10px',
-                        textTransform: 'none',
-                    }}
-                >
-                    <Typography variant="body1" fontWeight={'bold'}>Cancel</Typography>
-                </Button>
-                <Button
-                    onClick={props.onClose}
-                    autoFocus
-                    variant="contained"
-                    sx={{
-                        width: '40%',
-                        height: '50px',
-                        backgroundColor: '#EA284E',
-                        color: 'white',
-                        borderRadius: '10px',
-                        textTransform: 'none',
-                    }}
-                >
-                    <Typography variant="body1" fontWeight={'bold'}>Delete</Typography>
-                </Button>
-            </DialogActions>
-        </Dialog>
     );
 }

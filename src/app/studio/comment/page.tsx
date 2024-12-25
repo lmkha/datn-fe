@@ -10,6 +10,7 @@ import DeleteCommentDialog from "./components/confirm-delete-dialog";
 import { useAppContext } from "@/contexts/app-context";
 import { debounce } from "lodash";
 import CommentItemSkeleton from "./components/comment-item-skeleton";
+import { isMyFollower } from "@/services/real/user";
 
 interface FilterValue {
     search?: string;
@@ -47,19 +48,12 @@ export default function CommentPage() {
     };
 
     const fetchData = async () => {
-        setState({
-            ...state,
-            isFetching: true,
-        });
+        setState({ ...state, isFetching: true });
         const [comments] = await Promise.all([
             fetchAllComments(),
         ]);
         allComment.current = comments;
-        setState({
-            ...state,
-            comments: comments,
-            isFetching: false,
-        });
+        setState({ ...state, comments: comments, isFetching: false });
     };
 
     const updateFilterField = (field: FilterField, value: string) => {
@@ -76,17 +70,17 @@ export default function CommentPage() {
     const handleUpdateStatusFilter = async (status: string) => {
         if (!status) return;
         if (status === 'All comments') {
-            setState({ ...state, comments: allComment.current });
+            setFilterValue({ ...filterValue, status: 'All comments' });
             return;
         }
         if (status === 'Replied') {
             filteredCommentsByStatus.current = await fetchAllCommentWithStatusFilter('replied');
-            setState({ ...state, comments: filteredCommentsByStatus.current });
+            setFilterValue({ ...filterValue, status: 'Replied' });
             return;
         }
         if (status === 'Not replied') {
             filteredCommentsByStatus.current = await fetchAllCommentWithStatusFilter('not-replied');
-            setState({ ...state, comments: filteredCommentsByStatus.current });
+            setFilterValue({ ...filterValue, status: 'Not replied' });
             return;
         }
     };
@@ -170,12 +164,15 @@ export default function CommentPage() {
         );
     };
 
-    const filterPostedByValue = (comments: any[], postedBy: string): any[] => {
-        return comments.filter(comment => {
-            if (postedBy === 'Followers') return comment.isFollower;
-            if (postedBy === 'Non-followers') return !comment.isFollower;
-            return true;
-        });
+    const filterPostedByValue = async (comments: any[], postedBy: string): Promise<any[]> => {
+        return Promise.all(
+            comments.map(async (comment) => {
+                const isFollowerResult = await isMyFollower({ username: comment.username });
+                if (postedBy === 'Followers') return isFollowerResult.success && isFollowerResult.isMyFollower ? comment : null;
+                if (postedBy === 'Non-followers') return isFollowerResult.success && !isFollowerResult.isMyFollower ? comment : null;
+                return comment;
+            })
+        ).then(results => results.filter(comment => comment !== null));
     };
 
     const filterLikesValue = (comments: any[], likes: string): any[] => {
@@ -199,10 +196,9 @@ export default function CommentPage() {
 
         if (status) comments = filterStatusValue(comments, status);
         if (search) comments = filterSearchValue(comments, search);
-        if (postedBy) comments = filterPostedByValue(comments, postedBy);
         if (likes) comments = filterLikesValue(comments, likes);
-
-        setState({ ...state, comments: comments, isFiltering: false });
+        if (postedBy) comments = await filterPostedByValue(comments, postedBy);
+        setTimeout(() => setState({ ...state, comments: comments, isFiltering: false }), 300);
     }
 
     useEffect(() => {

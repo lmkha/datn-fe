@@ -10,7 +10,7 @@ import DeleteCommentDialog from "./components/confirm-delete-dialog";
 import { useAppContext } from "@/contexts/app-context";
 import { debounce } from "lodash";
 import CommentItemSkeleton from "./components/comment-item-skeleton";
-import { isMyFollower } from "@/services/real/user";
+import { getAllFollowers } from "@/services/real/user";
 
 interface FilterValue {
     search?: string;
@@ -165,14 +165,23 @@ export default function CommentPage() {
     };
 
     const filterPostedByValue = async (comments: any[], postedBy: string): Promise<any[]> => {
-        return Promise.all(
+        const followers = await getAllFollowers();
+        if (!followers.success) return comments;
+
+        const filteredComments = await Promise.all(
             comments.map(async (comment) => {
-                const isFollowerResult = await isMyFollower({ username: comment.username });
-                if (postedBy === 'Followers') return isFollowerResult.success && isFollowerResult.isMyFollower ? comment : null;
-                if (postedBy === 'Non-followers') return isFollowerResult.success && !isFollowerResult.isMyFollower ? comment : null;
-                return comment;
+                const isFollower = followers.followers.includes(comment?.username);
+                if (postedBy === 'Followers') {
+                    return isFollower ? comment : null;
+                } else if (postedBy === 'Non-followers') {
+                    return !isFollower ? comment : null;
+                } else {
+                    return comment;
+                }
             })
-        ).then(results => results.filter(comment => comment !== null));
+        );
+
+        return filteredComments.filter(comment => comment !== null);
     };
 
     const filterLikesValue = (comments: any[], likes: string): any[] => {

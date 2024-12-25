@@ -31,6 +31,15 @@ export const getAllFollowings = async () => {
     };
 };
 
+export const getAllFollowers = async () => {
+    const result = await userAPI.getAllFollowers();
+    return {
+        success: result.success,
+        message: result.message,
+        followers: result.data,
+    }
+};
+
 export const getPublicUserByUsername = async (params: { username: string }) => {
     const result = await userAPI.getPublicUserByUsername({ username: params.username });
     return {

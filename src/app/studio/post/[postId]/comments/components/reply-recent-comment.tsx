@@ -4,7 +4,7 @@ import { IconButton, Stack, TextField, Typography } from "@mui/material";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import SendIcon from '@mui/icons-material/Send';
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import UserAvatar from "@/core/components/avatar";
 import { get } from "@/hooks/use-local-storage";
 

@@ -3,7 +3,7 @@
 import { Box, Grid2, Stack, Typography } from "@mui/material";
 import Image from "next/legacy/image";
 import { useRouter } from 'next/navigation';
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import ShortcutIcon from '@mui/icons-material/Shortcut';

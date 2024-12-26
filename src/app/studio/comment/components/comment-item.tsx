@@ -11,7 +11,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { useRouter } from "next/navigation";
 import VideoThumbnail from "@/core/components/video-thumbnail";
 import UserAvatar from "@/core/components/avatar";
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import { get } from "@/hooks/use-local-storage";
 
 interface State {

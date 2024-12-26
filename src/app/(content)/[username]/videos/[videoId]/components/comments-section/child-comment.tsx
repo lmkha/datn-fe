@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ChildComment } from "../../types";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
-import { formatTimeToShortText } from "@/core/logic/convert";
+import { formatTimeToShortText } from "@/core/logic/format";
 import { deleteComment, isCommentLiked, likeComment, replyComment, unlikeComment, updateComment } from "@/services/real/comment";
 import { useAppContext } from "@/contexts/app-context";
 import EditDeleteCommentMenu from "./edit-delete-menu";

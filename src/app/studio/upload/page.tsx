@@ -7,7 +7,7 @@ import CircularProgress, {
 import { useEffect, useState, useMemo } from "react";
 import * as React from 'react';
 import Image from "next/legacy/image";
-import { formatDuration, formatSize } from "@/core/logic/convert";
+import { formatDuration, formatSize } from "@/core/logic/format";
 import { postVideo } from "@/services/real/video";
 import PlayListSelect from "./components/playlist-select";
 import VideoUploadButton from "./components/video-upload-button";

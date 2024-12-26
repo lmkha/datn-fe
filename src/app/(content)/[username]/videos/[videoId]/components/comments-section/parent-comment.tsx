@@ -8,7 +8,7 @@ import { ChildComment, ParentComment } from "../../types";
 import ChildCommentComponent from "./child-comment";
 import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/navigation";
-import { formatTimeToShortText } from "@/core/logic/convert";
+import { formatTimeToShortText } from "@/core/logic/format";
 import { deleteComment, getChildrenComments, getCommentById, isCommentLiked, likeComment, replyComment, unlikeComment, updateComment } from "@/services/real/comment";
 import EditDeleteCommentMenu from "./edit-delete-menu";
 import { get } from "@/hooks/use-local-storage";

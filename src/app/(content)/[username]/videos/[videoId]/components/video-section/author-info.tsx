@@ -1,7 +1,7 @@
 'use client';
 
 import UserAvatar from "@/core/components/avatar";
-import { formatNumberToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText } from "@/core/logic/format";
 import { Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 

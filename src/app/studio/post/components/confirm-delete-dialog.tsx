@@ -7,7 +7,7 @@ import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutline
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import Image from "next/legacy/image";
 import VideoThumbnail from "@/core/components/video-thumbnail";
-import { formatNumberToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText } from "@/core/logic/format";
 
 
 interface DeletePostConfirmDialogProps {

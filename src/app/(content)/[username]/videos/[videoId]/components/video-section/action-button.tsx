@@ -4,7 +4,7 @@ import { IconButton, Stack, Typography, CircularProgress } from "@mui/material";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
-import { formatNumberToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText } from "@/core/logic/format";
 import { useEffect, useState } from "react";
 import { isLikedVideo, likeVideo, unlikeVideo } from "@/services/real/video";
 import { get } from "@/hooks/use-local-storage";

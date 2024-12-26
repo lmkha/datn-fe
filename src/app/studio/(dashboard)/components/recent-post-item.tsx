@@ -5,7 +5,7 @@ import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutline
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import { Grid2, Stack, Typography } from "@mui/material";
 import VideoThumbnail from '@/core/components/video-thumbnail';
-import { formatDate, formatNumberToShortText } from '@/core/logic/convert';
+import { formatDate, formatNumberToShortText } from '@/core/logic/format';
 
 interface RecentPostItemProps {
     post?: any;

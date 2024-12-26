@@ -1,6 +1,6 @@
 'use client';
 
-import { formatNumberToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText } from "@/core/logic/format";
 import { Stack, Typography } from "@mui/material";
 
 interface KeyMetricItemProps {

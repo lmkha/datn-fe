@@ -6,7 +6,7 @@ import ActionButton from "./action-button";
 import AuthorInfoComponent from "./author-info";
 import VideoPlayerComponent from "./video-player";
 import { getVideoStreamLink } from "@/services/real/video";
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 
 interface VideoSectionProps {
     video: any,

@@ -12,7 +12,7 @@ import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 import SelectComponent from "./select";
 import VideoThumbnail from "@/core/components/video-thumbnail";
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import { get } from "@/hooks/use-local-storage";
 
 

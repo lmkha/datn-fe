@@ -3,7 +3,7 @@
 import { Button, Grid2, Stack, Typography } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { formatNumberToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText } from "@/core/logic/format";
 import { followUser, isFollowing } from "@/services/real/user";
 import UnFollowConfirmDialog from "@/app/(content)/components/unfollow-dialog";
 import { get } from "@/hooks/use-local-storage";

@@ -11,7 +11,7 @@ import { useRouter, useSearchParams, useParams } from "next/navigation";
 import VideoThumbnail from "@/core/components/video-thumbnail";
 import { getVideoByVideoId } from "@/services/real/video";
 import { useAppContext } from "@/contexts/app-context";
-import { formatNumberToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText } from "@/core/logic/format";
 import { getCommentById, getCommentsByVideoId } from "@/services/real/comment";
 import ReplyRecentComment from "./components/reply-recent-comment";
 import CommentItem from "./components/comment-item";

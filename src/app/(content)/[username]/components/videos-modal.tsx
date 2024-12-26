@@ -5,7 +5,7 @@ import Modal from '@mui/material/Modal';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Grid2, Stack, Typography, IconButton } from "@mui/material";
 import { useRouter } from 'next/navigation';
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import { getVideoByVideoId } from '@/services/real/video';
 import VideoThumbnail from '@/core/components/video-thumbnail';
 

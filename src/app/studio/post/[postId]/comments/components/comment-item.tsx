@@ -6,7 +6,7 @@ import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import { useState } from "react";
 import SendIcon from '@mui/icons-material/Send';
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import UserAvatar from "@/core/components/avatar";
 import { get } from "@/hooks/use-local-storage";
 

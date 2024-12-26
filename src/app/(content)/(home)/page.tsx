@@ -1,6 +1,6 @@
 'use client';
 
-import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/convert";
+import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import { getVideosForHomePage } from "@/services/real/video";
 import { Skeleton, } from "@mui/material";
 import Image from "next/legacy/image";

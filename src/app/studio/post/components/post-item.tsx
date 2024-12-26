@@ -1,14 +1,13 @@
 'use client';
 
 import React from "react";
-import { Box, Grid2, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { Grid2, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import Chip from '@mui/material/Chip';
-import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 import SelectComponent from "./select";
 import VideoThumbnail from "@/core/components/video-thumbnail";

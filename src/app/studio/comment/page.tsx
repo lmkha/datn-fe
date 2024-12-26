@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CommentItem from "./components/comment-item";
 import SelectComponent from "./components/select";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { deleteComment, getAllMyVideoComments, replyCommentInStudio, updateComment } from "@/services/real/comment";
+import { deleteComment, getAllMyVideoComments, likeComment, replyCommentInStudio, unlikeComment, updateComment } from "@/services/real/comment";
 import DeleteCommentDialog from "./components/confirm-delete-dialog";
 import { useAppContext } from "@/contexts/app-context";
 import { debounce } from "lodash";
@@ -141,6 +141,30 @@ export default function CommentPage() {
         }
         const updatedComments = state?.comments?.map(comment =>
             comment.id === commentId ? { ...comment, content } : comment
+        );
+        allComment.current = updatedComments;
+        setState({
+            ...state,
+            comments: updatedComments,
+        });
+    };
+
+    const handleLikeComment = async (commentId: string, isLike: boolean) => {
+        if (!commentId || !allComment.current || !state?.comments || state?.comments?.length === 0) return;
+        let result;
+        if (isLike) {
+            result = await likeComment(commentId);
+        } else {
+            result = await unlikeComment(commentId);
+        }
+        if (!result.success) {
+            showAlert({ message: 'Failed to like comment', severity: 'error' });
+            return;
+        }
+        const updatedComments = state?.comments?.map(comment =>
+            comment.id === commentId
+                ? { ...comment, likes: isLike ? comment.likes + 1 : comment.likes - 1, isLiked: isLike }
+                : comment
         );
         allComment.current = updatedComments;
         setState({
@@ -288,6 +312,7 @@ export default function CommentPage() {
                                 comment={comment}
                                 onReply={handleReplyComment}
                                 onUpdate={handleEditComment}
+                                onLike={handleLikeComment}
                                 onDelete={(comment) => { setState({ ...state, openDeleteDialog: true, deletedComment: comment }) }}
                             />
                         )))

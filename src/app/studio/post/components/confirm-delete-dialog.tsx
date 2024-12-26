@@ -1,11 +1,10 @@
 'use client';
 
 import React from "react";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid2, Stack, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid2, Stack, Typography } from "@mui/material";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
-import Image from "next/legacy/image";
 import VideoThumbnail from "@/core/components/video-thumbnail";
 import { formatNumberToShortText } from "@/core/logic/format";
 

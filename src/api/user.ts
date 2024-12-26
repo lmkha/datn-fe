@@ -203,7 +203,7 @@ class User extends Base {
 
     async isFollowing(params: { username: string }) {
         try {
-            const response = await this.get({ url: `/users/${params.username}/checkFollow` });
+            const response = await this.get({ url: `/users/${params.username}/checkFollowing` });
             return {
                 success: response.success,
                 message: response.message,

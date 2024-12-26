@@ -2,6 +2,7 @@
 
 import { Box, Button, Divider, Grid2, IconButton, Stack, TextField, Typography } from "@mui/material";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
@@ -25,7 +26,7 @@ interface CommentItemProps {
     comment?: any;
     onDelete?: (comment: any) => void;
     onReply?: (videoId: string, commentId: string, content: string) => void;
-    onLike?: (commentId: string) => void;
+    onLike?: (commentId: string, isLike: boolean) => void;
     onUpdate?: (commentId: string, content: string) => void;
 }
 export default function CommentItem(props: CommentItemProps) {
@@ -60,6 +61,10 @@ export default function CommentItem(props: CommentItemProps) {
         if (!state?.updateContent || state?.updateContent.length === 0) return;
         props?.onUpdate && props?.onUpdate(props?.comment?.id, state?.updateContent);
         setState({ ...state, editMode: false });
+    };
+
+    const handleLike = () => {
+        props?.onLike && props?.onLike(props?.comment?.id, !props?.comment?.isLiked);
     };
 
     return (
@@ -138,8 +143,9 @@ export default function CommentItem(props: CommentItemProps) {
                                 </Box>
                                 {/* Metrics */}
                                 <Stack direction={'row'} alignItems={'center'} spacing={2}>
+                                    {/* Time */}
                                     <Typography variant="body2" color="textSecondary">{formatTimeToShortText(props?.comment?.createdAt)}</Typography>
-
+                                    {/* Reply */}
                                     <Button
                                         onClick={() => setState({ ...state, openReply: !state?.openReply })}
                                         sx={{
@@ -150,10 +156,10 @@ export default function CommentItem(props: CommentItemProps) {
                                         startIcon={<ChatBubbleOutlineOutlinedIcon sx={{ fontWeight: 'bold' }} />}>
                                         Reply
                                     </Button>
-
+                                    {/* Like */}
                                     <Stack direction={'row'} justifyContent={'center'} alignItems={'center'}>
-                                        <IconButton>
-                                            <FavoriteBorderOutlinedIcon />
+                                        <IconButton onClick={handleLike}>
+                                            {props?.comment?.isLiked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
                                         </IconButton>
                                         <Typography variant="body2" color="textSecondary">{formatNumberToShortText(props?.comment?.likes)}</Typography>
                                     </Stack>

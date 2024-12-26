@@ -236,6 +236,7 @@ export const getAllMyVideoComments = async (repliedFilter: 'all' | 'replied' | '
         (result.comments || []).map(async (comment: any) => {
             const { user } = await getPublicUserId({ userId: comment.userId });
             const video = await getVideoByVideoId(comment.videoId);
+            const isLiked = await isCommentLiked(comment.id);
             return {
                 parentId: comment.replyTo || null,
                 id: comment.id,
@@ -255,6 +256,7 @@ export const getAllMyVideoComments = async (repliedFilter: 'all' | 'replied' | '
                 videoViews: video?.data?.viewsCount || 0,
                 videoLikes: video?.data?.likesCount || 0,
                 videoComments: video?.data?.commentsCount || 0,
+                isLiked: isLiked?.isLiked || false,
             };
         })
     );

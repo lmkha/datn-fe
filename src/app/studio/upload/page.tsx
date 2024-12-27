@@ -1,9 +1,6 @@
 'use client';
 
 import { Box, Button, Card, Grid2, Stack, TextField, Typography } from "@mui/material";
-import CircularProgress, {
-    CircularProgressProps,
-} from '@mui/material/CircularProgress';
 import { useEffect, useState, useMemo } from "react";
 import * as React from 'react';
 import Image from "next/legacy/image";
@@ -15,6 +12,7 @@ import HashtagInput from "./components/hashtag-input";
 import WhoCanWatchViewSelect from "./components/who-can-see-select";
 import ThumbnailUploadButton from "./components/thumbnail-upload-button";
 import { useAppContext } from "@/contexts/app-context";
+import CircularProgressWithLabel from "@/core/components/circular-progess-with-label";
 
 interface VideoFileMetadata {
     size?: string;
@@ -348,34 +346,5 @@ export default function UploadVideoPage() {
                 </Grid2>
             </Grid2>
         </Stack>
-    );
-}
-
-function CircularProgressWithLabel(
-    props: CircularProgressProps & { value?: number },
-) {
-    const displayValue = `${Math.round(props.value || 0)}%`;
-    return (
-        <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-            <CircularProgress variant="determinate" {...props} />
-            <Box
-                sx={{
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Typography
-                    variant="caption"
-                    component="div"
-                    sx={{ color: 'text.secondary' }}
-                >{displayValue}</Typography>
-            </Box>
-        </Box>
     );
 }

@@ -142,6 +142,29 @@ class Video extends Base {
         }
     }
 
+    async updateVideoMetaData(data: {
+        id: string,
+        title: string,
+        description: string,
+        tags: string[],
+        isPrivate: boolean,
+        isCommentOff: boolean,
+    }) {
+        try {
+            const response = await this.put({ url: '/videos', data });
+            return {
+                success: response.success,
+                message: response.message,
+                data: response.data,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Update video meta data failed",
+            }
+        }
+    }
+
     // Like video
     async likeAVideo(params: { videoId: string }) {
         try {

@@ -8,15 +8,19 @@ import PostItem from "./components/post-item";
 import DeletePostConfirmDialog from "./components/confirm-delete-dialog";
 import { debounce } from "lodash";
 import { get } from "@/hooks/use-local-storage";
-import { getVideosByUserId } from "@/services/real/video";
+import { getVideosByUserId, updateVideo } from "@/services/real/video";
 import PostItemSkeleton from "./components/post-item-skeleton";
+import ChangePrivacyDialog from "./components/confirm-change-privacy";
+import { useAppContext } from "@/contexts/app-context";
 
 type FilterField = 'search' | 'orderBy' | 'videoViews' | 'likes' | 'comments' | 'status' | 'privacy';
 
 interface State {
     posts?: any[];
     openDeletePostConfirmDialog?: boolean;
+    openChangePrivacyDialog?: boolean;
     deletedPost?: any;
+    changePrivacyPost?: any;
     isFetching?: boolean;
     isFiltering?: boolean;
 }
@@ -35,6 +39,7 @@ export default function PostPage() {
     const allPosts = useRef<any[]>();
     const [state, setState] = useState<State>();
     const [filterValue, setFilterValue] = useState<FilterValue>();
+    const { showAlert } = useAppContext();
 
     const updateFilterField = (field: FilterField, value: string) => {
         setFilterValue({ ...filterValue, [field]: value });
@@ -155,6 +160,31 @@ export default function PostPage() {
         setTimeout(() => {
             setState({ ...state, posts, isFiltering: false });
         }, 500);
+    };
+
+    const handleChangePrivacy = async () => {
+        if (!state?.changePrivacyPost?.id || !state?.changePrivacyPost?.title) return;
+        const changePrivacyResult = await updateVideo({
+            id: state?.changePrivacyPost?.id,
+            isPrivate: !state?.changePrivacyPost?.isPrivate,
+            title: state?.changePrivacyPost?.title,
+            description: state?.changePrivacyPost?.description,
+            isCommentOff: state?.changePrivacyPost?.isCommentOff,
+            tags: state?.changePrivacyPost?.tags
+        });
+        if (!changePrivacyResult.success) {
+            showAlert({ message: changePrivacyResult.message, severity: 'error' });
+            setState({ ...state, openChangePrivacyDialog: false, changePrivacyPost: undefined });
+            return;
+        }
+        const newPosts = state?.posts?.map((post) => {
+            if (post.id === state?.changePrivacyPost?.id) {
+                return { ...post, isPrivate: !post.isPrivate };
+            }
+            return post;
+        });
+        allPosts.current = newPosts;
+        setState({ ...state, posts: newPosts, openChangePrivacyDialog: false, changePrivacyPost: undefined });
     };
 
     useEffect(() => {
@@ -279,9 +309,8 @@ export default function PostPage() {
                                 <PostItem
                                     key={post.id}
                                     post={post}
-                                    onDeleteItem={() => {
-                                        setState({ ...state, openDeletePostConfirmDialog: true, deletedPost: post });
-                                    }}
+                                    onChangePrivacy={(post) => { setState({ ...state, openChangePrivacyDialog: true, changePrivacyPost: post }) }}
+                                    onDeleteItem={() => { setState({ ...state, openDeletePostConfirmDialog: true, deletedPost: post }) }}
                                 />
                             )))
                         }
@@ -292,6 +321,12 @@ export default function PostPage() {
                 open={state?.openDeletePostConfirmDialog || false}
                 onClose={() => setState({ ...state, openDeletePostConfirmDialog: false })}
                 post={state?.deletedPost}
+            />
+            <ChangePrivacyDialog
+                open={state?.openChangePrivacyDialog || false}
+                onClose={() => setState({ ...state, openChangePrivacyDialog: false, changePrivacyPost: undefined })}
+                post={state?.changePrivacyPost}
+                onConfirm={handleChangePrivacy}
             />
         </>
     );

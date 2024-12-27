@@ -188,3 +188,14 @@ export const getMyRecentVideos = async (videoCount: number = 5): Promise<{
         videos: response.data.slice(0, videoCount)
     };
 };
+
+export const updateVideo = async (data: {
+    id: string,
+    title: string,
+    description: string,
+    tags: string[],
+    isPrivate: boolean,
+    isCommentOff: boolean,
+}) => {
+    return await videoAPI.updateVideoMetaData(data);
+};

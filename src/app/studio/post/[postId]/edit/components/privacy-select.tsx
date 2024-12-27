@@ -4,11 +4,21 @@ import { Box, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/mater
 import * as React from 'react';
 import FormControl from '@mui/material/FormControl';
 
-export default function WhoCanWatchViewSelect() {
-    const [visibility, setVisibility] = React.useState('public');
+interface WhoCanWatchViewSelectProps {
+    privacy?: string;
+    options?: string[];
+    onChange?: (privacy: string) => void;
+};
+export default function WhoCanWatchViewSelect(props: WhoCanWatchViewSelectProps) {
+    const [privacy, setPrivacy] = React.useState('');
+
+    React.useEffect(() => {
+        setPrivacy(props.privacy || '');
+    }, [props.privacy]);
 
     const handleChange = (event: SelectChangeEvent) => {
-        setVisibility(event.target.value);
+        setPrivacy(event.target.value);
+        props.onChange?.(event.target.value);
     };
 
     return (
@@ -19,13 +29,14 @@ export default function WhoCanWatchViewSelect() {
             <FormControl fullWidth>
                 <Select
                     size="small"
-                    value={visibility}
+                    value={privacy}
                     onChange={handleChange}
                     displayEmpty
                     inputProps={{ 'aria-label': 'Select visibility' }}
                 >
-                    <MenuItem value="public">Everyone</MenuItem>
-                    <MenuItem value="private">Only me</MenuItem>
+                    {props.options?.map((option, index) => (
+                        <MenuItem key={index} value={option}>{option}</MenuItem>
+                    ))}
                 </Select>
             </FormControl>
         </Box>

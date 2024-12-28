@@ -14,6 +14,7 @@ import VideoThumbnail from "@/core/components/video-thumbnail";
 import UserAvatar from "@/core/components/avatar";
 import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import { get } from "@/hooks/use-local-storage";
+import { useAppContext } from "@/contexts/app-context";
 
 interface State {
     openReply?: boolean;
@@ -33,6 +34,7 @@ export default function CommentItem(props: CommentItemProps) {
     const [state, setState] = useState<State>();
     const myUserId = get<any>('user')?.id;
     const router = useRouter();
+    const { showAlert } = useAppContext();
 
     const handleReply = () => {
         if (!state?.replyContent || state?.replyContent.length === 0) return;
@@ -65,6 +67,14 @@ export default function CommentItem(props: CommentItemProps) {
 
     const handleLike = () => {
         props?.onLike && props?.onLike(props?.comment?.id, !props?.comment?.isLiked);
+    };
+
+    const handleOpenReply = () => {
+        if (props?.comment?.isCommentOff) {
+            showAlert({ message: 'This video has set comment off', severity: 'warning' });
+            return;
+        }
+        setState({ ...state, openReply: !state?.openReply });
     };
 
     return (
@@ -147,7 +157,7 @@ export default function CommentItem(props: CommentItemProps) {
                                     <Typography variant="body2" color="textSecondary">{formatTimeToShortText(props?.comment?.createdAt)}</Typography>
                                     {/* Reply */}
                                     <Button
-                                        onClick={() => setState({ ...state, openReply: !state?.openReply })}
+                                        onClick={handleOpenReply}
                                         sx={{
                                             textTransform: 'none',
                                             fontWeight: 'bold',

@@ -6,22 +6,31 @@ import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import { Grid2, Stack, Typography } from "@mui/material";
 import VideoThumbnail from '@/core/components/video-thumbnail';
 import { formatDate, formatNumberToShortText } from '@/core/logic/format';
+import { useRouter } from 'next/navigation';
 
 interface RecentPostItemProps {
     post?: any;
 };
 export default function RecentPostItem(props: RecentPostItemProps) {
+    const router = useRouter();
+
+    const handleClick = async () => {
+    };
+
     return (
-        <Grid2 container direction={'row'} spacing={2} sx={{
-            width: '100%',
-            backgroundColor: '#F8F8F8',
-            borderRadius: '10px',
-            height: 100,
-            cursor: 'pointer',
-            ":hover": {
-                backgroundColor: '#FFF2F5',
-            },
-        }}>
+        <Grid2 container direction={'row'} spacing={2}
+            sx={{
+                width: '100%',
+                backgroundColor: '#F8F8F8',
+                borderRadius: '10px',
+                height: 100,
+                cursor: 'pointer',
+                ":hover": {
+                    backgroundColor: '#FFF2F5',
+                },
+            }}
+            onClick={handleClick}
+        >
             <Grid2 size={3}>
                 <VideoThumbnail
                     thumbnailUrl={props?.post?.thumbnailUrl}

@@ -256,6 +256,7 @@ export const getAllMyVideoComments = async (repliedFilter: 'all' | 'replied' | '
                 videoViews: video?.data?.viewsCount || 0,
                 videoLikes: video?.data?.likesCount || 0,
                 videoComments: video?.data?.commentsCount || 0,
+                isCommentOff: video?.data?.isCommentOff || false,
                 isLiked: isLiked?.isLiked || false,
             };
         })

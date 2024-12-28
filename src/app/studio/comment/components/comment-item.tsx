@@ -281,7 +281,8 @@ export default function CommentItem(props: CommentItemProps) {
                                         </Stack>
                                         <Button
                                             onClick={() => {
-                                                props?.comment?.videoId && router.push(`/studio/post/${props?.comment?.videoId}/comments`);
+                                                props?.comment?.videoId && props?.comment?.id
+                                                    && router.push(`/studio/post/${props?.comment?.videoId}/comments?commentId=${props?.comment?.id}`);
                                             }}
                                             sx={{
                                                 textTransform: 'none',

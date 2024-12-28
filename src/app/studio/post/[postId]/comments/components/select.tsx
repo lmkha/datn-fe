@@ -7,12 +7,16 @@ import { useState } from "react";
 interface SelectComponentProps {
     label: string;
     options: string[];
+    onChange?: (value: string) => void;
 }
 export default function SelectComponent(props: SelectComponentProps) {
     const [selectedValue, setSelectedValue] = useState('');
 
     const handleChange = (event: SelectChangeEvent<string>) => {
         setSelectedValue(event.target.value);
+        if (props.onChange) {
+            props.onChange(event.target.value);
+        }
     };
 
     return (

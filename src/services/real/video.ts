@@ -64,6 +64,19 @@ export const getVideosByUserId = async (userId: string) => {
     return response;
 };
 
+export const getVideosOfOtherByUserId = async (userId: string) => {
+    const response = await videoAPI.getVideosByUserId({ userId });
+    if (!response.success || !response.data) {
+        return response;
+    }
+    const publicVideos = response.data.filter((video: any) => !video.isPrivate);
+    return {
+        success: response.success,
+        message: response.message,
+        data: publicVideos
+    };
+};
+
 export const getVideoByVideoId = async (videoId: string) => {
     const response = await videoAPI.getVideoByVideoId({ videoId });
     return response;
@@ -198,4 +211,8 @@ export const updateVideo = async (data: {
     isCommentOff: boolean,
 }) => {
     return await videoAPI.updateVideoMetaData(data);
+};
+
+export const deleteVideo = async (videoId: string) => {
+    return await videoAPI.deleteVideo({ videoId });
 };

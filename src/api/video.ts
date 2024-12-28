@@ -165,6 +165,21 @@ class Video extends Base {
         }
     }
 
+    async deleteVideo(params: { videoId: string }) {
+        try {
+            const response = await this.delete({ url: `/videos/${params.videoId}` });
+            return {
+                success: response.success,
+                message: response.message,
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err?.response?.data?.message || "Delete video failed",
+            }
+        }
+    };
+
     // Like video
     async likeAVideo(params: { videoId: string }) {
         try {

@@ -8,7 +8,7 @@ import PostItem from "./components/post-item";
 import DeletePostConfirmDialog from "./components/confirm-delete-dialog";
 import { debounce } from "lodash";
 import { get } from "@/hooks/use-local-storage";
-import { getVideosByUserId, updateVideo } from "@/services/real/video";
+import { deleteVideo, getVideosByUserId, updateVideo } from "@/services/real/video";
 import PostItemSkeleton from "./components/post-item-skeleton";
 import ChangePrivacyDialog from "./components/confirm-change-privacy";
 import { useAppContext } from "@/contexts/app-context";
@@ -57,7 +57,8 @@ export default function PostPage() {
         if (!myUserId) return undefined;
         const result = await getVideosByUserId(myUserId);
         if (!result.success) return undefined;
-        return result.data;
+        const orderedPosts = orderPosts(result.data, 'Newest to oldest');
+        return orderedPosts;
     };
 
     const fetchData = async () => {
@@ -185,6 +186,20 @@ export default function PostPage() {
         });
         allPosts.current = newPosts;
         setState({ ...state, posts: newPosts, openChangePrivacyDialog: false, changePrivacyPost: undefined });
+    };
+
+    const handleDeletePost = async () => {
+        if (!state?.deletedPost?.id) return;
+        const deleteResult = await deleteVideo(state?.deletedPost?.id);
+        if (!deleteResult.success) {
+            showAlert({ message: deleteResult.message, severity: 'error' });
+            setState({ ...state, openDeletePostConfirmDialog: false, deletedPost: undefined });
+            return;
+        }
+        const newPosts = state?.posts?.filter((post) => post.id !== state?.deletedPost?.id);
+        allPosts.current = newPosts;
+        setState({ ...state, posts: newPosts, openDeletePostConfirmDialog: false, deletedPost: undefined });
+        showAlert({ message: 'Delete post successfully', severity: 'success' });
     };
 
     useEffect(() => {
@@ -320,6 +335,7 @@ export default function PostPage() {
             <DeletePostConfirmDialog
                 open={state?.openDeletePostConfirmDialog || false}
                 onClose={() => setState({ ...state, openDeletePostConfirmDialog: false })}
+                onConfirm={handleDeletePost}
                 post={state?.deletedPost}
             />
             <ChangePrivacyDialog

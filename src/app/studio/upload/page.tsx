@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Card, Grid2, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, Grid2, Stack, Switch, TextField, Typography } from "@mui/material";
 import { useEffect, useState, useMemo } from "react";
 import * as React from 'react';
 import Image from "next/legacy/image";
@@ -12,7 +12,8 @@ import HashtagInput from "./components/hashtag-input";
 import WhoCanWatchViewSelect from "./components/who-can-see-select";
 import ThumbnailUploadButton from "./components/thumbnail-upload-button";
 import { useAppContext } from "@/contexts/app-context";
-import CircularProgressWithLabel from "@/core/components/circular-progess-with-label";
+import CircularProgressWithLabel from "@/core/components/circular-progress-with-label";
+import { useRouter } from "next/navigation";
 
 interface VideoFileMetadata {
     size?: string;
@@ -25,6 +26,7 @@ interface State {
     description?: string;
     hashtags?: string[];
     visibility?: string;
+    isCommentOff?: boolean;
     playlist?: string;
     thumbnailFile?: File;
     videoFile?: File;
@@ -36,6 +38,7 @@ interface State {
 export interface UploadVideoPageState extends State { }
 
 export default function UploadVideoPage() {
+    const router = useRouter();
     const { showAlert } = useAppContext();
     const [state, setState] = useState<State>();
 
@@ -105,17 +108,21 @@ export default function UploadVideoPage() {
 
         const result = await postVideo({
             title: state?.title as string,
-            isPrivate: state?.visibility === 'private',
+            isPrivate: state?.visibility === 'Only me',
+            commentOff: state?.isCommentOff,
             videoFile: state?.videoFile as File,
             thumbnailFile: state?.thumbnailFile,
             description: state?.description,
             tags: state?.hashtags,
-        }, (progress) => {
-            console.log('progress', progress);
-        });
+            playlistId: state?.playlist,
+        }, (progress) => { });
 
         if (result.success) {
             setState({ ...state, isUploading: false, success: true });
+            showAlert({ message: 'Video uploaded successfully', severity: 'success' });
+            setTimeout(() => {
+                router.push('/studio/post');
+            }, 1000);
         } else {
             showAlert({ message: result.message, severity: 'error' });
             setState({ ...state, isUploading: false });
@@ -303,7 +310,33 @@ export default function UploadVideoPage() {
                         {/* Set thumbnail button */}
                         <ThumbnailUploadButton onChange={(file) => setState({ ...state, thumbnailFile: file })} />
                         {/* Who can view video */}
-                        <WhoCanWatchViewSelect />
+                        <WhoCanWatchViewSelect
+                            options={['Everyone', 'Only me']}
+                            onChange={(privacy) => setState({ ...state, visibility: privacy })}
+                            privacy={state?.visibility}
+                        />
+                        <Stack direction={'row'} sx={{
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                        }}>
+                            <Typography fontWeight="bold" mb={1}>
+                                Allow comments
+                            </Typography>
+                            <Switch
+                                checked={state?.isCommentOff ? false : true}
+                                onChange={(e) => setState({ ...state, isCommentOff: !e.target.checked })}
+                                sx={{
+                                    color: 'black',
+                                    '& .MuiSwitch-switchBase.Mui-checked': {
+                                        color: '#EA284E',
+                                    },
+                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                        backgroundColor: 'pink',
+                                    },
+                                }}
+                            />
+                        </Stack>
                         {/* Playlist */}
                         <PlayListSelect onSelected={(playlistId) => {
                             setState({ ...state, playlist: playlistId });

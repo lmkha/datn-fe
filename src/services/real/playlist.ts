@@ -34,3 +34,10 @@ export const addVideoToPlayList = async (data: {
 }) => {
     return playlistAPI.addVideoToPlaylist(data);
 };
+
+export const removeVideoFromPlaylist = async (data: {
+    playlistId: string;
+    videoId: string;
+}) => {
+    return playlistAPI.removeVideoFromPlaylist(data);
+};

@@ -268,6 +268,44 @@ export const getAllMyVideoComments = async (repliedFilter: 'all' | 'replied' | '
     };
 };
 
+export const getAllMyVideoCommentsByVideoId = async (videoId: string, repliedFilter: 'all' | 'replied' | 'not-replied' = 'all') => {
+    const result = await commentAPI.getAllMyVideoComments({ pageNumber: 0, pageSize: 1000, repliedFilter: repliedFilter, videoId: videoId });
+    if (!result.success) return {
+        success: false,
+        message: result.message,
+        comments: []
+    }
+
+    const comments = await Promise.all(
+        (result.comments || []).map(async (comment: any) => {
+            const { user } = await getPublicUserId({ userId: comment.userId });
+            const isLiked = await isCommentLiked(comment.id);
+            return {
+                parentId: comment.replyTo || null,
+                id: comment.id,
+                content: comment.content,
+                likes: comment.likeCount,
+                childrenIds: comment.replies || [],
+                replyCount: comment.replyCount,
+                videoId: comment.videoId,
+                userId: comment.userId,
+                username: user?.username || "Anonymous",
+                userAvatar: user?.profilePic || null,
+                createdAt: comment.createdAt,
+                updatedAt: comment.updatedAt,
+                isEdited: comment.isEdited,
+                isLiked: isLiked?.isLiked || false,
+            };
+        })
+    );
+
+    return {
+        success: result.success,
+        message: result.message,
+        comments,
+    };
+};
+
 export const getCommentsByVideoId = async (videoId: string): Promise<{
     success: boolean;
     message: string;

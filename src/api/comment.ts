@@ -216,7 +216,7 @@ class Comment extends Base {
         }
     }
 
-    async getAllMyVideoComments(params: { pageSize?: number, pageNumber?: number, repliedFilter?: 'all' | 'replied' | 'not-replied' }) {
+    async getAllMyVideoComments(params: { pageSize?: number, pageNumber?: number, repliedFilter?: 'all' | 'replied' | 'not-replied', videoId?: string }) {
         const defaultRepliedFilter = 'all';
         try {
             const response = await this.get({
@@ -224,7 +224,8 @@ class Comment extends Base {
                 params: {
                     page: params.pageNumber,
                     size: params.pageSize,
-                    repliedFilter: params.repliedFilter || defaultRepliedFilter
+                    repliedFilter: params.repliedFilter || defaultRepliedFilter,
+                    videoId: params.videoId
                 }
             });
             return {
@@ -240,7 +241,6 @@ class Comment extends Base {
             }
         }
     }
-
 }
 
 const commentAPI = new Comment();

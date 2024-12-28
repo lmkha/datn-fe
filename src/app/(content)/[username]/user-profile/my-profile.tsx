@@ -1,12 +1,11 @@
 'use client';
 
 import { Box, Button, Grid2, Stack, Typography } from "@mui/material";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useEffect, useState } from "react";
 import { getPublicUserByUsername } from "@/services/real/user";
 import { getVideosByUserId } from "@/services/real/video";
-import { CldImage } from 'next-cloudinary';
 import MyTabs, { Tab } from "../../components/tabs";
 import Filter from "../../components/filter";
 import VideoItem from "../components/video-item";

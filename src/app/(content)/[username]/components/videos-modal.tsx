@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import { getVideoByVideoId } from '@/services/real/video';
 import VideoThumbnail from '@/core/components/video-thumbnail';
+import { get } from '@/hooks/use-local-storage';
 
 const style = {
     position: 'absolute',
@@ -39,6 +40,7 @@ interface State {
 
 export default function VideosModal(props: VideosModalProps) {
     const [state, setState] = React.useState<State>();
+    const user = get<any>('user');
 
     const fetchData = async () => {
         if (!props?.videoIds || props?.videoIds?.length === 0) {
@@ -49,9 +51,16 @@ export default function VideosModal(props: VideosModalProps) {
             const promises = props.videoIds.map((videoId) => getVideoByVideoId(videoId));
             const responses = await Promise.all(promises);
 
-            const videos = responses
+            // const videos = responses
+            //     .filter((response) => response.success && response.data)
+            //     .map((response) => response.data);
+            let videos = responses
                 .filter((response) => response.success && response.data)
                 .map((response) => response.data);
+
+            if (!user || user?.username !== props.username) {
+                videos = videos.filter((video) => video?.isPrivate !== true);
+            }
 
             setState((state) => ({
                 ...state,

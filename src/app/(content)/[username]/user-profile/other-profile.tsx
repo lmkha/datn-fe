@@ -1,17 +1,14 @@
 'use client';
 
-import { Avatar, Box, Button, Grid2, Stack, Typography } from "@mui/material";
-import SettingsIcon from '@mui/icons-material/Settings';
+import { Box, Button, Grid2, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { followUser, getPublicUserByUsername, isFollowing, unFollowUser } from "@/services/real/user";
-import { getVideosByUserId } from "@/services/real/video";
-import { CldImage } from 'next-cloudinary';
+import { getVideosOfOtherByUserId } from "@/services/real/video";
 import MyTabs, { Tab } from "../../components/tabs";
 import Filter from "../../components/filter";
 import VideoItem from "../components/video-item";
 import PlaylistItem from "../components/playlist-item";
 import LikedVideo from "../components/liked-video-item";
-import { get } from "@/hooks/use-local-storage";
 import UserAvatar from "@/core/components/avatar";
 import { getAllPlaylistByUserId } from "@/services/real/playlist";
 
@@ -39,7 +36,7 @@ export default function OtherProfile({ username }: OtherProfileProps) {
                         ...prevState,
                         user: result.user,
                     }));
-                    getVideosByUserId(result.user.id).then((videosResult) => {
+                    getVideosOfOtherByUserId(result.user.id).then((videosResult) => {
                         setState((prevState) => ({
                             ...prevState,
                             user: result.user,

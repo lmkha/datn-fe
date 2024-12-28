@@ -12,6 +12,7 @@ import { formatNumberToShortText } from "@/core/logic/format";
 interface DeletePostConfirmDialogProps {
     open: boolean;
     onClose: () => void;
+    onConfirm?: () => void;
     post?: any;
 }
 export default function DeletePostConfirmDialog(props: DeletePostConfirmDialogProps) {
@@ -110,7 +111,7 @@ export default function DeletePostConfirmDialog(props: DeletePostConfirmDialogPr
                     <Typography variant="body1" fontWeight={'bold'}>Cancel</Typography>
                 </Button>
                 <Button
-                    onClick={props.onClose}
+                    onClick={props.onConfirm}
                     autoFocus
                     variant="contained"
                     sx={{

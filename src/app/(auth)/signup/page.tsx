@@ -97,7 +97,16 @@ export default function SignUpPage() {
                 }}
             >
                 {/* Branding Header */}
-                <Typography variant="h4" sx={{ fontWeight: 600, color: '#EA284E', marginBottom: 1 }}>
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontWeight: 600,
+                        color: '#EA284E',
+                        marginBottom: 1,
+                        cursor: 'pointer',
+                    }}
+                    onClick={() => router.push('/')}
+                >
                     MeTube
                 </Typography>
                 <Typography variant="subtitle1" sx={{ fontWeight: 400, color: 'gray', marginBottom: 2 }}>

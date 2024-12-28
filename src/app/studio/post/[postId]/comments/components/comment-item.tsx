@@ -9,13 +9,63 @@ import SendIcon from '@mui/icons-material/Send';
 import { formatNumberToShortText, formatTimeToShortText } from "@/core/logic/format";
 import UserAvatar from "@/core/components/avatar";
 import { get } from "@/hooks/use-local-storage";
+import { useRouter } from "next/navigation";
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import VideoThumbnail from "@/core/components/video-thumbnail";
 
+interface State {
+    openReply?: boolean;
+    updateContent?: string;
+    replyContent?: string;
+    editMode?: boolean;
+}
 
 interface CommentItemProps {
     comment?: any;
+    onDelete?: (comment: any) => void;
+    onReply?: (videoId: string, commentId: string, content: string) => void;
+    onLike?: (commentId: string, isLike: boolean) => void;
+    onUpdate?: (commentId: string, content: string) => void;
 };
 export default function CommentItem(props: CommentItemProps) {
-    const [openReply, setOpenReply] = useState(false);
+    const [state, setState] = useState<State>();
+    const myUserId = get<any>('user')?.id;
+    const router = useRouter();
+
+    const handleReply = () => {
+        if (!state?.replyContent || state?.replyContent.length === 0) return;
+        setState({ replyContent: '' });
+        // Reply child comment
+        if (props?.comment?.parentId) {
+            props?.onReply && props?.onReply(props?.comment?.videoId, props?.comment?.parentId, state?.replyContent);
+            return;
+        }
+        // Reply parent comment
+        if (props?.comment?.id) {
+            props?.onReply && props?.onReply(props?.comment?.videoId, props?.comment?.id, state?.replyContent);
+            return;
+        }
+    };
+
+    const handleChangeEditMode = () => {
+        setState({
+            ...state,
+            editMode: !state?.editMode,
+            updateContent: props?.comment?.content,
+        });
+    };
+
+    const handleUpdate = () => {
+        if (!state?.updateContent || state?.updateContent.length === 0) return;
+        props?.onUpdate && props?.onUpdate(props?.comment?.id, state?.updateContent);
+        setState({ ...state, editMode: false });
+    };
+
+    const handleLike = () => {
+        props?.onLike && props?.onLike(props?.comment?.id, !props?.comment?.isLiked);
+    };
     return (
         <>
             <Grid2 container direction={'row'} spacing={2} sx={{
@@ -50,25 +100,58 @@ export default function CommentItem(props: CommentItemProps) {
                                         </Typography>
                                     </Stack>
                                     {/* Content */}
-                                    <Typography
-                                        variant="body2"
-                                        style={{
-                                            display: '-webkit-box',
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            WebkitLineClamp: 2,
-                                            whiteSpace: 'normal',
-                                        }}
-                                    >{props?.comment?.content}</Typography>
+                                    {!state?.editMode ?
+                                        (<Typography
+                                            variant="body2"
+                                            style={{
+                                                display: '-webkit-box',
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                WebkitLineClamp: 2,
+                                                whiteSpace: 'normal',
+                                            }}
+                                        >{props?.comment?.content}</Typography>) :
+                                        (<TextField
+                                            size="small"
+                                            value={state?.updateContent}
+                                            onChange={(e) => setState({ ...state, updateContent: e.target.value })}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                                            placeholder="Edit your comment"
+                                            sx={{
+                                                '.MuiOutlinedInput-notchedOutline': {
+                                                    border: 'none',
+                                                },
+                                            }}
+                                            slotProps={{
+                                                input: {
+                                                    endAdornment:
+                                                        <IconButton
+                                                            disabled={!state?.updateContent || state?.updateContent.length === 0}
+                                                            onClick={handleUpdate}
+                                                            sx={{
+                                                                backgroundColor: '#E0E0E0',
+                                                                color: state?.updateContent && state?.updateContent.length > 0 ? '#EA284E' : 'gray',
+                                                            }}
+                                                        >
+                                                            <SendIcon />
+                                                        </IconButton>,
+                                                    sx: {
+                                                        borderRadius: '10px',
+                                                        backgroundColor: '#E0E0E0',
+                                                    }
+                                                }
+                                            }}
+                                        />)
+                                    }
                                 </Box>
                                 {/* Metrics */}
                                 <Stack direction={'row'} alignItems={'center'} spacing={2}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        {formatTimeToShortText(props?.comment?.createdAt)}
-                                    </Typography>
+                                    {/* Time */}
+                                    <Typography variant="body2" color="textSecondary">{formatTimeToShortText(props?.comment?.createdAt)}</Typography>
+                                    {/* Reply */}
                                     <Button
-                                        onClick={() => setOpenReply(!openReply)}
+                                        onClick={() => setState({ ...state, openReply: !state?.openReply })}
                                         sx={{
                                             textTransform: 'none',
                                             fontWeight: 'bold',
@@ -77,13 +160,30 @@ export default function CommentItem(props: CommentItemProps) {
                                         startIcon={<ChatBubbleOutlineOutlinedIcon sx={{ fontWeight: 'bold' }} />}>
                                         Reply
                                     </Button>
+                                    {/* Like */}
                                     <Stack direction={'row'} justifyContent={'center'} alignItems={'center'}>
-                                        <IconButton>
-                                            <FavoriteBorderOutlinedIcon />
+                                        <IconButton onClick={handleLike}>
+                                            {props?.comment?.isLiked ? <FavoriteRoundedIcon sx={{ color: '#EA284E' }} /> : <FavoriteBorderOutlinedIcon />}
                                         </IconButton>
                                         <Typography variant="body2" color="textSecondary">{formatNumberToShortText(props?.comment?.likes)}</Typography>
                                     </Stack>
+
+                                    {props?.comment?.userId === myUserId && (
+                                        <Button
+                                            onClick={handleChangeEditMode}
+                                            sx={{
+                                                textTransform: 'none',
+                                                color: 'gray'
+                                            }}
+                                            startIcon={<EditIcon sx={{ fontWeight: 'bold' }} />}>
+                                            Edit
+                                        </Button>
+                                    )}
+
                                     <Button
+                                        onClick={() => {
+                                            props?.onDelete && props?.onDelete(props?.comment);
+                                        }}
                                         sx={{
                                             textTransform: 'none',
                                             color: 'gray'
@@ -93,7 +193,7 @@ export default function CommentItem(props: CommentItemProps) {
                                     </Button>
                                 </Stack>
                                 {/* Reply input */}
-                                {openReply && (
+                                {state?.openReply && (
                                     <TextField
                                         size="small"
                                         placeholder="Reply to this comment"

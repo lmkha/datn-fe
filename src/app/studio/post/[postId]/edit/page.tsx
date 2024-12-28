@@ -10,7 +10,7 @@ import WhoCanWatchViewSelect from "./components/privacy-select";
 import PlayListSelect from "./components/playlist-select";
 import HashtagInput from "./components/hashtag";
 import { useAppContext } from "@/contexts/app-context";
-import CircularProgressWithLabel from "@/core/components/circular-progess-with-label";
+import CircularProgressWithLabel from "@/core/components/circular-progress-with-label";
 
 interface State {
     title?: string;

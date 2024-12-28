@@ -67,7 +67,7 @@ class Playlist extends Base {
         videoId: string,
     }) {
         try {
-            const response = await this.patch({ url: `/playlists/${data.playlistId}/?videoId=${data.videoId}` });
+            const response = await this.patch({ url: `/playlists/${data.playlistId}/add?videoId=${data.videoId}` });
             return {
                 success: response.success,
                 message: response.message,

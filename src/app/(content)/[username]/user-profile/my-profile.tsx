@@ -154,7 +154,7 @@ export default function MyProfile({ username }: MyProfileProps) {
             }}>
                 <Grid2 size={6}>
                     <MyTabs
-                        isMyProfile={true}
+                        // isMyProfile={true}
                         onTabChange={(tab: Tab) => setState((prevState) => ({ ...prevState, selectedTab: tab }))}
                     />
                 </Grid2>

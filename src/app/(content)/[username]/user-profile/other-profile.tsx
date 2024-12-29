@@ -169,53 +169,59 @@ export default function OtherProfile({ username }: OtherProfileProps) {
                     </Box>
                 </Grid2>
             </Grid2>
-            {/* Section 2: Tabs, filter */}
-            <Grid2 container direction={'row'} sx={{
-                borderBottom: '1px solid lightgray',
-            }}>
-                <Grid2 size={6}>
-                    <MyTabs
-                        onTabChange={(tab: Tab) => setState((prevState) => ({ ...prevState, selectedTab: tab }))}
-                    />
-                </Grid2>
-                <Grid2 size={6} sx={{
-                    display: 'flex',
-                    justifyContent: 'end',
-                    alignItems: 'start',
-                }}>
-                    <Filter />
-                </Grid2>
-            </Grid2>
-            {/* Section 3: Videos or playlists */}
-            <Box >
-                <Grid2 container spacing={2}>
-                    {
-                        state?.selectedTab === 'videos' ?
-                            (state?.videos && state?.videos.map((video, index) =>
-                                <VideoItem
-                                    videoId={video.id}
-                                    username={state.user?.username || ''}
-                                    key={index}
-                                    index={index}
-                                    title={video.title}
-                                    description={video.description}
-                                    thumbnail={video.thumbnailUrl}
+            {state?.user?.isPrivate ?
+                (<Typography>This account is private</Typography>) :
+                (<>
+                    {/* Section 2: Tabs, filter */}
+                    <Grid2 container direction={'row'} sx={{
+                        borderBottom: '1px solid lightgray',
+                    }}>
+                        <Grid2 size={6}>
+                            <MyTabs
+                                onTabChange={(tab: Tab) => setState((prevState) => ({ ...prevState, selectedTab: tab }))}
+                            />
+                        </Grid2>
+                        <Grid2 size={6} sx={{
+                            display: 'flex',
+                            justifyContent: 'end',
+                            alignItems: 'start',
+                        }}>
+                            <Filter />
+                        </Grid2>
+                    </Grid2>
+                    {/* Section 3: Videos or playlists */}
+                    <Box >
+                        <Grid2 container spacing={2}>
+                            {
+                                state?.selectedTab === 'videos' ?
+                                    (state?.videos && state?.videos.map((video, index) =>
+                                        <VideoItem
+                                            videoId={video.id}
+                                            username={state.user?.username || ''}
+                                            key={index}
+                                            index={index}
+                                            title={video.title}
+                                            description={video.description}
+                                            thumbnail={video.thumbnailUrl}
 
-                                />)
-                            ) : state.selectedTab === 'playlists' ? (
-                                state?.playlists && state.playlists.map((playlist, index) =>
-                                    <PlaylistItem
-                                        key={playlist.id}
-                                        playlist={playlist}
-                                        username={username}
-                                    />)
-                            ) : (
-                                // Liked videos
-                                ([...Array(10)].map((_, index) => <LikedVideo key={index} index={index} />))
-                            )
-                    }
-                </Grid2>
-            </Box>
+                                        />)
+                                    ) : state.selectedTab === 'playlists' ? (
+                                        state?.playlists && state.playlists.map((playlist, index) =>
+                                            <PlaylistItem
+                                                key={playlist.id}
+                                                playlist={playlist}
+                                                username={username}
+                                            />)
+                                    ) : (
+                                        // Liked videos
+                                        ([...Array(10)].map((_, index) => <LikedVideo key={index} index={index} />))
+                                    )
+                            }
+                        </Grid2>
+                    </Box>
+                </>)
+            }
+
         </Stack>)
     );
 }

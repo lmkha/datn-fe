@@ -267,7 +267,7 @@ export default function EditProfilePage() {
                                 justifyContent: 'center',
                             }}>
                                 <Button
-                                    disabled={state.success || state.updating || !state.fullName || !state.dateOfBirth || !state.phone}
+                                    disabled={state.success || state.updating || !state.fullName}
                                     onClick={handleSave}
                                     variant="contained"
                                     sx={{

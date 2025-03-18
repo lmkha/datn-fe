@@ -1,6 +1,6 @@
 import { isEmailTaken, isUsernameTaken } from "@/services/real/auth";
 
-export async function isValidEmail(email?: string, checkExist: boolean = true): Promise<string | null> {
+export async function isValidEmail(email?: string, expectToExist: boolean = true): Promise<string | null> {
     if (!email) {
         return 'Email is required';
     }
@@ -9,16 +9,16 @@ export async function isValidEmail(email?: string, checkExist: boolean = true): 
         return 'Email is not valid';
     }
     const isTaken = await isEmailTaken(email);
-    if (checkExist && !isTaken) {
+    if (expectToExist && !isTaken) {
         return 'Email is not registered';
     }
-    if (!checkExist && isTaken) {
+    if (!expectToExist && isTaken) {
         return 'Email is already taken';
     }
     return null;
 };
 
-export async function isValidUsername(username?: string, checkExist: boolean = true): Promise<string | null> {
+export async function isValidUsername(username?: string, expectToExist: boolean = true): Promise<string | null> {
     if (!username) {
         return 'Username is required';
     }
@@ -27,10 +27,10 @@ export async function isValidUsername(username?: string, checkExist: boolean = t
         return 'Invalid username';
     }
     const isTaken = await isUsernameTaken(username);
-    if (!checkExist && isTaken) {
+    if (!expectToExist && isTaken) {
         return 'Username is already taken';
     }
-    if (checkExist && !isTaken) {
+    if (expectToExist && !isTaken) {
         return 'Username does not exist';
     }
     return null;

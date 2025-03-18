@@ -19,7 +19,7 @@ export async function validateSignUpForm(state: SignUpPageState): Promise<SignUp
         }
     });
 
-    await isValidUsername(state.username).then((error) => {
+    await isValidUsername(state.username, false).then((error) => {
         if (error) {
             errors.push({ field: 'username', message: error });
         }

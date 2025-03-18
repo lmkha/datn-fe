@@ -8,62 +8,32 @@ class Video extends Base {
         description?: string,
         tags?: string[],
     }) {
-        try {
-            const response = await this.post({ url: "/videos/new/", data });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Upload video meta data failed",
-            }
-        }
+        const response = await this.post<any>({
+            url: "/videos/new/",
+            data: data,
+        });
+        return response.data;
     }
 
     async getVideoMetaData(params: { videoId: string }) {
-        try {
-            const response = await this.get({
-                url: `/videos/metaData/${params.videoId}`,
-                authRequired: false
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get video meta data failed",
-            }
-        }
+        const response = await this.get({
+            url: `/videos/metaData/${params.videoId}`,
+            authRequired: false,
+        });
+        return response.data;
     }
 
     async uploadThumbnail(data: {
         file: File,
         videoId: string,
     }) {
-        try {
-            const formData = new FormData();
-            formData.append("file", data.file);
-            const response = await this.post({
-                url: `/videos/${data.videoId}/thumbnail`,
-                data: formData,
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Upload video thumbnail failed",
-            }
-        }
+        const formData = new FormData();
+        formData.append("file", data.file);
+        const response = await this.post<any>({
+            url: `/videos/${data.videoId}/thumbnail`,
+            data: formData,
+        })
+        return response.data
     }
 
     async uploadVideoFile(
@@ -73,73 +43,40 @@ class Video extends Base {
         },
         progressCallback?: (progress: number) => void
     ) {
-        try {
-            const formData = new FormData();
-            formData.append("file", data.file);
-            const response = await this.post({
-                url: `/file/video/${data.videoId}`,
-                data: formData,
-                config: {
-                    timeout: 300000,
-                    onUploadProgress(progressEvent) {
-                        if (progressEvent.lengthComputable && progressEvent.total) {
-                            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                            if (progressCallback) {
-                                progressCallback(progress);
-                            }
+        const formData = new FormData();
+        formData.append("file", data.file);
+        const response = await this.post<any>({
+            url: `/file/video/${data.videoId}`,
+            data: formData,
+            config: {
+                timeout: 300000,
+                onUploadProgress(progressEvent) {
+                    if (progressEvent.lengthComputable && progressEvent.total) {
+                        const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        if (progressCallback) {
+                            progressCallback(progress);
                         }
-                    },
-                }
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
+                    }
+                },
             }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Upload video file failed",
-            }
-        }
+        })
+        return response.data
     }
 
     async getVideosByUserId(params: { userId: string }) {
-        try {
-            const response = await this.get({
-                url: `/videos/user/${params.userId}`,
-                authRequired: false,
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get videos by user id failed",
-            }
-        }
+        const response = await this.get<any>({
+            url: `/videos/user/${params.userId}`,
+            authRequired: false,
+        })
+        return response.data
     }
 
     async getVideoByVideoId(params: { videoId: string }) {
-        try {
-            const response = await this.get({
-                url: `/videos/${params.videoId}`,
-                authRequired: false,
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get video by video id failed",
-            }
-        }
+        const response = await this.get<any>({
+            url: `/videos/${params.videoId}`,
+            authRequired: false,
+        });
+        return response.data
     }
 
     async updateVideoMetaData(data: {
@@ -150,104 +87,42 @@ class Video extends Base {
         isPrivate: boolean,
         isCommentOff: boolean,
     }) {
-        try {
-            const response = await this.put({ url: '/videos', data });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Update video meta data failed",
-            }
-        }
+        const response = await this.put<any>({
+            url: "/videos",
+            data: data
+        })
+        return response.data
     }
 
     async deleteVideo(params: { videoId: string }) {
-        try {
-            const response = await this.delete({ url: `/videos/${params.videoId}` });
-            return {
-                success: response.success,
-                message: response.message,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Delete video failed",
-            }
-        }
+        const response = await this.delete({ url: `/videos/${params.videoId}` })
+        return response.data
     };
 
     // Like video
     async likeAVideo(params: { videoId: string }) {
-        try {
-            const response = await this.post({ url: `/videos/likes/${params.videoId}` });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Like video failed",
-            }
-        }
+        const response = await this.post({ url: `/videos/likes/${params.videoId}` })
+        return response.data
     }
 
     async unLikeAVideo(params: { videoId: string }) {
-        try {
-            const response = await this.delete({ url: `/videos/likes/${params.videoId}` });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Unlike video failed",
-            }
-        }
+        const response = await this.delete({ url: `/videos/likes/${params.videoId}` });
+        return response.data
     }
 
     async isLikedAVideo(params: { videoId: string }) {
-        try {
-            const response = await this.get({ url: `/videos/likes/${params.videoId}` });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Check like video failed",
-            }
-        }
+        const response = await this.get({ url: `/videos/likes/${params.videoId}` });
+        return response.data
     }
 
     // Get video for home page
     async getVideosForHomePage(params: { count: number }) {
-        try {
-            const response = await this.get({
-                url: "videos/random",
-                params: params,
-                authRequired: false,
-            })
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get videos for home page failed",
-            }
-        }
+        const response = await this.get<any>({
+            url: "videos/random",
+            params: params,
+            authRequired: false,
+        })
+        return response.data
     }
 
     // Search video
@@ -256,23 +131,12 @@ class Video extends Base {
         pattern: string,
         count: number,
     }) {
-        try {
-            const response = await this.get({
-                url: "videos/search",
-                params: params,
-                authRequired: false,
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            };
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Search videos failed",
-            }
-        }
+        const response = await this.get<any>({
+            url: "videos/search",
+            params: params,
+            authRequired: false,
+        })
+        return response.data
     }
 }
 

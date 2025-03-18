@@ -5,10 +5,11 @@ import Cookies from "js-cookie";
 
 export const login = async ({ username, password }: { username: string, password: string }) => {
     const result = await auth.login({ username, password });
-    if (result.success) {
-        setAccessToken(result.token);
+    if (result.success && result.data) {
+        const token = result.data
+        setAccessToken(token);
 
-        Cookies.set("accessToken", result.token, {
+        Cookies.set("accessToken", token, {
             expires: 7,
             secure: false,
             sameSite: "lax",
@@ -35,11 +36,15 @@ export const logout = () => {
 }
 
 export const isUsernameTaken = async (username: string) => {
-    return (await auth.checkUsernameExist({ username })).success;
+    const res = await auth.checkUsernameExist({ username })
+    const result = res.success && res.data?.isExisted == true
+    return result
 }
 
 export const isEmailTaken = async (email: string) => {
-    return (await auth.checkEmailExist({ email })).success;
+    const res = await auth.checkEmailExist({ email })
+    const result = res.success && res.data?.isExisted
+    return result
 }
 
 export const createAccount = async (data: { fullName: string, email: string, username: string, password: string }) => {

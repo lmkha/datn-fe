@@ -1,6 +1,6 @@
 import axiosInstance from "@/configs/axios-instance";
 import { get } from "@/hooks/use-local-storage";
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, AxiosResponse } from "axios";
 
 type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
 
@@ -13,18 +13,33 @@ interface RequestOptions {
     authRequired?: boolean;
 }
 
-class Base {
-    private async execute(options: RequestOptions) {
-        const { method = "get", url, data, params, config = {}, authRequired = true } = options;
+interface Response<T> {
+    success: boolean;
+    message: string;
+    data?: T;
+}
 
-        if (!url || url.trim() === "") {
-            return null;
-        }
+interface SuccessResponse<T> extends Response<T> {
+    success: true;
+    data: T;
+}
+
+interface ErrorResponse extends Response<undefined> {
+    success: false;
+}
+
+interface CustomAxiosResponse<T> extends AxiosResponse {
+    data: Response<T>;
+}
+
+class Base {
+    private async execute<T>(options: RequestOptions): Promise<CustomAxiosResponse<T>> {
+        const { method = "get", url, data, params, config = {}, authRequired = true } = options;
 
         try {
             const updatedConfig: AxiosRequestConfig = { ...config };
             if (authRequired) {
-                const accessToken = get("accessToken");
+                const accessToken = await get("accessToken");
                 if (accessToken) {
                     updatedConfig.headers = {
                         ...updatedConfig.headers,
@@ -33,37 +48,44 @@ class Base {
                 }
             }
 
-            const response = await axiosInstance({
-                method,
-                url,
-                data,
-                params,
-                ...updatedConfig,
-            });
+            const response = await axiosInstance({ method, url, data, params, ...updatedConfig });
 
-            return response.data;
-        } catch (err) {
-            throw err;
+            return {
+                ...response,
+                data: {
+                    success: true,
+                    message: response?.data?.message || '',
+                    data: response?.data?.data as T
+                } as SuccessResponse<T>
+            };
+        } catch (err: any) {
+            return {
+                ...err.response,
+                data: {
+                    success: false,
+                    message: err?.response?.data?.message || 'Something went wrong'
+                } as ErrorResponse
+            };
         }
     }
 
-    async put(options: Omit<RequestOptions, "method">) {
+    async put<T>(options: Omit<RequestOptions, "method">): Promise<CustomAxiosResponse<T>> {
         return this.execute({ ...options, method: "put" });
     }
 
-    async get(options: Omit<RequestOptions, "method" | "data">) {
+    async get<T>(options: Omit<RequestOptions, "method" | "data">): Promise<CustomAxiosResponse<T>> {
         return this.execute({ ...options, method: "get" });
     }
 
-    async post(options: Omit<RequestOptions, "method">) {
+    async post<T>(options: Omit<RequestOptions, "method">): Promise<CustomAxiosResponse<T>> {
         return this.execute({ ...options, method: "post" });
     }
 
-    async delete(options: Omit<RequestOptions, "method">) {
+    async delete<T>(options: Omit<RequestOptions, "method">): Promise<CustomAxiosResponse<T>> {
         return this.execute({ ...options, method: "delete" });
     }
 
-    async patch(options: Omit<RequestOptions, "method">) {
+    async patch<T>(options: Omit<RequestOptions, "method">): Promise<CustomAxiosResponse<T>> {
         return this.execute({ ...options, method: "patch" });
     }
 }

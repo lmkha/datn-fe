@@ -79,7 +79,7 @@ export const getVideosOfOtherByUserId = async (userId: string) => {
 
 export const getVideoByVideoId = async (videoId: string) => {
     const response = await videoAPI.getVideoByVideoId({ videoId });
-    return response;
+    return response.data;
 };
 
 export const getVideosForHomePage = async (data: { count: number } = { count: 20 }): Promise<{

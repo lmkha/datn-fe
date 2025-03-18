@@ -2,244 +2,146 @@ import Base from "./base";
 
 class Comment extends Base {
     async addComment(data: { videoId: string, replyTo?: string, content: string }) {
-        try {
-            const response = await this.post({
-                url: '/comments/',
-                data: data
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                newComment: response.data
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Add comment failed",
-            }
+        const response = await this.post<any>({
+            url: '/comments/',
+            data: data,
+        });
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            newComment: response.data?.data,
         }
+
+        return result;
     }
 
     async deleteComment(params: { commentId: string }) {
-        try {
-            const response = await this.delete({ url: `/comments/${params.commentId}` });
-            return {
-                success: response.success,
-                message: response.message,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Delete comment failed",
-            }
-        }
+        const response = await this.delete({ url: `/comments/${params.commentId}` });
+        return response.data;
     }
 
     async updateComment(data: { id: string, content: string }) {
-        try {
-            const response = await this.put({
-                url: '/comments',
-                data: data
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                updatedComment: response.data
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Update comment failed",
-            }
+        const response = await this.put<any>({
+            url: '/comments',
+            data: data,
+        });
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            updatedComment: response.data?.data,
         }
+
+        return result;
     }
 
     // Get a comment by id
     async getCommentById(params: { commentId: string }) {
-        try {
-            const response = await this.get({
-                url: `/comments/${params.commentId}`,
-                authRequired: false
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                comment: response.data
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get comment by id failed",
-                comment: null
-            }
+        const response = await this.get<any>({
+            url: `/comments/${params.commentId}`,
+            authRequired: false
+        });
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            comment: response.data?.data,
         }
+
+        return result;
     }
 
     // Get parent comments of a video
     async getParentCommentsOfVideo(params: { videoId: string, order?: 'oldest' | 'newest' }) {
-        try {
-            const response = await this.get({
-                url: `/comments/video/parent/${params.videoId}`,
-                params: {
-                    order: params?.order ? params.order : "newest"
-                },
-                authRequired: false
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                comments: response.data
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get parent comments failed",
-                comments: []
-            }
-        }
+        const response = await this.get<any>({
+            url: `/comments/video/parent/${params.videoId}`,
+            params: {
+                order: params?.order ? params.order : "newest"
+            },
+            authRequired: false
+        });
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            comments: response.data?.data || []
+        };
+
+        return result;
     }
 
     // Get children comments of a parent comment
     async getChildrenComments(params: { commentId: string }) {
-        try {
-            const response = await this.get({
-                url: `/comments/${params.commentId}/children`,
-                authRequired: false
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                comments: response.data
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get replies failed",
-                replies: []
-            }
-        }
+        const response = await this.get<any>({
+            url: `/comments/${params.commentId}/children`,
+            authRequired: false
+        });
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            comments: response.data?.data || [],
+        };
+        return result;
     }
 
     async likeComment(params: { commentId: string }) {
-        try {
-            const response = await this.post({
-                url: `/comments/like/${params.commentId}`,
-            });
-            return {
-                success: response.success,
-                message: response.message,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Like comment failed",
-            }
-        }
+        const response = await this.post({ url: `/comments/like/${params.commentId}` });
+        return response.data;
     }
 
     async unlikeComment(params: { commentId: string }) {
-        try {
-            const response = await this.delete({
-                url: `/comments/like/${params.commentId}`,
-            });
-            return {
-                success: response.success,
-                message: response.message,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Unlike comment failed",
-            }
-        }
+        const response = await this.delete({ url: `/comments/like/${params.commentId}` });
+        return response.data;
     }
 
     async isCommentLiked(params: { commentId: string }) {
-        try {
-            const response = await this.get({
-                url: `/comments/like/${params.commentId}`,
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                isLiked: response.isLiked
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Check like failed",
-                isLiked: false
-            }
-        }
+        const response = await this.get({ url: `/comments/like/${params.commentId}` });
+        return response.data;
     }
 
     // Include both parent and children comments
     async getAllCommentByVideoId(params: { videoId: string, order?: 'oldest' | 'newest' }) {
-        try {
-            const response = await this.get({
-                url: `/comments/video/${params.videoId}`,
-                params: {
-                    order: params?.order ? params.order : "newest"
-                },
-                authRequired: false
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                comments: response.data
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get comments by video id failed",
-                comments: []
-            }
-        }
+        const response = await this.get<any>({
+            url: `/comments/video/${params.videoId}`,
+            params: {
+                order: params?.order ? params.order : "newest"
+            },
+            authRequired: false
+        });
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            comments: response.data?.data || [],
+        };
+        return result;
     }
 
     async getAllMyComments() {
-        try {
-            const response = await this.get({
-                url: '/comments/my'
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                comments: response.comments
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get my comments failed",
-                comments: []
-            }
+        const response = await this.get<any>({ url: '/comments/my' });
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            comments: response.data?.data || []
         }
+        return result;
     }
 
     async getAllMyVideoComments(params: { pageSize?: number, pageNumber?: number, repliedFilter?: 'all' | 'replied' | 'not-replied', videoId?: string }) {
         const defaultRepliedFilter = 'all';
-        try {
-            const response = await this.get({
-                url: '/comments/myVideosComments',
-                params: {
-                    page: params.pageNumber,
-                    size: params.pageSize,
-                    repliedFilter: params.repliedFilter || defaultRepliedFilter,
-                    videoId: params.videoId
-                }
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                comments: response.data
+        const response = await this.get<any>({
+            url: '/comments/myVideosComments',
+            params: {
+                page: params.pageNumber,
+                size: params.pageSize,
+                repliedFilter: params.repliedFilter || defaultRepliedFilter,
+                videoId: params.videoId
             }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get my video comments failed",
-                comments: []
-            }
+        });
+
+        const result = {
+            success: response.data.success,
+            message: response.data.message,
+            comments: response.data?.data || []
         }
+
+        return result;
     }
 }
 

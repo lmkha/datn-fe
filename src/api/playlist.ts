@@ -6,120 +6,58 @@ class Playlist extends Base {
         description: string,
         videoIdsList: string[],
     }) {
-        try {
-            const response = await this.post({
-                url: "/playlists/",
-                data: data
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Create a playlist failed",
-            }
-        }
+        const response = await this.post<any>({
+            url: "/playlists/",
+            data: data
+        });
+        return response.data;
     }
 
     async getAllPlaylistsByUserId(userId: string) {
-        try {
-            const response = await this.get({
-                url: `/playlists/user/${userId}`,
-                authRequired: false
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get all playlists by user id failed",
-            }
-        }
+        const response = await this.get<any>({
+            url: `/playlists/user/${userId}`,
+            authRequired: false
+        });
+        return response.data;
     }
 
     async getPlaylistById(playlistId: string) {
-        try {
-            const response = await this.get({
-                url: `/playlists/${playlistId}`,
-                authRequired: false
-            });
-            return {
-                success: response.success,
-                message: response.message,
-                data: response.data,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Get playlist failed",
-            }
-        }
+        const response = await this.get({
+            url: `/playlists/${playlistId}`,
+            authRequired: false
+        });
+        return response.data;
     }
 
     async addVideoToPlaylist(data: {
         playlistId: string,
         videoId: string,
     }) {
-        try {
-            const response = await this.patch({ url: `/playlists/${data.playlistId}/add?videoId=${data.videoId}` });
-            return {
-                success: response.success,
-                message: response.message,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Add video to playlist failed",
-            }
-        }
+        const response = await this.patch({ url: `/playlists/${data.playlistId}/add?videoId=${data.videoId}` });
+        return response.data;
     }
 
     async removeVideoFromPlaylist(data: {
         playlistId: string,
         videoId: string,
     }) {
-        try {
-            const response = await this.patch({ url: `/playlists/${data.playlistId}/remove?videoId=${data.videoId}` });
-            return {
-                success: response.success,
-                message: response.message,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Remove video from playlist failed",
-            }
-        }
+        const response = await this.patch({ url: `/playlists/${data.playlistId}/remove?videoId=${data.videoId}` });
+        return response.data;
     }
 
     async uploadThumbnailForPlaylist(data: {
         playlistId: string,
         thumbnailFile: File,
     }) {
-        try {
-            const formData = new FormData();
-            formData.append("img", data.thumbnailFile);
+        const formData = new FormData();
+        formData.append("img", data.thumbnailFile);
 
-            const response = await this.post({
-                url: `/playlists/${data.playlistId}/thumbnail`,
-                data: formData
-            });
-            return {
-                success: response.success,
-                message: response.message,
-            }
-        } catch (err: any) {
-            return {
-                success: false,
-                message: err?.response?.data?.message || "Upload thumbnail for playlist failed",
-            }
-        }
+        const response = await this.post({
+            url: `/playlists/${data.playlistId}/thumbnail`,
+            data: formData
+        });
+
+        return response.data;
     }
 }
 

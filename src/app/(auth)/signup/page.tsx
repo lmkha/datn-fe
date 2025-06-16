@@ -107,7 +107,7 @@ export default function SignUpPage() {
                     }}
                     onClick={() => router.push('/')}
                 >
-                    MeTube
+                    Visara
                 </Typography>
                 <Typography variant="subtitle1" sx={{ fontWeight: 400, color: 'gray', marginBottom: 2 }}>
                     Create a new account

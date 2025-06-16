@@ -73,7 +73,7 @@ function LayoutContent({
                 }}
             >
                 <Header
-                    title="MeTube"
+                    title="Visara"
                     logoClickRoute="/"
                     onOpenDrawerChange={() => setOpenDrawer(!openDrawer)}
                     onSearch={() => { }}

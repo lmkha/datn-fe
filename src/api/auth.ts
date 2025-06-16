@@ -2,8 +2,11 @@ import Base from "./base";
 
 class Auth extends Base {
     async login(data: { username: string, password: string }) {
-        const result = await this.post<string>({
-            url: "/auth/signIn",
+        const result = await this.post<{
+            accessToken: string;
+            refreshToken: string;
+        }>({
+            url: "/auth/sign-in",
             data: data,
             authRequired: false,
         })

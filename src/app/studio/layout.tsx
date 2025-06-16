@@ -63,7 +63,7 @@ function LayoutContent({
                 }}
             >
                 <Header
-                    title="MeTube Studio"
+                    title="Visara Studio"
                     logoClickRoute="/studio"
                 />
             </Box>

@@ -172,7 +172,7 @@ function Header() {
                     cursor: 'pointer',
                 }}
             >
-                MeTube
+                Visara
             </Typography>
 
             <Stack direction={'row'} spacing={1} justifyContent={'center'} alignItems={'center'}>

@@ -100,7 +100,7 @@ export default function Drawer(props: DrawerProps) {
 
                     <DrawerMenuItem
                         icon={<KeyboardBackspaceRoundedIcon />}
-                        text={'Back to MeTube'}
+                        text={'Back to Visara'}
                         sx={{ height: 50 }}
                         onClick={() => handleDrawerItemClick('GoBack')}
                         selected={props.selectedDrawerItem === 'GoBack'}

@@ -39,6 +39,14 @@ export function setAccessToken(value: string) {
     }
 }
 
+export function setRefreshToken(value: string) {
+    try {
+        window.localStorage.setItem('refreshToken', JSON.stringify(value));
+    } catch (error) {
+        console.error("Failed to save refreshToken:", error);
+    }
+}
+
 export function get<T>(key: Key): T | null {
     try {
         const storedValue = window.localStorage.getItem(key);

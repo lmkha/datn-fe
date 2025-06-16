@@ -102,7 +102,7 @@ export default function LoginForm() {
                         }
                     }}
                 >
-                    MeTube
+                    Visara
                 </Typography>
             </Stack>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>

@@ -55,7 +55,7 @@ export const postVideo = async (
 };
 
 export const getVideoStreamLink = (videoId: string) => {
-    const result = `http://localhost:8080/${videoId}/output.mpd`
+    const result = `http://localhost:8000/${videoId}/output.mpd`
     return result;
 };
 
